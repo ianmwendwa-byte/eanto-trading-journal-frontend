@@ -1,7 +1,6 @@
 import * as React from "react"
 import { NavMain } from "@/components/nav-main"
 import { NavSecondary } from "@/components/nav-secondary"
-import { NavUser } from "@/components/nav-user"
 import {
   Sidebar,
   SidebarContent,
@@ -11,7 +10,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
-import { LayoutDashboardIcon, ListIcon, ChartBarIcon, FolderIcon, UsersIcon, CameraIcon, FileTextIcon, Settings2Icon, CircleHelpIcon, SearchIcon, DatabaseIcon, FileChartColumnIcon, FileIcon, CommandIcon, LightbulbIcon, DatabaseZapIcon } from "lucide-react"
+import { LayoutDashboardIcon, ListIcon, ChartBarIcon, FolderIcon, UsersIcon, CameraIcon, FileTextIcon, Settings2Icon, CircleHelpIcon, SearchIcon, DatabaseIcon, FileChartColumnIcon, FileIcon, CommandIcon, LightbulbIcon, DatabaseZapIcon, FileChartColumnIncreasingIcon } from "lucide-react"
 
 const data = {
   user: {
@@ -24,102 +23,56 @@ const data = {
   navMain: [
     {
       title: "Dashboard",
-      url: "#",
+      url: "/dashboard",
       icon: (
         <LayoutDashboardIcon />
       ),
     },
      {
       title: "Accounts",
-      url: "#",
+      url: "/accounts",
       icon: (
         <DatabaseZapIcon />
       ),
     },
     {
       title: "Trades",
-      url: "#",
+      url: "/trades",
       icon: (
         <ListIcon />
       ),
     },
     {
+      title: "Transactions",
+      url: "/transactions",
+      icon: (
+        <FileChartColumnIncreasingIcon />
+      ),
+    },
+    {
       title: "Strategy",
-      url: "#",
+      url: "/strategies",
       icon: (
         <FileTextIcon/>
       ),
     },
     {
       title: "Analytics",
-      url: "#",
+      url: "/analytics",
       icon: (
         <ChartBarIcon/>
       ),
     },
     {
       title: "Insights",
-      url: "#",
+      url: "/insights",
       icon: (
         <LightbulbIcon/>
       ),
     },
   ],
 
-  navClouds: [
-    {
-      title: "Capture",
-      icon: (
-        <CameraIcon />
-      ),
-      isActive: true,
-      url: "#",
-      items: [
-        {
-          title: "Active Proposals",
-          url: "#",
-        },
-        {
-          title: "Archived",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Proposal",
-      icon: (
-        <FileTextIcon />
-      ),
-      url: "#",
-      items: [
-        {
-          title: "Active Proposals",
-          url: "#",
-        },
-        {
-          title: "Archived",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Prompts",
-      icon: (
-        <FileTextIcon />
-      ),
-      url: "#",
-      items: [
-        {
-          title: "Active Proposals",
-          url: "#",
-        },
-        {
-          title: "Archived",
-          url: "#",
-        },
-      ],
-    },
-  ],
+  
   navSecondary: [
    
     {
