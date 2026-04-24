@@ -9,6 +9,9 @@ const API_CONFIG = {
       LOGIN: "/auth/login",
       REGISTER: "/auth/register",
     },
+    USER: {
+      PROFILE: "/user/profile",
+    },
 
     ACCOUNT: {
       BASE: "/accounts",

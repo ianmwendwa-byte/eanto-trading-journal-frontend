@@ -15,7 +15,7 @@ export function ModeToggle() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        {/* FIX: remove Button padding mismatch */}
+     
         <div className="h-8 w-8 flex items-center justify-center rounded-md hover:bg-muted transition cursor-pointer">
           <Sun className="h-[1.2rem] w-[1.2rem] dark:hidden" />
           <Moon className="h-[1.2rem] w-[1.2rem] hidden dark:block" />
@@ -23,7 +23,7 @@ export function ModeToggle() {
         </div>
       </DropdownMenuTrigger>
 
-      {/* FIX: consistent dropdown alignment */}
+   
       <DropdownMenuContent
         align="end"
         side="bottom"

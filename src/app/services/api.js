@@ -80,6 +80,15 @@ export const authApi = {
     api.post(API_CONFIG.ENDPOINTS.AUTH.REGISTER, userData),
 }
 
+// ─── USER PROFILE ───────────────────────────────────────────────
+
+export const userApi = {
+  updateProfile: (data) =>
+    api.put(API_CONFIG.ENDPOINTS.USER.PROFILE, data),
+
+  getProfile: () =>
+    api.get(API_CONFIG.ENDPOINTS.USER.PROFILE),
+}
 // ─── ACCOUNTS ───────────────────────────────────────────────────────────────
 
 export const accountApi = {

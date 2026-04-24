@@ -7,7 +7,7 @@ import {
 } from "react"
 import { useNavigate } from "react-router-dom"
 
-import { authApi, setLogoutHandler } from "../services/api"
+import { authApi, userApi, setLogoutHandler } from "../services/api"
 
 const AuthContext = createContext(null)
 
@@ -19,6 +19,17 @@ export function AuthProvider({ children }) {
   const navigate = useNavigate()
 
   // ─────────────────────────────────────────────────────────────
+  // SESSION HELPERS
+  // ─────────────────────────────────────────────────────────────
+
+  const clearSession = () => {
+    localStorage.removeItem("token")
+    localStorage.removeItem("user")
+    setUser(null)
+    setToken(null)
+  }
+
+  // ─────────────────────────────────────────────────────────────
   // SESSION RESTORE
   // ─────────────────────────────────────────────────────────────
 
@@ -28,7 +39,9 @@ export function AuthProvider({ children }) {
       const storedToken = localStorage.getItem("token")
 
       if (storedUser && storedToken) {
-        setUser(JSON.parse(storedUser))
+        const parsedUser = JSON.parse(storedUser)
+
+        setUser(parsedUser)
         setToken(storedToken)
       }
     } catch (error) {
@@ -40,11 +53,20 @@ export function AuthProvider({ children }) {
   }, [])
 
   // ─────────────────────────────────────────────────────────────
-  // CONNECT GLOBAL LOGOUT HANDLER
+  // LOGOUT (defined early to avoid reference issues)
+  // ─────────────────────────────────────────────────────────────
+
+  const logout = () => {
+    clearSession()
+    navigate("/login")
+  }
+
+  // ─────────────────────────────────────────────────────────────
+  // CONNECT GLOBAL LOGOUT HANDLER (Axios 401)
   // ─────────────────────────────────────────────────────────────
 
   useEffect(() => {
-    setLogoutHandler(() => logout)
+    setLogoutHandler(logout)
   }, [])
 
   // ─────────────────────────────────────────────────────────────
@@ -70,9 +92,6 @@ export function AuthProvider({ children }) {
 
       return userData
     } catch (error) {
-      // IMPORTANT:
-      // Do NOT navigate or toast here
-      // Let UI handle it
       throw error
     }
   }
@@ -105,19 +124,27 @@ export function AuthProvider({ children }) {
   }
 
   // ─────────────────────────────────────────────────────────────
-  // LOGOUT
+  // UPDATE PROFILE
   // ─────────────────────────────────────────────────────────────
 
-  const clearSession = () => {
-    localStorage.removeItem("token")
-    localStorage.removeItem("user")
-    setUser(null)
-    setToken(null)
-  }
+  const updateProfile = async (data) => {
+    try {
+      const response = await userApi.updateProfile(data)
 
-  const logout = () => {
-    clearSession()
-    navigate("/login")
+      // support both response shapes
+      const updatedUser = response.user || response
+
+      if (!updatedUser) {
+        throw new Error("Invalid server response")
+      }
+
+      setUser(updatedUser)
+      localStorage.setItem("user", JSON.stringify(updatedUser))
+
+      return updatedUser
+    } catch (error) {
+      throw error
+    }
   }
 
   // ─────────────────────────────────────────────────────────────
@@ -139,6 +166,7 @@ export function AuthProvider({ children }) {
       login,
       register,
       logout,
+      updateProfile, // ✅ KEY ADDITION
     }),
     [user, token, loading, isAuthenticated]
   )
