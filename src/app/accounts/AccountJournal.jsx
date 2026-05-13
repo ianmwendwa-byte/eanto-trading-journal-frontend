@@ -106,74 +106,85 @@ export default function AccountJournal() {
   const { accountId } = useParams()
   const navigate = useNavigate()
 
-  const [loading, setLoading] = useState(true)
-  const [account, setAccount] = useState(null)
-  const [trades, setTrades] = useState([])
-  const [transactions, setTransactions] = useState([])
-  const [selectedDay, setSelectedDay] = useState(null)
-  const [open, setOpen] = useState(false)
-  const [accountDetailsOpen, setAccountDetailsOpen] = useState(false)
+   const [loading, setLoading] = useState(true)
+   const [account, setAccount] = useState(null)
+   const [trades, setTrades] = useState([])
+   const [transactions, setTransactions] = useState([])
+   const [transactionPagination, setTransactionPagination] = useState({
+     total: 0,
+     page: 1,
+     limit: 20,
+     pages: 1
+   })
+   const [selectedDay, setSelectedDay] = useState(null)
+   const [open, setOpen] = useState(false)
+   const [accountDetailsOpen, setAccountDetailsOpen] = useState(false)
 
-  // ───────────────── FETCH DATA ─────────────────
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true)
+   // Transaction filters and sort (UI state only)
+   const [txFilter, setTxFilter] = useState("all")
+   const [txSort, setTxSort] = useState({ field: "createdAt", order: "desc" })
+   const [txPage, setTxPage] = useState(1)
+   const [txLimit, setTxLimit] = useState(20)
 
-        const [accountRes, tradesRes, transactionsRes] =
-          await Promise.all([
-            accountApi.getOne(accountId),
-            tradeApi.getByAccount(accountId),
-            transactionApi.getByAccount(accountId),
-          ])
+   // Build query params string (UI state only)
+   const txQueryParams = useMemo(() => {
+     const params = new URLSearchParams()
+     params.append("page", txPage.toString())
+     params.append("limit", txLimit.toString())
+     if (txFilter !== "all") {
+       params.append("type", txFilter)
+     }
+     // Always sort by createdAt only (backend limitation)
+     params.append("sort", `${txSort.order === "desc" ? "-" : ""}createdAt`)
+     return params.toString()
+   }, [txPage, txLimit, txFilter, txSort])
 
-        setAccount(accountRes || {})
-        setTrades(tradesRes || [])
-        setTransactions(transactionsRes || [])
-      } catch (err) {
-        console.error(err)
-        toast.error(
-          err?.response?.data?.message ||
-            err?.message ||
-            "Failed to load journal data"
-        )
-      } finally {
-        setLoading(false)
-      }
-    }
+   // ───────────────── FETCH DATA ─────────────────
+   useEffect(() => {
+     const fetchData = async () => {
+       try {
+         setLoading(true)
 
-    if (accountId) {
-      fetchData()
-    }
-  }, [accountId])
+         const [accountRes, tradesRes, transactionsRes] =
+           await Promise.all([
+             accountApi.getOne(accountId),
+             tradeApi.getByAccount(accountId),
+             transactionApi.getByAccount(accountId, txQueryParams),
+           ])
 
-  // ───────────────── COMPUTED STATS (from API performance) ─────────────────
-  const totalPnl = account?.performance?.totalPnl ?? trades.reduce(
-    (sum, trade) => sum + (trade.pnl || 0),
-    0
-  )
+         setAccount(accountRes || {})
+         setTrades(tradesRes || [])
+         setTransactions(transactionsRes?.data || [])
+         setTransactionPagination(transactionsRes?.pagination || {
+           total: 0,
+           page: 1,
+           limit: 20,
+           pages: 1
+         })
+       } catch (err) {
+         console.error(err)
+         toast.error(
+           err?.response?.data?.message ||
+             err?.message ||
+             "Failed to load journal data"
+         )
+       } finally {
+         setLoading(false)
+       }
+     }
 
-  const wins = account?.performance?.wins ?? trades.filter(
-    (trade) => trade.type === "win"
-  ).length
+     if (accountId) {
+       fetchData()
+     }
+   }, [accountId, txQueryParams])
 
-  const losses = account?.performance?.losses ?? trades.filter(
-    (trade) => trade.type === "loss"
-  ).length
-
-  const winRate = account?.performance?.winRate ?? Math.round(
-    (wins / (wins + losses || 1)) * 100
-  )
-
-  const bestTrade = trades.reduce((max, trade) => {
-    const pnl = trade.pnl || 0
-    return pnl > (max?.pnl || -Infinity) ? trade : max
-  }, null)
-
-  const worstTrade = trades.reduce((min, trade) => {
-    const pnl = trade.pnl || 0
-    return pnl < (min?.pnl || Infinity) ? trade : min
-  }, null)
+  // ───────────────── STATS FROM API ─────────────────
+  const totalPnl = account?.performance?.totalPnl ?? 0
+  const winRate = account?.performance?.winRate ?? 0
+  const profitFactor = account?.performance?.profitFactor ?? 0
+  const largestWin = account?.performance?.largestWin ?? 0
+  const largestLoss = account?.performance?.largestLoss ?? 0
+  const totalTrades = account?.performance?.totalTrades ?? 0
 
   const selectedTrades = useMemo(() => {
     if (!selectedDay) return []
@@ -201,17 +212,18 @@ export default function AccountJournal() {
 <div className="px-6 pt-6">
   <div className="max-w-7xl mx-auto space-y-4">
 
-    {/* TOP ACTION BAR */}
-    <div className="flex items-center justify-between">
-      <Button
-        variant="ghost"
-        size="icon"
-        onClick={() => navigate(-1)}
-        className="shrink-0"
-      >
-        <ChevronLeft className="h-4 w-4" />
-      </Button>
-    </div>
+     {/* TOP ACTION BAR */}
+     <div className="flex items-center justify-between">
+       <Button
+         type="button"
+         variant="ghost"
+         size="icon"
+         onClick={() => navigate(-1)}
+         className="shrink-0"
+       >
+         <ChevronLeft className="h-4 w-4" />
+       </Button>
+     </div>
 
     {/* MAIN HEADER CARD */}
     <div className="trading-card bg-card/70 backdrop-blur-xl overflow-hidden">
@@ -253,38 +265,40 @@ export default function AccountJournal() {
 
           </div>
 
-          {/* RIGHT */}
-          <div className="flex flex-wrap items-center gap-3">
+           {/* RIGHT */}
+           <div className="flex flex-wrap items-center gap-3">
 
-            <Button
-              variant="outline"
-              onClick={() => {
-                setAccountDetailsOpen(true)
-              }}
-            >
-              Account Details
-            </Button>
+             <Button
+               type="button"
+               variant="outline"
+               onClick={() => {
+                 setAccountDetailsOpen(true)
+               }}
+             >
+               Account Details
+             </Button>
 
-            <Button variant="outline">
-              <Download className="h-4 w-4 mr-2" />
-              Export
-            </Button>
+             <Button type="button" variant="outline">
+               <Download className="h-4 w-4 mr-2" />
+               Export
+             </Button>
 
-            <Button variant="outline">
-              <Filter className="h-4 w-4 mr-2" />
-              Filters
-            </Button>
+             <Button type="button" variant="outline">
+               <Filter className="h-4 w-4 mr-2" />
+               Filters
+             </Button>
 
-            <Button
-              onClick={() =>
-                navigate(`/trades/add/${accountId}`)
-              }
-            >
-              <Plus className="h-4 w-4 mr-2" />
-              Add Trade
-            </Button>
+             <Button
+               type="button"
+               onClick={() =>
+                 navigate(`/trades/add/${accountId}`)
+               }
+             >
+               <Plus className="h-4 w-4 mr-2" />
+               Add Trade
+             </Button>
 
-          </div>
+           </div>
 
         </div>
 
@@ -357,7 +371,7 @@ export default function AccountJournal() {
                   </p>
 
                   <h3 className="text-2xl trading-number mt-1">
-                    {account?.performance?.totalTrades ?? trades.length}
+                    {totalTrades}
                   </h3>
                 </div>
 
@@ -381,7 +395,7 @@ export default function AccountJournal() {
                   </p>
 
                   <h3 className="text-2xl trading-number mt-1 profit-text">
-                    +{Math.abs(account?.performance?.largestWin ?? bestTrade?.pnl ?? 0).toLocaleString()}
+                    +{Math.abs(largestWin).toLocaleString()}
                   </h3>
                 </div>
 
@@ -405,11 +419,7 @@ export default function AccountJournal() {
                   </p>
 
                   <h3 className="text-2xl trading-number mt-1 loss-text">
-                    {account?.performance?.largestLoss
-                      ? Math.abs(account.performance.largestLoss).toLocaleString()
-                      : worstTrade?.pnl !== undefined
-                        ? Math.abs(worstTrade.pnl).toLocaleString()
-                        : 0}
+                    {Math.abs(largestLoss).toLocaleString()}
                   </h3>
                 </div>
 
@@ -444,7 +454,7 @@ export default function AccountJournal() {
               </div>
 
               <div className="flex items-center gap-2">
-                <Button variant="outline" size="icon">
+                <Button type="button" variant="outline" size="icon">
                   <ChevronLeft className="h-4 w-4" />
                 </Button>
 
@@ -457,7 +467,7 @@ export default function AccountJournal() {
                   </p>
                 </div>
 
-                <Button variant="outline" size="icon">
+                <Button type="button" variant="outline" size="icon">
                   <ChevronRight className="h-4 w-4" />
                 </Button>
               </div>
@@ -492,20 +502,21 @@ export default function AccountJournal() {
                 const hasTrades = dayTrades.length > 0
                 const status = getDayStatus(dayTrades)
 
-                return (
-                  <button
-                    key={day}
-                    onClick={() => {
-                      if (!hasTrades) return
-                      setSelectedDay(day)
-                      setOpen(true)
-                    }}
-                    className={`relative h-34 border-r border-b border-border p-3 text-left transition-all ${
-                      hasTrades
-                        ? statusClasses[status]
-                        : "hover:bg-muted/40"
-                    }`}
-                  >
+                 return (
+                   <button
+                     type="button"
+                     key={day}
+                     onClick={() => {
+                       if (!hasTrades) return
+                       setSelectedDay(day)
+                       setOpen(true)
+                     }}
+                     className={`relative h-34 border-r border-b border-border p-3 text-left transition-all ${
+                       hasTrades
+                         ? statusClasses[status]
+                         : "hover:bg-muted/40"
+                     }`}
+                   >
                     {/* DAY */}
                     <div className="flex items-center justify-between">
                       <span className="text-sm font-medium">{day}</span>
@@ -577,20 +588,60 @@ export default function AccountJournal() {
                 </p>
               </div>
 
-              <div className="flex items-center gap-2">
-                <Select defaultValue="all">
-                  <SelectTrigger className="w-40">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All</SelectItem>
-                    <SelectItem value="deposit">Deposits</SelectItem>
-                    <SelectItem value="withdrawal">Withdrawals</SelectItem>
-                    <SelectItem value="transfer">Transfers</SelectItem>
-                    <SelectItem value="trade">Trade PnL</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+               <div className="flex items-center gap-2">
+                  <Select value={txFilter} onValueChange={(val) => {
+                    setTxFilter(val)
+                    setTxPage(1)
+                  }}>
+                    <SelectTrigger className="w-40">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Types</SelectItem>
+                      <SelectItem value="deposit">Deposits</SelectItem>
+                      <SelectItem value="withdrawal">Withdrawals</SelectItem>
+                      <SelectItem value="transfer">Transfers</SelectItem>
+                      <SelectItem value="trade_profit">Trade Profit</SelectItem>
+                      <SelectItem value="trade_loss">Trade Loss</SelectItem>
+                      <SelectItem value="payout">Payout</SelectItem>
+                    </SelectContent>
+                  </Select>
+
+                 <Select
+                   value={`createdAt-${txSort.order}`}
+                   onValueChange={(val) => {
+                     const [field, order] = val.split("-")
+                     setTxSort({ field, order })
+                     setTxPage(1)
+                   }}
+                 >
+                   <SelectTrigger className="w-36">
+                     <SelectValue />
+                   </SelectTrigger>
+                   <SelectContent>
+                     <SelectItem value="createdAt-desc">Newest</SelectItem>
+                     <SelectItem value="createdAt-asc">Oldest</SelectItem>
+                   </SelectContent>
+                 </Select>
+
+                 <Select
+                   value={String(txLimit)}
+                   onValueChange={(val) => {
+                     setTxLimit(Number(val))
+                     setTxPage(1)
+                   }}
+                 >
+                   <SelectTrigger className="w-20">
+                     <SelectValue />
+                   </SelectTrigger>
+                   <SelectContent>
+                     <SelectItem value="10">10</SelectItem>
+                     <SelectItem value="20">20</SelectItem>
+                     <SelectItem value="50">50</SelectItem>
+                     <SelectItem value="100">100</SelectItem>
+                   </SelectContent>
+                 </Select>
+               </div>
             </div>
           </CardHeader>
 
@@ -604,105 +655,129 @@ export default function AccountJournal() {
                     <TableHead>Amount</TableHead>
                     <TableHead>Balance After</TableHead>
                     <TableHead>Description</TableHead>
-                    
                   </TableRow>
                 </TableHeader>
 
                 <TableBody>
-  {transactions.length === 0 ? (
-    <TableRow>
-      <TableCell
-        colSpan={6}
-        className="text-center text-muted-foreground py-8"
-      >
-        No transactions recorded yet.
-      </TableCell>
-    </TableRow>
-  ) : (
-    transactions.map((tx) => {
-      const amount = tx.amount ?? 0;
+                  {transactions.length === 0 ? (
+                    <TableRow>
+                      <TableCell
+                        colSpan={5}
+                        className="text-center text-muted-foreground py-8"
+                      >
+                        No transactions recorded yet.
+                      </TableCell>
+                    </TableRow>
+                  ) : (
+                    transactions.map((tx) => {
+                      const amount = tx.amount ?? 0
 
-      // ─────────────────────────────
-      // SIGN RULES (NEW SYSTEM)
-      // ─────────────────────────────
-      let displayAmount = amount;
+                      let displayAmount = amount
 
-      if (tx.type === "withdrawal" || tx.type === "trade_loss") {
-        displayAmount = -Math.abs(amount);
-      }
+                      if (tx.type === "withdrawal" || tx.type === "trade_loss") {
+                        displayAmount = -Math.abs(amount)
+                      }
 
-      if (tx.type === "deposit" || tx.type === "trade_profit" || tx.type === "payout") {
-        displayAmount = Math.abs(amount);
-      }
+                      if (tx.type === "deposit" || tx.type === "trade_profit" || tx.type === "payout") {
+                        displayAmount = Math.abs(amount)
+                      }
 
-      return (
-        <TableRow key={tx._id || tx.id}>
-          {/* DATE */}
-          <TableCell className="text-xs">
-            {tx.createdAt
-              ? new Date(tx.createdAt).toLocaleDateString()
-              : "N/A"}
-          </TableCell>
+                      return (
+                        <TableRow key={tx._id || tx.id}>
+                          {/* DATE */}
+                          <TableCell className="text-xs">
+                            {tx.createdAt
+                              ? new Date(tx.createdAt).toLocaleDateString()
+                              : "N/A"}
+                          </TableCell>
 
-          {/* TYPE */}
-          <TableCell>
-            <Badge
-              variant="outline"
-              className={
-                tx.type === "deposit"
-                  ? "border-success/20 text-success bg-success/10"
-                  : tx.type === "withdrawal"
-                  ? "border-destructive/20 text-destructive bg-destructive/10"
-                  : tx.type === "payout"
-                  ? "border-warning/20 text-warning bg-warning/10"
-                  : tx.type === "trade_profit"
-                  ? "border-success/20 text-success bg-success/10"
-                  : tx.type === "trade_loss"
-                  ? "border-danger/20 text-danger bg-danger/10"
-                  : "border-info/20 text-info bg-info/10"
-              }
-            >
-              {tx.type === "deposit"
-                ? "Deposit"
-                : tx.type === "withdrawal"
-                ? "Withdrawal"
-                : tx.type === "payout"
-                ? "Payout"
-                : tx.type === "trade_profit"
-                ? "Trade Profit"
-                : tx.type === "trade_loss"
-                ? "Trade Loss"
-                : tx.type || "N/A"}
-            </Badge>
-          </TableCell>
+                          {/* TYPE */}
+                          <TableCell>
+                            <Badge
+                              variant="outline"
+                              className={
+                                tx.type === "deposit"
+                                  ? "border-success/20 text-success bg-success/10"
+                                  : tx.type === "withdrawal"
+                                  ? "border-destructive/20 text-destructive bg-destructive/10"
+                                  : tx.type === "payout"
+                                  ? "border-warning/20 text-warning bg-warning/10"
+                                  : tx.type === "trade_profit"
+                                  ? "border-success/20 text-success bg-success/10"
+                                  : tx.type === "trade_loss"
+                                  ? "border-danger/20 text-danger bg-danger/10"
+                                  : "border-info/20 text-info bg-info/10"
+                              }
+                            >
+                              {tx.type === "deposit"
+                                ? "Deposit"
+                                : tx.type === "withdrawal"
+                                ? "Withdrawal"
+                                : tx.type === "payout"
+                                ? "Payout"
+                                : tx.type === "trade_profit"
+                                ? "Trade Profit"
+                                : tx.type === "trade_loss"
+                                ? "Trade Loss"
+                                : tx.type || "N/A"}
+                            </Badge>
+                          </TableCell>
 
-          {/* AMOUNT */}
-          <TableCell
-            className={`trading-number font-medium ${
-              displayAmount >= 0 ? "profit-text" : "loss-text"
-            }`}
-          >
-            {displayAmount >= 0 ? "+" : ""}
-            {displayAmount.toLocaleString()}
-          </TableCell>
+                          {/* AMOUNT */}
+                          <TableCell
+                            className={`trading-number font-medium ${
+                              displayAmount >= 0 ? "profit-text" : "loss-text"
+                            }`}
+                          >
+                            {displayAmount >= 0 ? "+" : ""}${displayAmount.toLocaleString()}
+                          </TableCell>
 
-          {/* BALANCE AFTER */}
-          <TableCell className="trading-number">
-            {(tx.currency || "$").toUpperCase()}{" "}
-            {tx.balanceAfter?.toLocaleString() ?? "N/A"}
-          </TableCell>
+                          {/* BALANCE AFTER */}
+                          <TableCell className="trading-number">
+                            {(account?.currency || "$").toUpperCase()}{" "}
+                            {Number(tx.balanceAfter || 0).toLocaleString()}
+                          </TableCell>
 
-          {/* NOTE */}
-          <TableCell className="max-w-50 truncate">
-            {tx.note || "—"}
-          </TableCell>
-        </TableRow>
-      );
-    })
-  )}
-</TableBody>
+                          {/* NOTE */}
+                          <TableCell className="max-w-50 truncate">
+                            {tx.note || "—"}
+                          </TableCell>
+                        </TableRow>
+                      )
+                    })
+                  )}
+                </TableBody>
               </Table>
             </div>
+
+             {/* PAGINATION */}
+             {transactionPagination.pages > 1 && (
+               <div className="flex items-center justify-between px-4 py-3 border-t border-border">
+                 <p className="text-sm text-muted-foreground">
+                   Total: {transactionPagination.total} | Page {transactionPagination.page} of {transactionPagination.pages}
+                 </p>
+                 <div className="flex items-center gap-2">
+                   <Button
+                     type="button"
+                     variant="outline"
+                     size="sm"
+                     disabled={txPage <= 1}
+                     onClick={() => setTxPage(prev => Math.max(prev - 1, 1))}
+                   >
+                     Prev
+                   </Button>
+                   <Button
+                     type="button"
+                     variant="outline"
+                     size="sm"
+                     disabled={txPage >= transactionPagination.pages}
+                     onClick={() => setTxPage(prev => Math.min(prev + 1, transactionPagination.pages))}
+                   >
+                     Next
+                   </Button>
+                 </div>
+               </div>
+             )}
           </CardContent>
         </Card>
       </div>
@@ -917,16 +992,7 @@ export default function AccountJournal() {
 
           <div className="p-6 space-y-6 overflow-y-auto h-full pb-28">
             {/* QUICK STATS */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <Card className="trading-card">
-                <CardContent className="p-4 text-center">
-                  <p className="text-muted-foreground text-sm">Balance</p>
-                  <h3 className="text-2xl trading-number mt-1 profit-text">
-                    {(account?.currency || "$").toUpperCase()}{" "}
-                    {Number(account?.balanceSnapshot || 0).toLocaleString()}
-                  </h3>
-                </CardContent>
-              </Card>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
               <Card className="trading-card">
                 <CardContent className="p-4 text-center">
@@ -994,25 +1060,21 @@ export default function AccountJournal() {
                   <Card className="trading-card">
                     <CardHeader>
                       <CardTitle className="text-base">Best & Worst</CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-3">
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">Best Trade</span>
-                        <span className="trading-number font-medium profit-text">
-                          +{Math.abs(account?.performance?.largestWin ?? bestTrade?.pnl ?? 0).toLocaleString()}
-                        </span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">Worst Trade</span>
-                        <span className="trading-number font-medium loss-text">
-                          {account?.performance?.largestLoss
-                            ? Math.abs(account.performance.largestLoss).toLocaleString()
-                            : worstTrade?.pnl !== undefined
-                              ? Math.abs(worstTrade.pnl).toLocaleString()
-                              : 0}
-                        </span>
-                      </div>
-                    </CardContent>
+                    </CardHeader> 
+                   <CardContent className="space-y-3">
+                       <div className="flex justify-between">
+                         <span className="text-muted-foreground">Best Trade</span>
+                         <span className="trading-number font-medium profit-text">
+                           +{Math.abs(largestWin).toLocaleString()}
+                         </span>
+                       </div>
+                       <div className="flex justify-between">
+                         <span className="text-muted-foreground">Worst Trade</span>
+                         <span className="trading-number font-medium loss-text">
+                           {Math.abs(largestLoss).toLocaleString()}
+                         </span>
+                       </div>
+                     </CardContent>
                   </Card>
                 </div>
               </TabsContent>
@@ -1196,12 +1258,12 @@ export default function AccountJournal() {
               )}
             </Tabs>
 
-            {/* ACTIONS */}
-            <div className="flex justify-end gap-3 pt-2">
-              <Button variant="outline" onClick={() => navigate(`/accounts/${accountId}/edit`)}>
-                Edit Full Details
-              </Button>
-            </div>
+             {/* ACTIONS */}
+             <div className="flex justify-end gap-3 pt-2">
+               <Button type="button" variant="outline" onClick={() => navigate(`/accounts/${accountId}/edit`)}>
+                 Edit Full Details
+               </Button>
+             </div>
           </div>
         </SheetContent>
       </Sheet>
