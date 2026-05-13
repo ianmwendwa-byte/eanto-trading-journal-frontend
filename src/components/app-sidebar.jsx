@@ -36,13 +36,6 @@ const data = {
       ),
     },
     {
-      title: "Trades",
-      url: "/trades",
-      icon: (
-        <ListIcon />
-      ),
-    },
-    {
       title: "Transactions",
       url: "/transactions",
       icon: (

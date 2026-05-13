@@ -5,7 +5,7 @@ import Layout from './app/layout/Layout'
 import AuthLayout from './app/layout/AuthLayout'
 import Login from './app/Auth/Login'
 import Register from './app/Auth/Register'
-import Trades from './app/trades/Trades'
+import AddTrade from './components/AddTrade'
 import Analytics from './app/analytics/Analytics'
 import Strategies from './app/strategies/Strategies'
 import Transactions from './app/transactions/Transactions'
@@ -16,6 +16,8 @@ import { ThemeProvider } from './components/theme-provider'
 import { TooltipProvider } from './components/ui/tooltip'
 import { AuthProvider } from './app/context/AuthContext'
 import { Toaster } from './components/ui/sonner'
+import EditAccount from './app/accounts/EditAccount'
+import AccountJournal from './app/accounts/AccountJournal'
 
 function App() {
 
@@ -38,7 +40,9 @@ function App() {
                 <Route path="/" element={<Navigate to="/dashboard" replace />} />
                 <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="/accounts" element={<Accounts />} />
-                <Route path="/trades" element={<Trades />} />
+                <Route path="/accounts/:accountId/edit" element={<EditAccount />} />
+                <Route path="/journal/:accountId/" element={<AccountJournal/>}/>
+                <Route path="/trades/add/:accountId?" element={<AddTrade />} />
                 <Route path="/transactions" element={<Transactions />} />
                 <Route path="/analytics" element={<Analytics />} />
                 <Route path="/strategies" element={<Strategies />} />

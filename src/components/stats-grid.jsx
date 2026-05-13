@@ -44,24 +44,24 @@ export function StatsGrid() {
           <Card
             key={stat.label}
             className={cn(
-              "relative overflow-hidden transition-all hover:shadow-lg",
+              "card-elevated transition-all hover:shadow-lg",
 
-              // BACKGROUND GRADIENTS
+              // BACKGROUND VARIATIONS USING DESIGN TOKENS
               stat.type === "profit" &&
-                "bg-linear-to-br from-green-50 to-green-100 border-green-200 dark:from-green-950/30 dark:to-green-900/20",
+                "bg-success/5 border-success/20 dark:bg-success/10 dark:border-success/30",
 
               stat.type === "loss" &&
-                "bg-linear-to-br from-red-50 to-red-100 border-red-200 dark:from-red-950/30 dark:to-red-900/20",
+                "bg-destructive/5 border-destructive/20 dark:bg-destructive/10 dark:border-destructive/30",
 
               stat.type === "neutral" &&
-                "bg-linear-to-br from-muted/40 to-muted/20"
+                "bg-muted/30 border-border"
             )}
           >
             <CardContent className="p-6 flex flex-col gap-5">
 
               {/* HEADER */}
               <div className="flex items-center justify-between">
-                <p className="text-sm text-muted-foreground">
+                <p className="text-sm text-muted-foreground font-medium">
                   {stat.label}
                 </p>
 
@@ -69,8 +69,8 @@ export function StatsGrid() {
                   className={cn(
                     "p-2 rounded-lg",
 
-                    stat.type === "profit" && "bg-green-200/40",
-                    stat.type === "loss" && "bg-red-200/40",
+                    stat.type === "profit" && "bg-success/10",
+                    stat.type === "loss" && "bg-destructive/10",
                     stat.type === "neutral" && "bg-muted"
                   )}
                 >
@@ -78,8 +78,8 @@ export function StatsGrid() {
                     className={cn(
                       "h-5 w-5",
 
-                      stat.type === "profit" && "text-green-700",
-                      stat.type === "loss" && "text-red-700",
+                      stat.type === "profit" && "text-success",
+                      stat.type === "loss" && "text-destructive",
                       stat.type === "neutral" && "text-muted-foreground"
                     )}
                   />
@@ -90,10 +90,10 @@ export function StatsGrid() {
               <div>
                 <h3
                   className={cn(
-                    "text-3xl lg:text-4xl font-bold tracking-tight",
+                    "text-3xl lg:text-4xl font-bold tracking-tight font-heading",
 
-                    stat.type === "profit" && "text-green-700",
-                    stat.type === "loss" && "text-red-700",
+                    stat.type === "profit" && "profit-text",
+                    stat.type === "loss" && "loss-text",
                     stat.type === "neutral" && "text-foreground"
                   )}
                 >
@@ -106,17 +106,6 @@ export function StatsGrid() {
                   {stat.type === "neutral" && "Stable account"}
                 </p>
               </div>
-
-              {/* GLOW EFFECT */}
-              <div
-                className={cn(
-                  "absolute -bottom-6 -right-6 h-20 w-20 rounded-full blur-2xl opacity-20",
-
-                  stat.type === "profit" && "bg-green-400",
-                  stat.type === "loss" && "bg-red-400",
-                  stat.type === "neutral" && "bg-gray-400"
-                )}
-              />
 
             </CardContent>
           </Card>

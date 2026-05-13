@@ -6,16 +6,16 @@ import { Badge } from "@/components/ui/badge"
 
 export function DisciplinePanel() {
   return (
-    <Card className="lg:col-span-1">
+    <Card className="card-elevated lg:col-span-1">
       <CardHeader>
-        <CardTitle>Discipline</CardTitle>
+        <CardTitle className="font-heading">Discipline</CardTitle>
       </CardHeader>
 
       <CardContent className="flex flex-col gap-4">
 
         {/* Adherence */}
         <div>
-          <p className="text-sm mb-1">Rule Adherence</p>
+          <p className="text-sm text-foreground font-medium mb-1">Rule Adherence</p>
           <Progress value={78} />
           <span className="text-xs text-muted-foreground">
             78%
@@ -24,11 +24,11 @@ export function DisciplinePanel() {
 
         {/* Flags */}
         <div className="flex flex-col gap-2">
-          <Badge variant="destructive">
+          <Badge variant="destructive" className="loss-text">
             Overtrading: YES
           </Badge>
 
-          <Badge variant="secondary">
+          <Badge variant="secondary" className="text-muted-foreground">
             Risk Consistency: OK
           </Badge>
         </div>

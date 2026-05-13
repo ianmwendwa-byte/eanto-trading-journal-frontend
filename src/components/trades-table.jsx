@@ -1,16 +1,15 @@
-
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
 export function TradesTable() {
   return (
-    <Card>
+    <Card className="card-elevated">
       <CardHeader>
-        <CardTitle>Recent Trades</CardTitle>
+        <CardTitle className="font-heading">Recent Trades</CardTitle>
       </CardHeader>
 
       <CardContent>
         <div className="text-sm text-muted-foreground">
-          Table coming here...
+          Trades are managed through the Account Journal.
         </div>
       </CardContent>
     </Card>
