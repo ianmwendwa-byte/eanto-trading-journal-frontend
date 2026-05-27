@@ -8,9 +8,12 @@ export const useAuth = () => {
   const queryClient = useQueryClient();
 
   const logout = async () => {
-    await signOut(auth);
-    queryClient.clear();
-    authState.logout();
+    try {
+      await signOut(auth);
+    } finally {
+      authState.logout();
+      queryClient.clear();
+    }
   };
 
   return {

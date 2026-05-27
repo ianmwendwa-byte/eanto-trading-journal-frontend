@@ -15,7 +15,9 @@ export const useMarkAllRead = () => {
   return useMutation({
     mutationFn: () => api.patch("/api/v1/notifications/read-all"),
     onSuccess: () => {
-      queryClient.setQueryData(notificationKeys.unreadCount(), { count: 0 });
+      queryClient.setQueryData(notificationKeys.unreadCount(), (old) =>
+        typeof old === "object" && old !== null ? { ...old, count: 0 } : 0
+      );
       queryClient.invalidateQueries({ queryKey: notificationKeys.all() });
     },
   });
