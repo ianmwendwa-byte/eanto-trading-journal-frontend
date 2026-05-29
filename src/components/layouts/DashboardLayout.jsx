@@ -3,10 +3,11 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { DashboardSidebar } from "./DashboardSidebar";
 import { DashboardHeader } from "./DashboardHeader";
+import { NotificationPanel } from "@/components/notifications/NotificationPanel";
 import { useAppStore } from "@/store/useAppStore";
 import { useIsMobile } from "@/hooks/use-mobile";
 
-const SIDEBAR_EXPANDED = 240;
+const SIDEBAR_EXPANDED  = 240;
 const SIDEBAR_COLLAPSED = 64;
 
 export const DashboardLayout = () => {
@@ -35,7 +36,6 @@ export const DashboardLayout = () => {
       <AnimatePresence>
         {isMobile && mobileOpen && (
           <>
-            {/* Backdrop */}
             <motion.div
               key="backdrop"
               initial={{ opacity: 0 }}
@@ -45,7 +45,6 @@ export const DashboardLayout = () => {
               onClick={() => setMobileOpen(false)}
               className="fixed inset-0 bg-black/60 z-40"
             />
-            {/* Drawer */}
             <motion.div
               key="drawer"
               initial={{ x: -SIDEBAR_EXPANDED }}
@@ -72,6 +71,9 @@ export const DashboardLayout = () => {
           <Outlet />
         </main>
       </div>
+
+      {/* Notification panel — lives at layout level, persists across page navigation */}
+      <NotificationPanel />
     </div>
   );
 };

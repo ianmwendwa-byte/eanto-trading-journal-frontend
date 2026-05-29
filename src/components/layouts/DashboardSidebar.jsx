@@ -55,14 +55,14 @@ const NavItem = ({ item, collapsed }) => {
   const content = (
     <div
       className={cn(
-        "flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors relative group",
+        "flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors relative group overflow-x-hidden",
         isActive
           ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium"
           : "text-sidebar-foreground/60 hover:bg-sidebar-accent/40 hover:text-sidebar-foreground",
         soon && "pointer-events-none opacity-50"
       )}
     >
-      <Icon className="h-4 w-4 flex-shrink-0" />
+      <Icon className="h-4 w-4 shrink-0" />
       <AnimatePresence initial={false}>
         {!collapsed && (
           <motion.span
@@ -97,13 +97,12 @@ const NavItem = ({ item, collapsed }) => {
 };
 
 export const DashboardSidebar = ({ collapsed, onToggle, mobile = false }) => {
-  const { mongoUser, firebaseUser } = useAuthStore();
+  const { mongoUser } = useAuthStore();
   const { logout } = useAuth();
 
-  const displayName = mongoUser
-    ? `${mongoUser.firstName ?? ""} ${mongoUser.lastName ?? ""}`.trim()
-    : firebaseUser?.displayName ?? firebaseUser?.email?.split("@")[0] ?? "Trader";
-  const email = mongoUser?.email ?? firebaseUser?.email ?? "";
+  const displayName =
+    `${mongoUser?.firstName ?? ""} ${mongoUser?.lastName ?? ""}`.trim() || "Trader";
+  const email = mongoUser?.email ?? "";
   const initials = displayName
     .split(" ")
     .filter(Boolean)
@@ -112,12 +111,14 @@ export const DashboardSidebar = ({ collapsed, onToggle, mobile = false }) => {
     .toUpperCase()
     .slice(0, 2) || "T";
 
+    const photoUrl = mongoUser?.traderProfile?.avatarUrl || null;
+
   return (
     <div className="h-full flex flex-col bg-sidebar border-r border-sidebar-border">
       {/* Logo + toggle */}
       <div
         className={cn(
-          "flex items-center h-14 px-3 border-b border-sidebar-border flex-shrink-0",
+          "flex items-center h-14 px-3 border-b border-sidebar-border shrink-0",
           collapsed ? "justify-center" : "justify-between"
         )}
       >
@@ -174,7 +175,7 @@ export const DashboardSidebar = ({ collapsed, onToggle, mobile = false }) => {
 
       {/* User section */}
       <div className={cn(
-        "border-t border-sidebar-border p-2 flex-shrink-0",
+        "border-t border-sidebar-border p-2 shrink-0",
         collapsed ? "flex justify-center" : ""
       )}>
         {collapsed ? (
@@ -187,8 +188,12 @@ export const DashboardSidebar = ({ collapsed, onToggle, mobile = false }) => {
           </button>
         ) : (
           <div className="flex items-center gap-2 px-1">
-            <div className="w-7 h-7 rounded-full bg-primary/20 border border-primary/30 flex items-center justify-center flex-shrink-0">
+            <div className="w-7 h-7 rounded-full bg-primary/20 border border-primary/30 flex items-center justify-center shrink-0">
+            {photoUrl ? (
+              <img src={photoUrl} alt={displayName} className="w-full h-full rounded-full object-cover" />
+            ) : (
               <span className="text-[10px] font-bold text-primary">{initials}</span>
+            )}
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-xs font-medium text-sidebar-foreground truncate">{displayName}</p>
@@ -196,7 +201,7 @@ export const DashboardSidebar = ({ collapsed, onToggle, mobile = false }) => {
             </div>
             <button
               onClick={logout}
-              className="h-7 w-7 flex items-center justify-center rounded-md hover:bg-sidebar-accent transition-colors text-muted-foreground hover:text-sidebar-foreground flex-shrink-0"
+              className="h-7 w-7 flex items-center justify-center rounded-md hover:bg-sidebar-accent transition-colors text-muted-foreground hover:text-sidebar-foreground shrink-0"
               title="Logout"
             >
               <LogOut className="h-3.5 w-3.5" />

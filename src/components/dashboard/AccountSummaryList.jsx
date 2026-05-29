@@ -7,7 +7,8 @@ import { cn } from "@/lib/utils";
 const TYPE_LABELS = { normal: "Normal", prop: "Prop", war: "War" };
 
 const AccountRow = ({ account }) => {
-  const pnl = (account.currentBalance ?? 0) - (account.startingBalance ?? 0);
+  const pnl = (account.currentBalance) - (account.startingBalance);
+  console.log(account);
 
   return (
     <Link to={`/accounts/${account._id}`}>
@@ -31,7 +32,7 @@ const AccountRow = ({ account }) => {
             )}
           </div>
         </div>
-        <div className="text-right flex-shrink-0">
+        <div className="text-right shrink-0">
           <p className="text-sm font-mono font-medium text-foreground">
             {formatCurrency(account.currentBalance ?? account.startingBalance ?? 0)}
           </p>

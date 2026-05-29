@@ -1,64 +1,35 @@
-import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
-import './App.css'
-import Dashboard from './app/dashboard/Dashboard'
-import Layout from './app/layout/Layout'
-import AuthLayout from './app/layout/AuthLayout'
-import Login from './app/Auth/Login'
-import Register from './app/Auth/Register'
-import AddTrade from './components/AddTrade'
-import Analytics from './app/analytics/Analytics'
-import Strategies from './app/strategies/Strategies'
-import Transactions from './app/transactions/Transactions'
-import Accounts from './app/accounts/Accounts'
-import NotFound from './app/NotFound'
-import Insights from './app/insights/Insights'
-import { ThemeProvider } from './components/theme-provider'
-import { TooltipProvider } from './components/ui/tooltip'
-import { AuthProvider } from './app/context/AuthContext'
-import { Toaster } from './components/ui/sonner'
-import EditAccount from './app/accounts/EditAccount'
-import AccountJournal from './app/accounts/AccountJournal'
+import React from "react";
+import ReactDOM from "react-dom/client";
+import { RouterProvider } from "react-router-dom";
+import { QueryClientProvider } from "@tanstack/react-query";
+import { Toaster } from "sonner";
+import { TooltipProvider } from "./components/ui/tooltip";
+import { router }       from "./router";
+import { queryClient }  from "./lib/queryClient";
+import { AuthProvider } from "./components/providers/AuthProvider";
+import { ThemeProvider } from "./components/theme-provider";
+import "./index.css";
 
-function App() {
-
-  return (
-    <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
-      <TooltipProvider>
-        <BrowserRouter>
+ReactDOM.createRoot(document.getElementById("root")).render(
+  <React.StrictMode>
+    <ThemeProvider defaultTheme="dark" storageKey="tradecore-ui">
+      <QueryClientProvider client={queryClient}>
+        <TooltipProvider>
           <AuthProvider>
-             <Toaster richColors position="top-right" />
-            <Routes>
-
-              {/* Auth Routes */}
-              <Route element={<AuthLayout />}>
-                <Route path="/login" element={<Login />} />
-                <Route path="/register" element={<Register />} />
-              </Route>
-
-              {/* Protected App Routes */}
-              <Route element={<Layout />}>
-                <Route path="/" element={<Navigate to="/dashboard" replace />} />
-                <Route path="/dashboard" element={<Dashboard />} />
-                <Route path="/accounts" element={<Accounts />} />
-                <Route path="/accounts/:accountId/edit" element={<EditAccount />} />
-                <Route path="/journal/:accountId/" element={<AccountJournal/>}/>
-                <Route path="/trades/add/:accountId?" element={<AddTrade />} />
-                <Route path="/transactions" element={<Transactions />} />
-                <Route path="/analytics" element={<Analytics />} />
-                <Route path="/strategies" element={<Strategies />} />
-                <Route path="/insights" element={<Insights />} />
-              </Route>
-
-              {/* 404 */}
-              <Route path="*" element={<NotFound />} />
-
-            </Routes>
-
+            <RouterProvider router={router} />
+            <Toaster
+              position="bottom-right"
+              toastOptions={{
+                style: {
+                  background: "hsl(var(--card))",
+                  color:      "hsl(var(--card-foreground))",
+                  border:     "1px solid hsl(var(--border))",
+                },
+              }}
+            />
           </AuthProvider>
-        </BrowserRouter>
-      </TooltipProvider>
+        </TooltipProvider>
+      </QueryClientProvider>
     </ThemeProvider>
-  )
-}
-
-export default App
+  </React.StrictMode>
+);

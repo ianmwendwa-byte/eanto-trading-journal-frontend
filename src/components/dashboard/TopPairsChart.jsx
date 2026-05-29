@@ -2,6 +2,7 @@ import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell,
 } from "recharts";
 import { Skeleton } from "@/components/ui/skeleton";
+import { ErrorState } from "@/components/shared/ErrorState";
 
 const CustomTooltip = ({ active, payload, label }) => {
   if (!active || !payload?.length) return null;
@@ -20,23 +21,33 @@ const CustomTooltip = ({ active, payload, label }) => {
   );
 };
 
-export const TopPairsChart = ({ pairStats, isLoading }) => {
+export const TopPairsChart = ({ pairStats, isLoading, isError, onRetry }) => {
   if (isLoading) {
     return <Skeleton className="h-40 w-full rounded-lg" />;
+  }
+
+  if (isError) {
+    return (
+      <ErrorState
+        message="Failed to load chart data"
+        onRetry={onRetry}
+        className="min-h-[10rem]"
+      />
+    );
   }
 
   const pairs = (pairStats?.pairs ?? pairStats ?? [])
     .slice(0, 5)
     .map((p) => ({
-      pair: p.pair,
+      pair:    p.pair,
       winRate: typeof p.winRate === "number" ? p.winRate * (p.winRate <= 1 ? 100 : 1) : 0,
-      trades: p.trades ?? p.totalTrades ?? 0,
+      trades:  p.trades ?? p.totalTrades ?? 0,
     }));
 
   if (!pairs.length) {
     return (
       <div className="h-40 flex items-center justify-center text-sm text-muted-foreground">
-        No pair data yet
+        No trade data yet
       </div>
     );
   }

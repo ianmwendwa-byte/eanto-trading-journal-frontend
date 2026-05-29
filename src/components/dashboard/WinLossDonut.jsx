@@ -1,5 +1,6 @@
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
 import { Skeleton } from "@/components/ui/skeleton";
+import { ErrorState } from "@/components/shared/ErrorState";
 
 const SLICES = [
   { key: "wins",      label: "Win",       color: "hsl(var(--profit))" },
@@ -18,9 +19,19 @@ const CustomTooltip = ({ active, payload }) => {
   );
 };
 
-export const WinLossDonut = ({ tradeStats, isLoading }) => {
+export const WinLossDonut = ({ tradeStats, isLoading, isError, onRetry }) => {
   if (isLoading) {
     return <Skeleton className="h-40 w-full rounded-lg" />;
+  }
+
+  if (isError) {
+    return (
+      <ErrorState
+        message="Failed to load chart data"
+        onRetry={onRetry}
+        className="min-h-[10rem]"
+      />
+    );
   }
 
   const data = SLICES.map((s) => ({
@@ -60,14 +71,12 @@ export const WinLossDonut = ({ tradeStats, isLoading }) => {
           <Tooltip content={<CustomTooltip />} />
         </PieChart>
       </ResponsiveContainer>
-      {/* Center label */}
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
         <div className="text-center">
           <p className="text-lg font-bold font-mono text-foreground">{total}</p>
           <p className="text-[10px] text-muted-foreground">trades</p>
         </div>
       </div>
-      {/* Legend */}
       <div className="flex justify-center gap-4 mt-1">
         {data.map((d) => (
           <div key={d.label} className="flex items-center gap-1.5 text-xs text-muted-foreground">

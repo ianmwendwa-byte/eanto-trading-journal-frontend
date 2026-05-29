@@ -1,44 +1,60 @@
-import { z } from "zod"
+import { z } from "zod";
 
-export const tradeSchema = z.object({
-  accountId: z.string().min(1, "Account is required"),
+export const tradeFormSchema = z.object({
+  accountId:   z.string().min(1, "Account is required"),
+  pair:        z.string().min(1, "Pair is required"),
+  direction:   z.enum(["buy", "sell"], { required_error: "Direction is required" }),
+  entryPrice:  z.coerce.number({ invalid_type_error: "Must be a number" }).positive("Must be > 0"),
+  exitPrice:   z.coerce.number({ invalid_type_error: "Must be a number" }).positive("Must be > 0"),
+  lotSize:     z.coerce.number({ invalid_type_error: "Must be a number" }).positive("Must be > 0"),
+  stopLoss:    z.coerce.number().positive().optional().or(z.literal("")),
+  takeProfit:  z.coerce.number().positive().optional().or(z.literal("")),
+  openedAt:    z.string().min(1, "Open time is required"),
+  closedAt:    z.string().min(1, "Close time is required"),
+  session:     z.string().optional(),
+  commission:  z.coerce.number().min(0).optional().or(z.literal("")),
+  swap:        z.coerce.number().min(0).optional().or(z.literal("")),
+  riskPercent: z.coerce.number().min(0).max(100).optional().or(z.literal("")),
+  ticketNumber: z.string().optional(),
+  magicNumber: z.coerce.number().int().optional().or(z.literal("")),
+  note:        z.string().max(2000).optional(),
+  tags:        z.array(z.string()).optional(),
+  setupQualityRating: z.coerce.number().int().min(1).max(5).optional().or(z.literal("")),
+}).refine(
+  (d) => {
+    if (!d.openedAt || !d.closedAt) return true;
+    return new Date(d.closedAt) >= new Date(d.openedAt);
+  },
+  { message: "Close time must be after open time", path: ["closedAt"] }
+);
 
-  pair: z
-    .string()
-    .min(3, "Pair is required")
-    .transform((val) => val.toUpperCase()),
+const toNum = (v) =>
+  v === "" || v === null || v === undefined ? null : Number(v);
 
-  direction: z.enum(["buy", "sell"], {
-    required_error: "Direction is required",
-  }),
-
-  lotSize: z.coerce
-    .number({ invalid_type_error: "Lot size is required" })
-    .positive("Lot size must be positive"),
-
-  entryPrice: z.coerce
-    .number({ invalid_type_error: "Entry price is required" })
-    .positive("Entry price must be positive"),
-
-  stopLoss: z.coerce
-    .number({ invalid_type_error: "Stop loss is required" })
-    .positive("Stop loss must be positive"),
-
-  takeProfit: z.coerce
-    .number()
-    .positive("Take profit must be positive")
-    .optional()
-    .or(z.literal("")),
-
-  pnl: z.coerce.number({ invalid_type_error: "P&L is required" }),
-
-  riskAmount: z.coerce
-    .number({ invalid_type_error: "Risk amount is required" })
-    .positive("Risk amount must be positive"),
-
-  session: z.enum(["london", "new_york", "asia", "sydney", "tokyo"], {
-    required_error: "Session is required",
-  }),
-
-  note: z.string().optional(),
-})
+export const transformTradeForm = (data, calculatedPnl) => {
+  const commission = toNum(data.commission) ?? 0;
+  const swap       = toNum(data.swap)       ?? 0;
+  return {
+    accountId:   data.accountId,
+    pair:        data.pair.toUpperCase().replace(/\s+/g, ""),
+    direction:   data.direction,
+    entryPrice:  data.entryPrice,
+    exitPrice:   data.exitPrice,
+    lotSize:     data.lotSize,
+    pnl:         calculatedPnl,
+    openedAt:    new Date(data.openedAt).toISOString(),
+    closedAt:    new Date(data.closedAt).toISOString(),
+    commission,
+    swap,
+    ...(toNum(data.stopLoss)    != null ? { stopLoss:    toNum(data.stopLoss)    } : {}),
+    ...(toNum(data.takeProfit)  != null ? { takeProfit:  toNum(data.takeProfit)  } : {}),
+    ...(data.session            ? { session:       data.session            } : {}),
+    ...(toNum(data.riskPercent) != null ? { riskPercent: toNum(data.riskPercent) } : {}),
+    ...(data.ticketNumber       ? { ticketNumber:  data.ticketNumber       } : {}),
+    ...(toNum(data.magicNumber) != null ? { magicNumber: toNum(data.magicNumber) } : {}),
+    ...(data.note               ? { note:          data.note               } : {}),
+    ...(data.tags?.length       ? { tags:          data.tags               } : {}),
+    ...(toNum(data.setupQualityRating) != null
+      ? { setupQualityRating: toNum(data.setupQualityRating) } : {}),
+  };
+};

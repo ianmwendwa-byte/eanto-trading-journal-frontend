@@ -1,5 +1,7 @@
-import { TrendingUp, TrendingDown, Wallet, Target, Trophy } from "lucide-react";
+import { useEffect } from "react";
+import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
+import { InfoTooltip } from "@/components/shared/InfoTooltip";
 import { formatCurrency, formatPercent, getPnLColor } from "@/utils/format";
 import { cn } from "@/lib/utils";
 
@@ -11,19 +13,29 @@ const SCORE_BANDS = {
   elite:       { label: "Elite",       color: "text-blue-400" },
 };
 
-const StatCard = ({ icon: Icon, label, value, subValue, subColor, loading }) => (
+const StatCard = ({ label, tooltip, value, subValue, subColor, loading, isError, onRetry }) => (
   <div className="trading-card p-4">
     <div className="flex items-center justify-between mb-3">
       <p className="text-xs text-muted-foreground font-medium">{label}</p>
-      <div className="w-7 h-7 rounded-lg bg-muted flex items-center justify-center">
-        <Icon className="h-3.5 w-3.5 text-muted-foreground" />
-      </div>
+      <InfoTooltip content={tooltip} />
     </div>
     {loading ? (
       <>
         <Skeleton className="h-7 w-32 mb-1" />
         <Skeleton className="h-3 w-20" />
       </>
+    ) : isError ? (
+      <div className="flex flex-col items-start gap-1.5 py-1">
+        <p className="text-xs text-muted-foreground">Failed to load</p>
+        {onRetry && (
+          <button
+            onClick={() => { toast.info("Retrying..."); onRetry(); }}
+            className="text-xs text-primary hover:underline"
+          >
+            Retry
+          </button>
+        )}
+      </div>
     ) : (
       <>
         <p className="text-2xl font-bold font-mono text-foreground leading-none mb-1">
@@ -39,7 +51,23 @@ const StatCard = ({ icon: Icon, label, value, subValue, subColor, loading }) => 
   </div>
 );
 
-export const StatCards = ({ accounts, tradeStats, userScore }) => {
+export const StatCards = ({
+  accounts,
+  tradeStats,
+  userScore,
+  statsIsError,
+  onRetryStats,
+  scoreIsError,
+  onRetryScore,
+}) => {
+  useEffect(() => {
+    if (statsIsError) toast.error("Failed to load trade data. Please try again.");
+  }, [statsIsError]);
+
+  useEffect(() => {
+    if (scoreIsError) toast.error("Failed to load business score. Please try again.");
+  }, [scoreIsError]);
+
   const nonWarAccounts = (accounts ?? []).filter((a) => a.type !== "war");
   const totalBalance = nonWarAccounts.reduce(
     (sum, a) => sum + (a.currentBalance ?? a.startingBalance ?? 0),
@@ -47,39 +75,43 @@ export const StatCards = ({ accounts, tradeStats, userScore }) => {
   );
 
   const todayPnl = tradeStats?.todayPnl ?? tradeStats?.todaysPnl ?? null;
-  const winRate = tradeStats?.winRate ?? null;
+  const winRate   = tradeStats?.winRate ?? null;
 
-  const scoreData = userScore?.score;
-  const hasScoreData = scoreData?.metadata?.hasMinimumData !== false;
-  const scoreOverall = hasScoreData ? scoreData?.overall : null;
-  const scoreBand = scoreData?.band;
-  const bandInfo = SCORE_BANDS[scoreBand] ?? null;
+  const scoreData    = userScore?.score ?? null;
+  const hasScoreData = scoreData != null && scoreData.metadata?.hasMinimumData !== false;
+  const scoreOverall = hasScoreData ? (scoreData?.overall ?? null) : null;
+  const scoreBand    = scoreData?.band;
+  const bandInfo     = SCORE_BANDS[scoreBand] ?? null;
 
   const accountsLoading = accounts === undefined;
-  const statsLoading = tradeStats === undefined;
-  const scoreLoading = userScore === undefined;
+  const statsLoading    = tradeStats === undefined && !statsIsError;
+  const scoreLoading    = userScore === undefined && !scoreIsError;
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
       <StatCard
-        icon={Wallet}
         label="Total Balance"
+        tooltip="Combined balance across all your active trading accounts in USD"
         loading={accountsLoading}
         value={formatCurrency(totalBalance)}
         subValue={`${nonWarAccounts.length} account${nonWarAccounts.length !== 1 ? "s" : ""}`}
       />
       <StatCard
-        icon={todayPnl >= 0 ? TrendingUp : TrendingDown}
         label="Today's P&L"
+        tooltip="Total profit and loss from all trades closed today across all accounts"
         loading={statsLoading}
+        isError={statsIsError}
+        onRetry={onRetryStats}
         value={todayPnl !== null ? formatCurrency(todayPnl) : "—"}
         subValue={todayPnl !== null ? (todayPnl >= 0 ? "Positive day" : "Negative day") : undefined}
         subColor={todayPnl !== null ? getPnLColor(todayPnl) : undefined}
       />
       <StatCard
-        icon={Target}
         label="Win Rate"
+        tooltip="Percentage of winning trades out of total closed trades in the last 30 days"
         loading={statsLoading}
+        isError={statsIsError}
+        onRetry={onRetryStats}
         value={winRate !== null ? formatPercent(winRate) : "—"}
         subValue={
           tradeStats
@@ -88,9 +120,11 @@ export const StatCards = ({ accounts, tradeStats, userScore }) => {
         }
       />
       <StatCard
-        icon={Trophy}
         label="Business Score"
+        tooltip="A 0-100 composite score measuring how well you are running your trading business. Calculated weekly based on consistency, risk management, profitability, discipline and growth. Requires 10+ trades."
         loading={scoreLoading}
+        isError={scoreIsError}
+        onRetry={onRetryScore}
         value={
           scoreLoading
             ? undefined

@@ -3,6 +3,7 @@ import {
   Repeat2, DollarSign, MinusCircle, PlusCircle,
 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { ErrorState } from "@/components/shared/ErrorState";
 import { formatCurrency, formatRelativeTime, getPnLColor } from "@/utils/format";
 import { cn } from "@/lib/utils";
 
@@ -25,8 +26,8 @@ const TYPE_CONFIG = {
 
 const ActivityRow = ({ tx }) => {
   const isPositive = POSITIVE_TYPES.has(tx.type);
-  const config = TYPE_CONFIG[tx.type] ?? { icon: DollarSign, label: tx.type };
-  const Icon = config.icon;
+  const config     = TYPE_CONFIG[tx.type] ?? { icon: DollarSign, label: tx.type };
+  const Icon       = config.icon;
 
   return (
     <div className="flex items-center gap-3">
@@ -49,7 +50,7 @@ const ActivityRow = ({ tx }) => {
   );
 };
 
-export const RecentActivityList = ({ transactions, isLoading }) => {
+export const RecentActivityList = ({ transactions, isLoading, isError, onRetry }) => {
   if (isLoading) {
     return (
       <div className="space-y-3">
@@ -67,12 +68,22 @@ export const RecentActivityList = ({ transactions, isLoading }) => {
     );
   }
 
+  if (isError) {
+    return (
+      <ErrorState
+        message="Failed to load transactions"
+        onRetry={onRetry}
+        className="py-6"
+      />
+    );
+  }
+
   const items = transactions ?? [];
 
   if (!items.length) {
     return (
       <p className="text-sm text-muted-foreground text-center py-6">
-        No transactions yet
+        No recent activity
       </p>
     );
   }
