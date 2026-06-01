@@ -130,9 +130,10 @@ export const LandingNavbar = () => {
             </SheetTrigger>
             <SheetContent
               side="right"
-              className="w-72 bg-background border-border"
+              className="w-80 bg-background border-border p-6 flex flex-col"
             >
-              <div className="flex items-center gap-2 mb-8 mt-2">
+              {/* Logo — padded away from the close button */}
+              <div className="flex items-center gap-2 mb-8 pt-1">
                 <TrendingUp
                   className="h-5 w-5 text-primary"
                   aria-hidden="true"
@@ -141,42 +142,40 @@ export const LandingNavbar = () => {
                   Tradecore
                 </span>
               </div>
+
+              {/* Nav links */}
               <nav
-                className="flex flex-col gap-4"
+                className="flex flex-col gap-1 flex-1"
                 aria-label="Mobile navigation"
               >
                 {navLinks.map(({ label, id }) => (
                   <button
                     key={id}
                     onClick={() => scrollTo(id)}
-                    className="text-base text-muted-foreground hover:text-foreground transition-colors text-left"
+                    className="text-base text-muted-foreground hover:text-foreground hover:bg-muted transition-colors text-left px-3 py-2.5 rounded-md"
                   >
                     {label}
                   </button>
                 ))}
-                <div className="flex flex-col gap-2 mt-4 pt-4 border-t border-border">
-                  <div className="flex items-center justify-between py-1">
-                    <span className="text-sm text-muted-foreground">Theme</span>
-                    <ThemeToggle />
-                  </div>
-                  <Button variant="ghost" asChild>
-                    <Link
-                      to="/login"
-                      onClick={() => setMobileOpen(false)}
-                    >
-                      Sign In
-                    </Link>
-                  </Button>
-                  <Button asChild>
-                    <Link
-                      to="/register"
-                      onClick={() => setMobileOpen(false)}
-                    >
-                      Get Started
-                    </Link>
-                  </Button>
-                </div>
               </nav>
+
+              {/* CTAs */}
+              <div className="flex flex-col gap-2 pt-4 border-t border-border">
+                <div className="flex items-center justify-between px-3 py-1 mb-1">
+                  <span className="text-sm text-muted-foreground">Theme</span>
+                  <ThemeToggle />
+                </div>
+                <Button variant="outline" className="w-full" asChild>
+                  <Link to="/login" onClick={() => setMobileOpen(false)}>
+                    Sign In
+                  </Link>
+                </Button>
+                <Button className="w-full" asChild>
+                  <Link to="/register" onClick={() => setMobileOpen(false)}>
+                    Get Started
+                  </Link>
+                </Button>
+              </div>
             </SheetContent>
           </Sheet>
         </div>
