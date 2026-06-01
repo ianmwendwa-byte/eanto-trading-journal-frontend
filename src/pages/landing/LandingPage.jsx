@@ -141,7 +141,7 @@ export const LandingPage = () => {
   useHashScroll();
 
   return (
-    <div className="min-h-screen bg-background text-foreground antialiased">
+    <div className="min-h-screen bg-background text-foreground antialiased overflow-x-hidden">
         {/* Skip to main content (accessibility) */}
         <a
           href="#main-content"

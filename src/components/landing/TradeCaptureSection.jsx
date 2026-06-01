@@ -137,7 +137,7 @@ const STEPS = [
 export const TradeCaptureSection = () => {
   return (
     <section
-      className="py-24 md:py-32 border-t border-border"
+      className="py-24 md:py-32 border-t border-border overflow-hidden"
       aria-labelledby="capture-heading"
     >
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">

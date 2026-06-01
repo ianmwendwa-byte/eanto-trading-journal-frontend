@@ -188,7 +188,7 @@ const ACCOUNT_TYPES = [
 export const AccountManagementSection = () => {
   return (
     <section
-      className="py-24 md:py-32 border-t border-border"
+      className="py-24 md:py-32 border-t border-border overflow-hidden"
       aria-labelledby="accounts-heading"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

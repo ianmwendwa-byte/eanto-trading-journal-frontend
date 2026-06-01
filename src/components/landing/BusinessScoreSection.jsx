@@ -109,7 +109,7 @@ const BANDS = [
 export const BusinessScoreSection = () => {
   return (
     <section
-      className="py-24 md:py-32 border-t border-primary/10 relative"
+      className="py-24 md:py-32 border-t border-primary/10 relative overflow-hidden"
       style={{ background: "rgba(23,61,237,0.025)" }}
       aria-labelledby="score-heading"
     >
