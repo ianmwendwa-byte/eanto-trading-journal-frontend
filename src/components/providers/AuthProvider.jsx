@@ -11,6 +11,7 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       if (firebaseUser) {
+        setLoading(true);
         setFirebaseUser(firebaseUser);
         try {
           const response = await api.post(API.AUTH.LOGIN, {
@@ -19,20 +20,20 @@ export const AuthProvider = ({ children }) => {
           });
           setMongoUser(response.user);
           setOnboardingComplete(response.onboardingComplete);
-          
         } catch (error) {
           if (error.status === 401) {
             await signOut(auth);
             logout();
+            return;
           } else {
             console.error("Backend sync failed:", error);
             setMongoUser(null);
           }
         }
+        setLoading(false);
       } else {
         logout();
       }
-      setLoading(false);
     });
     return () => unsubscribe();
   }, []);

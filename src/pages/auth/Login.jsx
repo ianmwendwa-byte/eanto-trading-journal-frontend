@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
 import { useForm } from "react-hook-form";
@@ -6,6 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { auth, googleProvider } from "@/lib/firebase";
 import { getFirebaseErrorMessage } from "@/lib/firebaseErrors";
+import { useAuthStore } from "@/store/useAuthStore";
 import { AuthLayout } from "@/components/layouts/AuthLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -30,25 +31,42 @@ const schema = z.object({
 export const Login = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const [loading, setLoading]           = useState(false);
-  const [googleLoading, setGoogleLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
+  const { mongoUser, isLoading: apiLoading } = useAuthStore();
+  const [loading, setLoading]               = useState(false);
+  const [googleLoading, setGoogleLoading]   = useState(false);
+  const [showPassword, setShowPassword]     = useState(false);
+  const [pendingSync, setPendingSync]       = useState(false);
   const from = location.state?.from?.pathname ?? "/dashboard";
 
   const { register, handleSubmit, formState: { errors } } = useForm({
     resolver: zodResolver(schema),
   });
 
+  // Navigate only after AuthProvider has finished syncing with the backend
+  useEffect(() => {
+    if (!pendingSync) return;
+    if (apiLoading) return;
+
+    if (mongoUser) {
+      navigate(from, { replace: true });
+    } else {
+      // API sync failed (non-401 — 401 would have signed out already)
+      toast.error("Could not connect to the server. Please try again.");
+      setPendingSync(false);
+      setLoading(false);
+      setGoogleLoading(false);
+    }
+  }, [pendingSync, apiLoading, mongoUser]);
+
   const handleGoogle = async () => {
     setGoogleLoading(true);
     try {
       await signInWithPopup(auth, googleProvider);
-      navigate(from, { replace: true });
+      setPendingSync(true);
     } catch (error) {
       if (error.code !== "auth/popup-closed-by-user") {
         toast.error(getFirebaseErrorMessage(error.code));
       }
-    } finally {
       setGoogleLoading(false);
     }
   };
@@ -57,10 +75,9 @@ export const Login = () => {
     setLoading(true);
     try {
       await signInWithEmailAndPassword(auth, data.email, data.password);
-      navigate(from, { replace: true });
+      setPendingSync(true);
     } catch (error) {
       toast.error(getFirebaseErrorMessage(error.code));
-    } finally {
       setLoading(false);
     }
   };
@@ -91,7 +108,7 @@ export const Login = () => {
             disabled={googleLoading || loading}
           >
             <GoogleIcon />
-            {googleLoading ? "Connecting…" : "Continue with Google"}
+            {googleLoading ? (pendingSync ? "Setting up…" : "Connecting…") : "Continue with Google"}
           </Button>
 
           <div className="relative">
@@ -156,7 +173,7 @@ export const Login = () => {
             </div>
 
             <Button type="submit" className="w-full mt-1" disabled={loading}>
-              {loading ? "Signing in…" : "Sign In"}
+              {loading ? (pendingSync ? "Setting up…" : "Signing in…") : "Sign In"}
             </Button>
           </form>
 
