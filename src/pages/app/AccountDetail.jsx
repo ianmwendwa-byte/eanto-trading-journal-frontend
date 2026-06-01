@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+﻿import { useState, useRef, useEffect } from "react";
 import { useParams, useNavigate, useSearchParams, Link } from "react-router-dom";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -29,19 +29,21 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 
-import { AccountTypeBadge } from "@/components/accounts/AccountTypeBadge";
-import { EASyncStatus }     from "@/components/accounts/EASyncStatus";
-import { DrawdownBar }      from "@/components/accounts/DrawdownBar";
-import { InfoTooltip }      from "@/components/shared/InfoTooltip";
+import { AccountTypeBadge }   from "@/components/accounts/AccountTypeBadge";
+import { AccountStatusBadge } from "@/components/accounts/AccountStatusBadge";
+import { EASyncStatus }       from "@/components/accounts/EASyncStatus";
+import { PropChallengeCard }  from "@/components/accounts/PropChallengeCard";
+import { InfoTooltip }        from "@/components/shared/InfoTooltip";
 import { ErrorState }       from "@/components/shared/ErrorState";
 import { BalanceHistoryChart } from "@/components/dashboard/BalanceHistoryChart";
+import { AccountEATab }       from "@/components/ea/AccountEATab";
 
 import {
   useAccount, useUpdateAccount, useDeleteAccount,
   useEAStatus, useGenerateEAKey, useRevokeEAKey,
 } from "@/hooks/useAccounts";
 import { useTradeStats, useTrades } from "@/hooks/useTrades";
-import { useBalanceHistory } from "@/hooks/useTransactions";
+import { useBalanceHistory, useTransactions, useTransactionSummary } from "@/hooks/useTransactions";
 
 import { accountFormSchema, transformAccountForm } from "@/app/schema/account";
 import { formatCurrency, formatDate, formatRelativeTime, getPnLColor, formatPnL } from "@/utils/format";
@@ -49,6 +51,9 @@ import { DirectionBadge } from "@/components/trades/DirectionBadge";
 import { OutcomeBadge }   from "@/components/trades/OutcomeBadge";
 import { AddTradeSheet }  from "@/components/trades/AddTradeSheet";
 import { TradeDetailPanel } from "@/components/trades/TradeDetailPanel";
+import { TransactionRow }        from "@/components/transactions/TransactionRow";
+import { TransactionRowSkeleton } from "@/components/transactions/TransactionRowSkeleton";
+import { AddTransactionModal }   from "@/components/transactions/AddTransactionModal";
 import { pageVariants }     from "@/lib/animations";
 import { cn }               from "@/lib/utils";
 
@@ -112,7 +117,7 @@ const CopyInput = ({ value }) => {
         className="font-mono text-xs bg-background border-border flex-1"
       />
       <Button variant="outline" size="icon" onClick={copy} className="flex-shrink-0">
-        {copied ? <Check className="h-4 w-4 text-[hsl(var(--profit))]" /> : <Copy className="h-4 w-4" />}
+        {copied ? <Check className="h-4 w-4 text-[var(--profit)]" /> : <Copy className="h-4 w-4" />}
       </Button>
     </div>
   );
@@ -134,7 +139,7 @@ const SettingsTab = ({ account, onDelete }) => {
       broker:          account.broker ?? "",
       tradingMode:     account.tradingMode ?? "live",
       notes:           account.notes ?? "",
-      propFirm:        account.propFirm ?? "",
+      propFirm:        account.propRules?.propFirmName ?? "",
     },
   });
 
@@ -347,9 +352,9 @@ const EASyncTab = ({ accountId }) => {
         {/* Newly generated key — show once */}
         {newKey && (
           <div className="space-y-2">
-            <div className="flex items-start gap-2 p-3 rounded-lg bg-[hsl(var(--warning)/0.1)] border border-[hsl(var(--warning)/0.3)]">
+            <div className="flex items-start gap-2 p-3 rounded-lg bg-[var(--warning)]/10 border border-[var(--warning)]/30">
               <span className="text-sm">⚠️</span>
-              <p className="text-xs text-[hsl(var(--warning))]">
+              <p className="text-xs text-[var(--warning)]">
                 Copy this key now. Once you leave this page it cannot be retrieved.
               </p>
             </div>
@@ -559,6 +564,111 @@ const AccountTradesTab = ({ accountId, accountName }) => {
   );
 };
 
+// ── Account Transactions Tab ──────────────────────────────────
+const AccountTransactionsTab = ({ accountId, account }) => {
+  const [isAddOpen,       setIsAddOpen]       = useState(false);
+  const [selectedTradeId, setSelectedTradeId] = useState(null);
+
+  const { data, isLoading } = useTransactions({
+    accountId,
+    limit:  10,
+    sortBy: "transactionDate",
+    order:  "desc",
+  });
+  const { data: balanceHistory, isLoading: historyLoading } = useBalanceHistory({ accountId });
+
+  const transactions = data?.transactions ?? [];
+  const total        = data?.pagination?.total ?? 0;
+
+  return (
+    <>
+      <div className={cn("transition-[padding] duration-300", !!selectedTradeId && "pr-[444px]")}>
+        <div className="flex items-center justify-between mb-3">
+          <p className="text-sm font-medium text-foreground">
+            {total > 0 ? `${total} transactions` : "Transactions"}
+          </p>
+          <div className="flex items-center gap-2">
+            <Button
+              size="sm"
+              variant="outline"
+              className="gap-1.5 h-8 text-xs"
+              onClick={() => setIsAddOpen(true)}
+            >
+              <span className="text-base leading-none">+</span>
+              Add Transaction
+            </Button>
+            <Button
+              size="sm"
+              variant="ghost"
+              className="h-8 text-xs text-muted-foreground hover:text-foreground"
+              asChild
+            >
+              <Link to={`/transactions?accountId=${accountId}`}>View all</Link>
+            </Button>
+          </div>
+        </div>
+
+        {/* Compact balance chart */}
+        <div className="trading-card p-4 mb-3">
+          <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium mb-2">
+            Balance History
+          </p>
+          <div className="h-40">
+            <BalanceHistoryChart data={balanceHistory} isLoading={historyLoading} />
+          </div>
+        </div>
+
+        {/* Transactions list */}
+        <div className="trading-card overflow-hidden">
+          {isLoading ? (
+            Array.from({ length: 5 }).map((_, i) => (
+              <TransactionRowSkeleton key={i} />
+            ))
+          ) : transactions.length === 0 ? (
+            <div className="p-8 flex flex-col items-center justify-center text-center space-y-2">
+              <p className="text-sm font-medium text-foreground">No transactions yet</p>
+              <p className="text-xs text-muted-foreground">
+                Transactions are created automatically when you add trades.
+              </p>
+              <Button size="sm" className="mt-2 gap-1.5" onClick={() => setIsAddOpen(true)}>
+                <span className="text-base leading-none">+</span>
+                Add Deposit
+              </Button>
+            </div>
+          ) : (
+            <>
+              {transactions.map((tx) => (
+                <TransactionRow
+                  key={tx._id}
+                  transaction={tx}
+                  showAccount={false}
+                  onTradeClick={(id) => setSelectedTradeId(id)}
+                />
+              ))}
+              {total > 10 && (
+                <div className="px-4 py-2.5 border-t border-border">
+                  <Button variant="ghost" size="sm" className="w-full text-xs text-muted-foreground" asChild>
+                    <Link to={`/transactions?accountId=${accountId}`}>
+                      View all {total} transactions →
+                    </Link>
+                  </Button>
+                </div>
+              )}
+            </>
+          )}
+        </div>
+      </div>
+
+      <AddTransactionModal
+        open={isAddOpen}
+        onClose={() => setIsAddOpen(false)}
+        accounts={account ? [account] : []}
+        defaultAccountId={accountId}
+      />
+    </>
+  );
+};
+
 // ── Main AccountDetail component ──────────────────────────────
 export const AccountDetail = () => {
   const { id }               = useParams();
@@ -601,15 +711,35 @@ export const AccountDetail = () => {
     );
   }
 
-  const balance         = account.currentBalance ?? account.startingBalance ?? 0;
-  const pnl             = balance - (account.startingBalance ?? 0);
-  const winRate         = tradeStats?.winRate ?? null;
-  const totalTrades     = tradeStats?.totalTrades ?? null;
-  const monthlyPnl      = tradeStats?.monthlyPnl ?? null;
-  const eaEnabled       = account.eaSync?.enabled ?? false;
-  const eaOnline        = account.eaSync?.isOnline ?? false;
-  const currentDrawdown = account.currentDrawdownPercent ?? 0;
-  const maxDrawdown     = account.propRules?.maxDrawdownPercent ?? 10;
+  const isProp = account.type === "prop";
+
+  // Balance: prop shows firm capital (accountSize); normal/war shows live balance
+  const balance  = isProp
+    ? (account.accountSize ?? account.startingBalance ?? 0)
+    : (account.balanceSnapshot ?? account.startingBalance ?? 0);
+
+  // P&L from API — never calculated
+  const pnl = account.performance?.totalPnl ?? 0;
+
+  // Performance from account.performance (winRate is 0-100 per API spec)
+  const winRate     = account.performance?.winRate     ?? null;
+  const avgRR       = account.performance?.avgRR       ?? null;
+  const totalTrades = account.performance?.totalTrades ?? null;
+
+  const eaEnabled = account.eaSync?.enabled  ?? false;
+  const eaOnline  = account.eaSync?.isOnline ?? false;
+
+  // Prop drawdown from propMetrics (never from account root)
+  const currentDrawdown      = account.propMetrics?.currentDrawdownPercent      ?? 0;
+  const currentDailyDrawdown = account.propMetrics?.currentDailyDrawdownPercent ?? 0;
+  const maxDrawdown          = account.propRules?.maxDrawdownPercent             ?? 0;
+  const currentProfit        = account.propMetrics?.currentProfitPercent        ?? 0;
+  const profitTarget         = account.propRules?.profitTarget                  ?? 0;
+  const tradingDays          = account.propMetrics?.tradingDaysCompleted        ?? 0;
+  const minTradingDays       = account.propRules?.minTradingDays                ?? 0;
+
+  // Return on capital from personalMetrics (null on prop)
+  const returnOnCapital = account.personalMetrics?.returnOnCapital ?? null;
 
   return (
     <motion.div
@@ -632,29 +762,58 @@ export const AccountDetail = () => {
 
       {/* ── Account header ───────────────────────── */}
       <div className="space-y-2">
-        <div className="flex items-center gap-3 flex-wrap">
+        <div className="flex items-center gap-2 flex-wrap">
           <h1 className="text-2xl font-heading font-bold text-foreground">{account.name}</h1>
           <AccountTypeBadge type={account.type} />
+          <AccountStatusBadge status={account.status} />
         </div>
+
         <div className="flex items-center gap-3 text-sm text-muted-foreground flex-wrap">
-          {account.type !== "prop" && account.broker && <span>{account.broker}</span>}
-          {account.type === "prop" && account.propFirm && <span>{account.propFirm}</span>}
+          {isProp
+            ? <span>{account.propRules?.propFirmName ?? account.propFirm ?? "Prop Firm"}</span>
+            : account.broker && <span>{account.broker}</span>
+          }
           {account.platform && (
             <>
               <span className="text-border">·</span>
               <span>{account.platform}</span>
             </>
           )}
+          {account.baseCurrency && (
+            <>
+              <span className="text-border">·</span>
+              <span>{account.baseCurrency}</span>
+            </>
+          )}
           <EASyncStatus isOnline={eaOnline} enabled={eaEnabled} />
         </div>
-        <div className="flex items-center gap-2">
-          <p className="text-3xl font-bold font-mono text-foreground">
-            {formatCurrency(balance)}
-          </p>
-          <span className={cn("text-sm font-mono", getPnLColor(pnl))}>
-            {pnl >= 0 ? "+" : ""}{formatCurrency(pnl)}
-          </span>
-        </div>
+
+        {isProp ? (
+          /* Prop: show account size (firm's capital) */
+          <div>
+            <p className="text-3xl font-bold font-mono text-foreground">
+              {formatCurrency(balance)}
+            </p>
+            <p className="text-xs text-muted-foreground mt-0.5">(Firm's Capital)</p>
+          </div>
+        ) : (
+          /* Normal/War: show live balance + P&L from API */
+          <div className="flex items-center gap-3 flex-wrap">
+            <p className="text-3xl font-bold font-mono text-foreground">
+              {formatCurrency(balance)}
+            </p>
+            <div>
+              <span className={cn("text-sm font-mono font-medium", getPnLColor(pnl))}>
+                {formatPnL(pnl)}
+              </span>
+              {returnOnCapital !== null && (
+                <span className={cn("ml-2 text-xs font-mono", getPnLColor(returnOnCapital))}>
+                  {returnOnCapital >= 0 ? "+" : ""}{returnOnCapital.toFixed(2)}% ROC
+                </span>
+              )}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* ── Tabs ────────────────────────────────── */}
@@ -669,33 +828,69 @@ export const AccountDetail = () => {
 
         {/* ── Overview tab ───────────────────────── */}
         <TabsContent value="overview" className="mt-4 space-y-4">
-          {/* Stat cards row */}
+          {/* Stat cards — different for prop vs normal/war */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <OverviewStatCard
-              label="Balance"
-              value={formatCurrency(balance)}
-              tooltip="Current account balance"
-            />
-            <OverviewStatCard
-              label="Monthly PnL"
-              value={monthlyPnl !== null ? formatCurrency(monthlyPnl) : "—"}
-              subColor={getPnLColor(monthlyPnl)}
-              tooltip="Net PnL this calendar month"
-            />
-            <OverviewStatCard
-              label="Win Rate"
-              value={
-                winRate !== null
-                  ? `${(winRate * (winRate <= 1 ? 100 : 1)).toFixed(1)}%`
-                  : statsLoading ? null : "—"
-              }
-              tooltip="Percentage of winning trades in the last 30 days"
-            />
-            <OverviewStatCard
-              label="Total Trades"
-              value={totalTrades !== null ? String(totalTrades) : statsLoading ? null : "—"}
-              tooltip="Total number of closed trades on this account"
-            />
+            {isProp ? (
+              <>
+                <OverviewStatCard
+                  label="Profit Progress"
+                  value={currentProfit !== null ? `${currentProfit.toFixed(2)}%` : "—"}
+                  sub={profitTarget ? `Target: ${profitTarget}%` : undefined}
+                  subColor={currentProfit >= profitTarget
+                    ? "text-[var(--profit)]"
+                    : "text-muted-foreground"}
+                  tooltip="Current profit percentage vs target needed to pass this challenge phase."
+                />
+                <OverviewStatCard
+                  label="Current Drawdown"
+                  value={currentDrawdown !== null ? `${currentDrawdown.toFixed(2)}%` : "—"}
+                  sub={maxDrawdown ? `Limit: ${maxDrawdown}%` : undefined}
+                  subColor={
+                    maxDrawdown > 0 && currentDrawdown / maxDrawdown >= 0.7
+                      ? "text-[var(--loss)]"
+                      : maxDrawdown > 0 && currentDrawdown / maxDrawdown >= 0.5
+                      ? "text-[var(--warning)]"
+                      : "text-muted-foreground"
+                  }
+                  tooltip={`Current drawdown vs maximum allowed. Do not exceed ${maxDrawdown}%.`}
+                />
+                <OverviewStatCard
+                  label="Win Rate"
+                  value={winRate !== null ? `${winRate.toFixed(1)}%` : "—"}
+                  tooltip="Win rate from all closed trades"
+                />
+                <OverviewStatCard
+                  label="Trading Days"
+                  value={tradingDays ?? "—"}
+                  sub={minTradingDays ? `Min: ${minTradingDays}` : undefined}
+                  tooltip="Trading days completed vs minimum required to pass."
+                />
+              </>
+            ) : (
+              <>
+                <OverviewStatCard
+                  label="Win Rate"
+                  value={winRate !== null ? `${winRate.toFixed(1)}%` : "—"}
+                  tooltip="Win rate from all closed trades"
+                />
+                <OverviewStatCard
+                  label="Total P&L"
+                  value={formatPnL(pnl)}
+                  subColor={getPnLColor(pnl)}
+                  tooltip="Total profit and loss from all closed trades"
+                />
+                <OverviewStatCard
+                  label="Avg R:R"
+                  value={avgRR !== null ? `${avgRR.toFixed(2)}:1` : "—"}
+                  tooltip="Average reward to risk ratio"
+                />
+                <OverviewStatCard
+                  label="Total Trades"
+                  value={totalTrades !== null ? String(totalTrades) : "—"}
+                  tooltip="Total number of closed trades on this account"
+                />
+              </>
+            )}
           </div>
 
           {/* Balance history chart */}
@@ -714,69 +909,8 @@ export const AccountDetail = () => {
             </div>
           </div>
 
-          {/* Prop challenge card */}
-          {account.type === "prop" && (
-            <div className="trading-card p-4 space-y-4">
-              <div className="flex items-center justify-between">
-                <p className="text-xs font-medium text-muted-foreground uppercase tracking-widest">
-                  Challenge Progress
-                </p>
-                {account.status && (
-                  <Badge
-                    variant="outline"
-                    className="text-[10px] bg-orange-500/10 text-orange-400 border-orange-500/20"
-                  >
-                    {account.status.charAt(0).toUpperCase() + account.status.slice(1)}
-                  </Badge>
-                )}
-              </div>
-
-              <DrawdownBar current={currentDrawdown} max={maxDrawdown} />
-
-              {account.propRules?.profitTargetPercent && (
-                <div className="space-y-1">
-                  <div className="flex justify-between text-xs">
-                    <span className="text-muted-foreground">Profit Target</span>
-                    <span className="font-mono">
-                      {pnl >= 0 ? "+" : ""}{((pnl / (account.startingBalance ?? 1)) * 100).toFixed(2)}%
-                      {" / "}
-                      {account.propRules.profitTargetPercent}%
-                    </span>
-                  </div>
-                  <div className="h-1.5 rounded-full bg-muted overflow-hidden">
-                    <div
-                      className="h-full rounded-full bg-[hsl(var(--profit))] transition-all duration-500"
-                      style={{
-                        width: `${Math.min(100, Math.max(0,
-                          ((pnl / (account.startingBalance ?? 1)) * 100)
-                          / account.propRules.profitTargetPercent * 100
-                        ))}%`
-                      }}
-                    />
-                  </div>
-                </div>
-              )}
-
-              <div className="grid grid-cols-2 gap-4 text-xs">
-                {account.propRules?.minTradingDays && (
-                  <div>
-                    <p className="text-muted-foreground">Min Trading Days</p>
-                    <p className="font-mono font-medium text-foreground mt-0.5">
-                      {account.propRules.minTradingDays} days required
-                    </p>
-                  </div>
-                )}
-                {account.propRules?.challengeFee && (
-                  <div>
-                    <p className="text-muted-foreground">Challenge Fee</p>
-                    <p className="font-mono font-medium text-foreground mt-0.5">
-                      {formatCurrency(account.propRules.challengeFee)}
-                    </p>
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
+          {/* Prop challenge card — uses correct field mapping */}
+          {isProp && <PropChallengeCard account={account} />}
         </TabsContent>
 
         {/* ── Trades tab ─────────────────────────── */}
@@ -786,17 +920,12 @@ export const AccountDetail = () => {
 
         {/* ── Transactions tab ───────────────────── */}
         <TabsContent value="transactions" className="mt-4">
-          <div className="trading-card p-8 flex flex-col items-center justify-center text-center space-y-2">
-            <p className="text-sm font-medium text-foreground">Transactions coming soon</p>
-            <p className="text-xs text-muted-foreground">
-              Transaction history and management will be available in the next update.
-            </p>
-          </div>
+          <AccountTransactionsTab accountId={id} account={account} />
         </TabsContent>
 
         {/* ── EA Sync tab ────────────────────────── */}
         <TabsContent value="ea" className="mt-4">
-          <EASyncTab accountId={id} />
+          <AccountEATab account={account} isTabActive={activeTab === "ea"} />
         </TabsContent>
 
         {/* ── Settings tab ───────────────────────── */}

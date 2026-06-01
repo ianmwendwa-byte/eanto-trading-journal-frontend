@@ -9,6 +9,8 @@ import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useAuth } from "@/hooks/useAuth";
 import { Badge } from "@/components/ui/badge";
+import { useAccounts } from "@/hooks/useAccounts";
+import { useMemo } from "react";
 
 const NAV_SECTIONS = [
   {
@@ -30,7 +32,7 @@ const NAV_SECTIONS = [
     label: "TOOLS",
     items: [
       { label: "CSV Import",      icon: Upload,  path: "/import", soon: true },
-      { label: "EA Sync",         icon: Cpu,     path: "/ea",     soon: true },
+      { label: "EA Sync",         icon: Cpu,     path: "/ea"     },
       { label: "Business Score",  icon: Trophy,  path: "/score",  soon: true },
     ],
   },
@@ -44,13 +46,18 @@ const NAV_SECTIONS = [
   },
 ];
 
-const NavItem = ({ item, collapsed }) => {
+const NavItem = ({ item, collapsed, eaBadge }) => {
   const location = useLocation();
   const { label, icon: Icon, path, soon } = item;
   const isActive =
     path === "/dashboard"
       ? location.pathname === "/dashboard"
       : location.pathname.startsWith(path);
+
+  const showEABadge = eaBadge?.hasEA && eaBadge.onlineCount > 0;
+  const eaBadgeColor = eaBadge?.allOffline
+    ? "bg-[var(--loss)]/20 text-[var(--loss)]"
+    : "bg-[var(--profit)]/20 text-[var(--profit)]";
 
   const content = (
     <div
@@ -83,6 +90,11 @@ const NavItem = ({ item, collapsed }) => {
           Soon
         </Badge>
       )}
+      {!collapsed && showEABadge && (
+        <span className={cn("ml-auto text-[10px] px-1.5 py-0 h-4 rounded-full font-mono font-bold flex items-center", eaBadgeColor)}>
+          {eaBadge.onlineCount}
+        </span>
+      )}
       {collapsed && (
         <div className="absolute left-full ml-2 px-2 py-1 bg-popover border border-border rounded-md text-xs text-popover-foreground whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none z-50 transition-opacity shadow-lg">
           {label}
@@ -96,9 +108,20 @@ const NavItem = ({ item, collapsed }) => {
   return <Link to={path}>{content}</Link>;
 };
 
+const useEAOnlineCount = () => {
+  const { data } = useAccounts({ limit: 50 });
+  return useMemo(() => {
+    const accounts = data?.accounts ?? [];
+    const eaAccounts = accounts.filter((a) => a.eaSync?.enabled === true);
+    const onlineCount = eaAccounts.filter((a) => a.eaSync?.isOnline === true).length;
+    return { onlineCount, hasEA: eaAccounts.length > 0, allOffline: eaAccounts.length > 0 && onlineCount === 0 };
+  }, [data]);
+};
+
 export const DashboardSidebar = ({ collapsed, onToggle, mobile = false }) => {
   const { mongoUser } = useAuthStore();
   const { logout } = useAuth();
+  const { onlineCount, hasEA, allOffline } = useEAOnlineCount();
 
   const displayName =
     `${mongoUser?.firstName ?? ""} ${mongoUser?.lastName ?? ""}`.trim() || "Trader";
@@ -166,7 +189,12 @@ export const DashboardSidebar = ({ collapsed, onToggle, mobile = false }) => {
             </AnimatePresence>
             <div className="space-y-0.5">
               {section.items.map((item) => (
-                <NavItem key={item.path} item={item} collapsed={collapsed} />
+                <NavItem
+                  key={item.path}
+                  item={item}
+                  collapsed={collapsed}
+                  eaBadge={item.path === "/ea" ? { onlineCount, hasEA, allOffline } : null}
+                />
               ))}
             </div>
           </div>

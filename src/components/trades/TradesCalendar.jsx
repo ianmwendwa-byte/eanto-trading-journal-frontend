@@ -1,4 +1,4 @@
-import { useRef } from "react";
+﻿import { useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -82,9 +82,9 @@ const DayCell = ({ day, trades, onClick }) => {
             <span className={cn(
               "text-[10px] font-mono font-semibold px-1.5 py-0.5 rounded-full",
               stats.isProfit
-                ? "bg-[hsl(var(--profit)/0.15)] text-[hsl(var(--profit))]"
+                ? "bg-[hsl(var(--profit)/0.15)] text-[var(--profit)]"
                 : stats.isLoss
-                  ? "bg-[hsl(var(--loss)/0.15)] text-[hsl(var(--loss))]"
+                  ? "bg-[hsl(var(--loss)/0.15)] text-[var(--loss)]"
                   : "bg-muted text-muted-foreground"
             )}>
               {formatPnL(stats.netPnl)}
@@ -99,10 +99,10 @@ const DayCell = ({ day, trades, onClick }) => {
             {/* Outcome dots */}
             <div className="flex items-center gap-0.5">
               {Array.from({ length: Math.min(stats.wins, 4) }).map((_, i) => (
-                <span key={`w${i}`} className="w-1.5 h-1.5 rounded-full bg-[hsl(var(--profit))]" />
+                <span key={`w${i}`} className="w-1.5 h-1.5 rounded-full bg-[var(--profit)]" />
               ))}
               {Array.from({ length: Math.min(stats.losses, 4 - Math.min(stats.wins, 4)) }).map((_, i) => (
-                <span key={`l${i}`} className="w-1.5 h-1.5 rounded-full bg-[hsl(var(--loss))]" />
+                <span key={`l${i}`} className="w-1.5 h-1.5 rounded-full bg-[var(--loss)]" />
               ))}
               {stats.breakeven > 0 && (
                 <span className="w-1.5 h-1.5 rounded-full bg-[hsl(var(--breakeven))]" />
@@ -153,21 +153,21 @@ const MonthSummaryBar = ({ summary, isLoading }) => {
     {
       label: "Profitable Days",
       value: summary.profitableDays,
-      cls:   "bg-[hsl(var(--profit)/0.1)] text-[hsl(var(--profit))] border-[hsl(var(--profit)/0.2)]",
+      cls:   "bg-[var(--profit)]/10 text-[var(--profit)] border-[var(--profit)]/20",
       tooltip: "Days with positive net P&L",
     },
     {
       label: "Losing Days",
       value: summary.losingDays,
-      cls:   "bg-[hsl(var(--loss)/0.1)] text-[hsl(var(--loss))] border-[hsl(var(--loss)/0.2)]",
+      cls:   "bg-[var(--loss)]/10 text-[var(--loss)] border-[var(--loss)]/20",
       tooltip: "Days with negative net P&L",
     },
     {
       label: "Total P&L",
       value: formatPnL(summary.totalNetPnl),
       cls:   summary.totalNetPnl >= 0
-        ? "bg-[hsl(var(--profit)/0.1)] text-[hsl(var(--profit))] border-[hsl(var(--profit)/0.2)]"
-        : "bg-[hsl(var(--loss)/0.1)] text-[hsl(var(--loss))] border-[hsl(var(--loss)/0.2)]",
+        ? "bg-[var(--profit)]/10 text-[var(--profit)] border-[var(--profit)]/20"
+        : "bg-[var(--loss)]/10 text-[var(--loss)] border-[var(--loss)]/20",
       tooltip: "Total net P&L for the month",
       mono: true,
     },

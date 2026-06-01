@@ -11,7 +11,7 @@ export const useUnreadCount = () => {
   return useQuery({
     queryKey:        notificationKeys.unreadCount(),
     queryFn:         () => api.get(API.NOTIFICATION.UNREAD_COUNT),
-    select:          (data) => data?.data?.count ?? 0,
+    select:          (data) => data?.unreadCount ?? 0,
     staleTime:       30 * 1000,
     refetchInterval: 30 * 1000,
     enabled:         isAuthenticated,
@@ -28,8 +28,8 @@ export const useNotifications = (filters = {}) => {
     queryKey:        notificationKeys.list(cleanFilters),
     queryFn:         () => api.get(API.NOTIFICATION.BASE, { params: cleanFilters }),
     select:          (data) => ({
-      notifications: data?.data?.data         ?? [],
-      pagination:    data?.data?.pagination   ?? {
+      notifications: data?.data         ?? [],
+      pagination:    data?.pagination   ?? {
         total: 0, page: 1, pages: 0, limit: 20,
       },
     }),
@@ -45,10 +45,11 @@ export const useMarkAsRead = () => {
   return useMutation({
     mutationFn: (id) => api.patch(API.NOTIFICATION.READ(id)),
     onMutate: () => {
-      queryClient.setQueryData(
-        notificationKeys.unreadCount(),
-        (old) => Math.max(0, (old ?? 0) - 1)
-      );
+      queryClient.setQueryData(notificationKeys.unreadCount(), (old) => {
+        if (!old) return old;
+        const current = old?.unreadCount ?? 0;
+        return { ...old, unreadCount: Math.max(0, current - 1) };
+      });
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: notificationKeys.all() });
@@ -62,11 +63,13 @@ export const useMarkAllAsRead = () => {
   return useMutation({
     mutationFn: () => api.patch(API.NOTIFICATION.READ_ALL),
     onSuccess: () => {
-      queryClient.setQueryData(notificationKeys.unreadCount(), 0);
+      queryClient.setQueryData(notificationKeys.unreadCount(), (old) =>
+        old ? { ...old, unreadCount: 0 } : old
+      );
       queryClient.invalidateQueries({ queryKey: notificationKeys.all() });
       toast.success("All notifications marked as read");
     },
-    onError: (error) => toast.error(error?.response?.data?.message ?? "Failed to mark all as read"),
+    onError: (error) => toast.error(error?.message ?? "Failed to mark all as read"),
   });
 };
 
@@ -79,7 +82,7 @@ export const useDeleteNotification = () => {
       queryClient.invalidateQueries({ queryKey: notificationKeys.all() });
       toast.success("Notification deleted");
     },
-    onError: (error) => toast.error(error?.response?.data?.message ?? "Failed to delete notification"),
+    onError: (error) => toast.error(error?.message ?? "Failed to delete notification"),
   });
 };
 
@@ -89,7 +92,7 @@ export const useNotificationPreferences = () => {
   return useQuery({
     queryKey:  notificationKeys.preferences(),
     queryFn:   () => api.get(API.NOTIFICATION.PREFERENCES),
-    select:    (data) => data?.data?.data ?? null,
+    select:    (data) => data?.preferences ?? null,
     staleTime: 10 * 60 * 1000,
     enabled:   isAuthenticated,
   });
@@ -103,6 +106,6 @@ export const useUpdateNotificationPreferences = () => {
       queryClient.invalidateQueries({ queryKey: notificationKeys.preferences() });
       toast.success("Preferences updated");
     },
-    onError: (error) => toast.error(error?.response?.data?.message ?? "Failed to update preferences"),
+    onError: (error) => toast.error(error?.message ?? "Failed to update preferences"),
   });
 };

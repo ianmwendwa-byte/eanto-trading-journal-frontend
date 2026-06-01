@@ -1,8 +1,8 @@
-import { cn } from "@/lib/utils";
+﻿import { cn } from "@/lib/utils";
 
 const CONFIG = {
-  buy:  { label: "▲ BUY",  cls: "bg-[hsl(var(--profit)/0.1)] text-[hsl(var(--profit))] border-[hsl(var(--profit)/0.3)]" },
-  sell: { label: "▼ SELL", cls: "bg-[hsl(var(--loss)/0.1)]   text-[hsl(var(--loss))]   border-[hsl(var(--loss)/0.3)]"   },
+  buy:  { label: "▲ BUY",  cls: "bg-[var(--profit)]/10 text-[var(--profit)] border-[var(--profit)]/30" },
+  sell: { label: "▼ SELL", cls: "bg-[var(--loss)]/10   text-[var(--loss)]   border-[var(--loss)]/30"   },
 };
 
 export const DirectionBadge = ({ direction }) => {

@@ -1,4 +1,4 @@
-import {
+﻿import {
   ArrowDownToLine, ArrowUpFromLine, TrendingUp, TrendingDown,
   Repeat2, DollarSign, MinusCircle, PlusCircle,
 } from "lucide-react";
@@ -34,8 +34,8 @@ const ActivityRow = ({ tx }) => {
       <div className={cn(
         "w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0",
         isPositive
-          ? "bg-[hsl(var(--profit)/0.1)] text-[hsl(var(--profit))]"
-          : "bg-[hsl(var(--loss)/0.1)] text-[hsl(var(--loss))]"
+          ? "bg-[var(--profit)]/10 text-[var(--profit)]"
+          : "bg-[var(--loss)]/10 text-[var(--loss)]"
       )}>
         <Icon className="h-3.5 w-3.5" />
       </div>

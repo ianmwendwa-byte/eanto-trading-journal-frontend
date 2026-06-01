@@ -1,0 +1,186 @@
+import { useState } from "react";
+import { Button }   from "@/components/ui/button";
+import { Input }    from "@/components/ui/input";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle,
+  AlertDialogDescription, AlertDialogFooter,
+} from "@/components/ui/alert-dialog";
+import { Loader2, Shield } from "lucide-react";
+import { useSendPasswordReset, useDeleteUserAccount } from "@/hooks/useUser";
+import { useAuthStore }  from "@/store/useAuthStore";
+import { formatRelativeTime } from "@/utils/format";
+import { cn }            from "@/lib/utils";
+
+export const SecuritySection = () => {
+  const { mongoUser } = useAuthStore();
+  const { mutate: sendReset, isPending: sendingReset } = useSendPasswordReset();
+  const { mutate: deleteAccount, isPending: deleting } = useDeleteUserAccount();
+
+  const [deleteDialog, setDeleteDialog] = useState(false);
+  const [confirmEmail, setConfirmEmail] = useState("");
+
+  const email = mongoUser?.email ?? "";
+  const security = mongoUser?.security ?? {};
+  const canDelete = confirmEmail.trim().toLowerCase() === email.toLowerCase();
+
+  // lastLoginAt is top-level; lastLoginIp and failedLoginAttempts are under security
+  const lastLoginAt       = mongoUser?.lastLoginAt ?? null;
+  const lastLoginIp       = security.lastLoginIp ?? null;
+  const failedAttempts    = security.failedLoginAttempts ?? 0;
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center gap-2">
+        <Shield className="h-4 w-4 text-muted-foreground" />
+        <p className="text-sm font-medium text-foreground">Security Settings</p>
+      </div>
+
+      <Tabs defaultValue="password">
+        <TabsList className="bg-muted/50">
+          <TabsTrigger value="password">Password</TabsTrigger>
+          <TabsTrigger value="account">Account</TabsTrigger>
+        </TabsList>
+
+        {/* ── Password ─────────────────────────────── */}
+        <TabsContent value="password" className="mt-4 space-y-4">
+          {/* Password reset */}
+          <div className="trading-card p-4 space-y-3">
+            <div>
+              <p className="text-sm font-semibold text-foreground">Change Password</p>
+              <p className="text-xs text-muted-foreground mt-1">
+                We'll send a password reset email to{" "}
+                <span className="font-medium text-foreground">{email}</span>
+              </p>
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => sendReset(email)}
+              disabled={sendingReset || !email}
+            >
+              {sendingReset ? (
+                <>
+                  <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />
+                  Sending...
+                </>
+              ) : (
+                "Send Reset Email"
+              )}
+            </Button>
+          </div>
+
+          {/* Last login info */}
+          {(lastLoginAt || lastLoginIp || failedAttempts > 0) && (
+            <div className="trading-card p-4 space-y-2">
+              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                Login Activity
+              </p>
+              {lastLoginAt && (
+                <p className="text-xs text-muted-foreground">
+                  Last login:{" "}
+                  <span className="text-foreground">
+                    {formatRelativeTime(lastLoginAt)}
+                  </span>
+                </p>
+              )}
+              {lastLoginIp && (
+                <p className="text-xs text-muted-foreground">
+                  From:{" "}
+                  <span className="font-mono text-foreground">{lastLoginIp}</span>
+                </p>
+              )}
+              {failedAttempts > 0 && (
+                <p className="text-xs flex items-center gap-1" style={{ color: "var(--loss)" }}>
+                  <span className="font-mono font-bold">{failedAttempts}</span>
+                  failed login attempt{failedAttempts !== 1 ? "s" : ""}
+                </p>
+              )}
+            </div>
+          )}
+        </TabsContent>
+
+        {/* ── Account (Danger Zone) ────────────────── */}
+        <TabsContent value="account" className="mt-4 space-y-4">
+          <div className="trading-card p-4 space-y-4 border-destructive/30 bg-destructive/5">
+            <div>
+              <p className="text-sm font-semibold" style={{ color: "var(--loss)" }}>
+                Delete Account
+              </p>
+              <p className="text-xs text-muted-foreground mt-1">
+                Permanently delete your Tradecore account.
+                Your data will be marked for deletion. This action cannot be easily undone.
+              </p>
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              className="border-destructive/40 text-destructive hover:bg-destructive/10"
+              onClick={() => { setConfirmEmail(""); setDeleteDialog(true); }}
+            >
+              Delete Account
+            </Button>
+          </div>
+        </TabsContent>
+      </Tabs>
+
+      {/* Delete account dialog */}
+      <AlertDialog open={deleteDialog} onOpenChange={setDeleteDialog}>
+        <AlertDialogContent className="bg-card border-border">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete your account?</AlertDialogTitle>
+            <AlertDialogDescription asChild>
+              <div className="space-y-2 text-sm text-muted-foreground">
+                <p>
+                  This will soft-delete your account. Your trading data will be preserved
+                  for <strong className="text-foreground">30 days</strong> before permanent
+                  deletion. You can contact support to recover your account within this period.
+                </p>
+                <div className="pt-1">
+                  <p className="text-xs font-medium text-foreground mb-1">
+                    Type your email to confirm:
+                  </p>
+                  <Input
+                    value={confirmEmail}
+                    onChange={(e) => setConfirmEmail(e.target.value)}
+                    placeholder={email}
+                    className="bg-background border-border h-8 text-sm"
+                    autoComplete="off"
+                  />
+                  {confirmEmail && !canDelete && (
+                    <p className="text-[11px] mt-1" style={{ color: "var(--loss)" }}>
+                      Email doesn't match
+                    </p>
+                  )}
+                </div>
+              </div>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <Button
+              variant="ghost"
+              onClick={() => setDeleteDialog(false)}
+              disabled={deleting}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={() => deleteAccount()}
+              disabled={!canDelete || deleting}
+            >
+              {deleting ? (
+                <>
+                  <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />
+                  Deleting...
+                </>
+              ) : (
+                "Delete Account"
+              )}
+            </Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </div>
+  );
+};

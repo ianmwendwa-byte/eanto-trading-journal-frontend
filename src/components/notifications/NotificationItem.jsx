@@ -10,6 +10,7 @@ export const NotificationItem = ({
   notification,
   onRead,
   onDelete,
+  onAction,
   compact = false,
 }) => {
   const navigate = useNavigate();
@@ -22,7 +23,10 @@ export const NotificationItem = ({
 
   const handleClick = () => {
     if (!read && onRead) onRead(_id);
-    if (actionUrl) navigate(actionUrl);
+    if (actionUrl) {
+      navigate(actionUrl);
+      if (onAction) onAction();
+    }
   };
 
   const handleRead = (e) => {

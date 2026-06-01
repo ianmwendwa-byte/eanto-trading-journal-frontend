@@ -60,15 +60,13 @@ export const formatLotSize = (value) => {
 };
 
 export const getPnLColor = (value) => {
-  if (value > 0) return "text-[hsl(var(--profit))]";
-  if (value < 0) return "text-[hsl(var(--loss))]";
+  if (value > 0) return "text-[var(--profit)]";
+  if (value < 0) return "text-[var(--loss)]";
   return "text-muted-foreground";
 };
 
 export const getPnLBg = (value) => {
-  if (value > 0)
-    return "bg-[hsl(var(--profit)/0.1)] text-[hsl(var(--profit))]";
-  if (value < 0)
-    return "bg-[hsl(var(--loss)/0.1)] text-[hsl(var(--loss))]";
+  if (value > 0) return "bg-[var(--profit)]/10 text-[var(--profit)]";
+  if (value < 0) return "bg-[var(--loss)]/10 text-[var(--loss)]";
   return "bg-muted text-muted-foreground";
 };

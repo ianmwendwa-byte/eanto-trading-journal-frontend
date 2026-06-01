@@ -1,11 +1,11 @@
-import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
+﻿import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ErrorState } from "@/components/shared/ErrorState";
 
 const SLICES = [
-  { key: "wins",      label: "Win",       color: "hsl(var(--profit))" },
-  { key: "losses",    label: "Loss",      color: "hsl(var(--loss))" },
-  { key: "breakeven", label: "Breakeven", color: "hsl(var(--breakeven))" },
+  { key: "wins",      label: "Win",       color: "var(--profit)" },
+  { key: "losses",    label: "Loss",      color: "var(--loss)" },
+  { key: "breakeven", label: "Breakeven", color: "var(--breakeven)" },
 ];
 
 const CustomTooltip = ({ active, payload }) => {

@@ -1,4 +1,4 @@
-import { useState } from "react";
+﻿import { useState } from "react";
 import { Star } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -25,7 +25,7 @@ export const GradeStars = ({ value = 0, onChange, readonly = false }) => {
             className={cn(
               "h-3.5 w-3.5 transition-colors",
               star <= display
-                ? "fill-[hsl(var(--warning))] text-[hsl(var(--warning))]"
+                ? "fill-[hsl(var(--warning))] text-[var(--warning)]"
                 : "text-muted-foreground fill-transparent"
             )}
           />

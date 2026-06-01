@@ -1,16 +1,24 @@
 import { useEffect, useRef } from "react";
-import { createChart } from "lightweight-charts";
+import { createChart, AreaSeries } from "lightweight-charts";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ErrorState } from "@/components/shared/ErrorState";
+
+// TradingView requires exactly "yyyy-mm-dd" — strip any time component
+const toDateStr = (raw) => {
+  if (!raw) return null;
+  if (typeof raw === "string" && /^\d{4}-\d{2}-\d{2}$/.test(raw)) return raw;
+  try { return new Date(raw).toISOString().split("T")[0]; } catch { return null; }
+};
 
 const formatChartData = (history) => {
   if (!Array.isArray(history)) return [];
   return history
-    .map((item) => ({
-      time:  item.date ?? item.time,
-      value: item.balance ?? item.value ?? 0,
-    }))
-    .filter((d) => d.time)
+    .map((item) => {
+      const time  = toDateStr(item.date ?? item.time);
+      const value = item.balance ?? item.value ?? 0;
+      return time ? { time, value } : null;
+    })
+    .filter(Boolean)
     .sort((a, b) => (a.time > b.time ? 1 : -1));
 };
 
@@ -50,7 +58,7 @@ export const BalanceHistoryChart = ({ data, isLoading, isError, onRetry }) => {
 
     chartRef.current = chart;
 
-    const series = chart.addAreaSeries({
+    const series = chart.addSeries(AreaSeries, {
       lineColor:               "#173ded",
       topColor:                "rgba(23,61,237,0.25)",
       bottomColor:             "rgba(23,61,237,0)",

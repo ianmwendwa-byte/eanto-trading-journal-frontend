@@ -1,9 +1,9 @@
-import { cn } from "@/lib/utils";
+﻿import { cn } from "@/lib/utils";
 
 const STATUS_CONFIG = {
-  online:  { color: "bg-[hsl(var(--profit))]", label: "Syncing"         },
-  offline: { color: "bg-[hsl(var(--loss))]",   label: "Offline"         },
-  pending: { color: "bg-[hsl(var(--warning))]", label: "Pending"        },
+  online:  { color: "bg-[var(--profit)]", label: "Syncing"         },
+  offline: { color: "bg-[var(--loss)]",   label: "Offline"         },
+  pending: { color: "bg-[var(--warning)]", label: "Pending"        },
   disabled:{ color: "bg-muted-foreground",      label: "Not configured" },
 };
 

@@ -1,4 +1,4 @@
-import {
+﻿import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell,
 } from "recharts";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -76,7 +76,7 @@ export const TopPairsChart = ({ pairStats, isLoading, isError, onRetry }) => {
           {pairs.map((entry, i) => (
             <Cell
               key={i}
-              fill={entry.winRate >= 50 ? "hsl(var(--profit))" : "hsl(var(--loss))"}
+              fill={entry.winRate >= 50 ? "var(--profit)" : "var(--loss)"}
               fillOpacity={0.8}
             />
           ))}

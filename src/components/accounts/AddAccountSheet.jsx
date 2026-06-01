@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+﻿import { useState, useRef, useEffect } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { motion, AnimatePresence } from "framer-motion";
@@ -37,11 +37,11 @@ const TYPE_OPTIONS = [
     label:       "Normal",
     description: "Personal trading account for live or demo trading",
     features:    ["Live or demo trading modes", "Full performance analytics", "Custom risk rules"],
-    color:       "text-[hsl(var(--profit))]",
-    bg:          "bg-[hsl(var(--profit)/0.1)]",
-    border:      "border-[hsl(var(--profit)/0.3)]",
-    dotBg:       "bg-[hsl(var(--profit))]",
-    badge:       "bg-[hsl(var(--profit)/0.1)] text-[hsl(var(--profit))] border-[hsl(var(--profit)/0.2)]",
+    color:       "text-[var(--profit)]",
+    bg:          "bg-[var(--profit)]/10",
+    border:      "border-[var(--profit)]/30",
+    dotBg:       "bg-[var(--profit)]",
+    badge:       "bg-[var(--profit)]/10 text-[var(--profit)] border-[var(--profit)]/20",
   },
   {
     value:       "prop",
@@ -61,11 +61,11 @@ const TYPE_OPTIONS = [
     label:       "War",
     description: "High-risk account for aggressive strategies",
     features:    ["Isolated from main metrics", "Purpose-driven goals", "Unrestricted risk modes"],
-    color:       "text-[hsl(var(--loss))]",
-    bg:          "bg-[hsl(var(--loss)/0.1)]",
-    border:      "border-[hsl(var(--loss)/0.3)]",
-    dotBg:       "bg-[hsl(var(--loss))]",
-    badge:       "bg-[hsl(var(--loss)/0.1)] text-[hsl(var(--loss))] border-[hsl(var(--loss)/0.2)]",
+    color:       "text-[var(--loss)]",
+    bg:          "bg-[var(--loss)]/10",
+    border:      "border-[var(--loss)]/30",
+    dotBg:       "bg-[var(--loss)]",
+    badge:       "bg-[var(--loss)]/10 text-[var(--loss)] border-[var(--loss)]/20",
   },
 ];
 
@@ -712,7 +712,7 @@ export const AddAccountSheet = ({ open, onOpenChange, defaultType }) => {
                     className={cn(
                       "w-full flex items-start gap-3 p-4 rounded-xl border text-left transition-all duration-200",
                       confirmed
-                        ? "bg-[hsl(var(--profit)/0.05)] border-[hsl(var(--profit)/0.35)]"
+                        ? "bg-[var(--profit)]/5 border-[hsl(var(--profit)/0.35)]"
                         : "bg-muted/20 border-border hover:border-border/80"
                     )}
                   >

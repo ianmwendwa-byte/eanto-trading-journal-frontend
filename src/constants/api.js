@@ -14,10 +14,12 @@ export const API = {
     PROFILE:                   "/user/profile",
     PREFERENCES_AI:            "/user/preferences/ai",
     PREFERENCES_NOTIFICATIONS: "/user/preferences/notifications",
+    FEATURE_FLAGS:             "/user/feature-flags",
     ONBOARDING_COMPLETE:       "/user/onboarding/complete",
     ONBOARDING_SKIP:           "/user/onboarding/skip",
   },
   ACCOUNT: {
+
     BASE:            "/accounts",
     DETAIL:          (id) => `/accounts/${id}`,
     EA_STATUS:       (id) => `/accounts/${id}/ea/status`,
@@ -69,5 +71,10 @@ export const API = {
     RECALC_USER:     "/score/user/recalculate",
     HISTORY:         (id) => `/score/account/${id}/history`,
     USER_HISTORY:    "/score/user/history",
+  },
+  DASHBOARD: {
+    OVERVIEW:      "/dashboard/overview",
+    PREFERENCES:   "/dashboard/preferences",
+    REFRESH_CACHE: (id) => `/dashboard/account/${id}/refresh-cache`,
   },
 };

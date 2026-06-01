@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+﻿import { useState, useEffect, useRef } from "react";
 import {
   Search, X, ChevronDown, LayoutList, CalendarDays, Plus,
 } from "lucide-react";
@@ -65,8 +65,8 @@ const PillGroup = ({ options, value, onChange, colored = false }) => (
           onClick={() => onChange(active ? "" : opt.value)}
           className={cn(
             "px-2.5 py-1 rounded-md text-xs font-medium border transition-all whitespace-nowrap",
-            active && colored && isBuy  && "bg-[hsl(var(--profit)/0.15)] text-[hsl(var(--profit))] border-[hsl(var(--profit)/0.4)]",
-            active && colored && isSell && "bg-[hsl(var(--loss)/0.15)] text-[hsl(var(--loss))] border-[hsl(var(--loss)/0.4)]",
+            active && colored && isBuy  && "bg-[hsl(var(--profit)/0.15)] text-[var(--profit)] border-[hsl(var(--profit)/0.4)]",
+            active && colored && isSell && "bg-[hsl(var(--loss)/0.15)] text-[var(--loss)] border-[hsl(var(--loss)/0.4)]",
             active && !isBuy && !isSell && "bg-primary/10 text-primary border-primary/30",
             !active && "bg-transparent text-muted-foreground border-border hover:border-border/60 hover:text-foreground"
           )}

@@ -1,40 +1,32 @@
-import { useNavigate } from "react-router-dom";
+﻿import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { MoreHorizontal, Eye, Key, Pencil, Trash2 } from "lucide-react";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Button } from "@/components/ui/button";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
+  MoreHorizontal, Eye, Key, Pencil, Trash2, AlertTriangle,
+} from "lucide-react";
+import { Skeleton }  from "@/components/ui/skeleton";
+import { Button }    from "@/components/ui/button";
+import { Badge }     from "@/components/ui/badge";
+import {
+  DropdownMenu, DropdownMenuContent, DropdownMenuItem,
+  DropdownMenuSeparator, DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Badge } from "@/components/ui/badge";
-import { AccountTypeBadge } from "./AccountTypeBadge";
-import { EASyncStatus }     from "./EASyncStatus";
-import { DrawdownBar }      from "./DrawdownBar";
-import { InfoTooltip }      from "@/components/shared/InfoTooltip";
-import { formatCurrency, getPnLColor } from "@/utils/format";
-import { cn } from "@/lib/utils";
+import { AccountTypeBadge }   from "./AccountTypeBadge";
+import { AccountStatusBadge } from "./AccountStatusBadge";
+import { EASyncStatus }       from "./EASyncStatus";
+import { InfoTooltip }        from "@/components/shared/InfoTooltip";
+import { formatCurrency, formatPnL, getPnLColor } from "@/utils/format";
+import { cn }                 from "@/lib/utils";
 import { staggerItemVariants } from "@/lib/animations";
+import { useEAStatus }        from "@/hooks/useEA";
 
-const PROP_STATUS_CONFIG = {
-  evaluation: { label: "Evaluation", cls: "bg-orange-500/10 text-orange-400 border-orange-500/20" },
-  active:     { label: "Active",     cls: "bg-green-500/10  text-green-400  border-green-500/20"  },
-  funded:     { label: "Funded",     cls: "bg-purple-500/10 text-purple-400 border-purple-500/20" },
-  breached:   { label: "Breached",   cls: "bg-red-500/10    text-red-400    border-red-500/20"    },
-  paused:     { label: "Paused",     cls: "bg-slate-500/10  text-slate-400  border-slate-500/20"  },
-  archived:   { label: "Archived",   cls: "bg-slate-500/10  text-slate-400  border-slate-500/20"  },
+// ── Accent bar color by type ──────────────────────────────────
+const TYPE_BAR = {
+  normal: "bg-[var(--profit)]",
+  prop:   "bg-primary",
+  war:    "bg-[var(--loss)]",
 };
 
-// Left accent bar color per account type
-const TYPE_BAR_CLASS = {
-  normal: "bg-primary",
-  prop:   "bg-violet-500",
-  war:    "bg-red-500",
-};
-
+// ── Small stat cell ───────────────────────────────────────────
 const StatCell = ({ label, value, valueClass, tooltip }) => (
   <div className="space-y-0.5">
     <div className="flex items-center gap-0.5">
@@ -47,88 +39,179 @@ const StatCell = ({ label, value, valueClass, tooltip }) => (
   </div>
 );
 
-export const AccountCard = ({ account, viewMode = "grid", onEdit, onDelete }) => {
-  const navigate = useNavigate();
-  const balance  = account.currentBalance ?? account.startingBalance ?? 0;
-  const pnl      = balance - (account.startingBalance ?? 0);
+// ── Progress bar (prop challenges) ────────────────────────────
+const PropBar = ({ label, current = 0, target = 0, tooltip, colorMode = "drawdown" }) => {
+  const pct = target > 0 ? Math.min(100, (current / target) * 100) : 0;
 
-  const propStatus = PROP_STATUS_CONFIG[account.status] ?? null;
-  const eaEnabled  = account.eaSync?.enabled ?? false;
-  const eaOnline   = account.eaSync?.isOnline ?? false;
+  const barColor = colorMode === "profit"
+    ? "bg-[var(--profit)]"
+    : pct >= 70 ? "bg-[var(--loss)]"
+    : pct >= 50 ? "bg-[var(--warning)]"
+    : "bg-[var(--profit)]";
 
-  const winRate     = account.performance?.winRate     ?? account.personalMetrics?.winRate     ?? null;
-  const avgRR       = account.performance?.avgRR       ?? account.personalMetrics?.avgRR       ?? null;
-  const totalTrades = account.performance?.totalTrades ?? account.personalMetrics?.totalTrades ?? null;
+  const textColor = colorMode === "profit"
+    ? "text-foreground"
+    : pct >= 70 ? "text-[var(--loss)]"
+    : pct >= 50 ? "text-[var(--warning)]"
+    : "text-muted-foreground";
 
-  const currentDrawdown = account.currentDrawdownPercent ?? 0;
-  const maxDrawdown     = account.propRules?.maxDrawdownPercent ?? 10;
-
-  const normalizedWinRate =
-    winRate !== null
-      ? winRate <= 1 ? winRate * 100 : winRate
-      : null;
-
-  const winRateDisplay = normalizedWinRate !== null ? `${normalizedWinRate.toFixed(1)}%` : "—";
-  const winRateColor   =
-    normalizedWinRate !== null
-      ? normalizedWinRate >= 50 ? "text-[hsl(var(--profit))]" : "text-[hsl(var(--loss))]"
-      : "text-muted-foreground";
-
-  const avgRRDisplay = avgRR !== null ? `${avgRR.toFixed(2)}R` : "—";
-  const avgRRColor   =
-    avgRR !== null
-      ? avgRR >= 1 ? "text-[hsl(var(--profit))]" : "text-[hsl(var(--loss))]"
-      : "text-muted-foreground";
-
-  const Actions = () => (
-    <div
-      className="flex items-center gap-1"
-      onClick={(e) => e.stopPropagation()}
-    >
-      <Button
-        variant="ghost"
-        size="sm"
-        className="h-7 px-2 text-xs"
-        onClick={(e) => { e.stopPropagation(); navigate(`/accounts/${account._id}`); }}
-      >
-        <Eye className="h-3.5 w-3.5 mr-1" />
-        View
-      </Button>
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="ghost" size="icon" className="h-7 w-7">
-            <MoreHorizontal className="h-3.5 w-3.5" />
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="bg-card border-border">
-          <DropdownMenuItem
-            onClick={(e) => { e.stopPropagation(); onEdit?.(account); }}
-            className="gap-2 cursor-pointer"
-          >
-            <Pencil className="h-3.5 w-3.5" />
-            Edit
-          </DropdownMenuItem>
-          <DropdownMenuItem
-            onClick={(e) => { e.stopPropagation(); navigate(`/accounts/${account._id}?tab=ea`); }}
-            className="gap-2 cursor-pointer"
-          >
-            <Key className="h-3.5 w-3.5" />
-            EA Settings
-          </DropdownMenuItem>
-          <DropdownMenuSeparator className="bg-border" />
-          <DropdownMenuItem
-            onClick={(e) => { e.stopPropagation(); onDelete?.(account); }}
-            className="gap-2 cursor-pointer text-destructive focus:text-destructive"
-          >
-            <Trash2 className="h-3.5 w-3.5" />
-            Delete
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
+  return (
+    <div className="space-y-1">
+      <div className="flex items-center justify-between text-xs">
+        <div className="flex items-center gap-1">
+          <span className="text-muted-foreground">{label}</span>
+          {tooltip && <InfoTooltip content={tooltip} side="top" />}
+        </div>
+        <span className={cn("font-mono", textColor)}>
+          {current.toFixed(2)}% / {target}%
+        </span>
+      </div>
+      <div className="h-1.5 rounded-full bg-muted overflow-hidden">
+        <div
+          className={cn("h-full rounded-full transition-all duration-500", barColor)}
+          style={{ width: `${pct}%` }}
+        />
+      </div>
     </div>
   );
+};
 
-  // ── List view ───────────────────────────────────────────────
+// ── Win rate color ────────────────────────────────────────────
+const winRateColor = (wr) => {
+  if (wr === null) return "text-muted-foreground";
+  if (wr >= 60) return "text-[var(--profit)]";
+  if (wr >= 50) return "text-[var(--warning)]";
+  return "text-[var(--loss)]";
+};
+
+// ── Avg RR color ──────────────────────────────────────────────
+const avgRRColor = (rr) => {
+  if (rr === null) return "text-muted-foreground";
+  if (rr >= 2.0) return "text-[var(--profit)]";
+  if (rr >= 1.0) return "text-[var(--warning)]";
+  return "text-[var(--loss)]";
+};
+
+// ── EA status from /ea/status — enabled + isOnline ────────────
+// Response: { success, data: { enabled, isOnline, hasApiKey, ... } }
+// Only fetches when account.eaSync?.enabled is true to avoid N calls for non-EA accounts.
+// Falls back to account.eaSync for the brief window before the first fetch completes.
+const EAStatusChip = ({ account }) => {
+  const configEnabled = account.eaSync?.enabled ?? false;
+
+  const { data: status } = useEAStatus(account._id, {
+    polling: false,
+    enabled: configEnabled,
+  });
+
+  const enabled  = status?.enabled  ?? configEnabled;
+  const isOnline = status?.isOnline ?? false;
+
+  return <EASyncStatus isOnline={isOnline} enabled={enabled} />;
+};
+
+// ── Dropdown actions ──────────────────────────────────────────
+const Actions = ({ account, onEdit, onDelete, navigate }) => (
+  <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
+    <Button
+      variant="ghost"
+      size="sm"
+      className="h-7 px-2 text-xs"
+      onClick={(e) => { e.stopPropagation(); navigate(`/accounts/${account._id}`); }}
+    >
+      <Eye className="h-3.5 w-3.5 mr-1" />
+      View
+    </Button>
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost" size="icon" className="h-7 w-7">
+          <MoreHorizontal className="h-3.5 w-3.5" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="bg-card border-border">
+        <DropdownMenuItem
+          onClick={(e) => { e.stopPropagation(); onEdit?.(account); }}
+          className="gap-2 cursor-pointer"
+        >
+          <Pencil className="h-3.5 w-3.5" />Edit
+        </DropdownMenuItem>
+        <DropdownMenuItem
+          onClick={(e) => { e.stopPropagation(); navigate(`/accounts/${account._id}?tab=ea`); }}
+          className="gap-2 cursor-pointer"
+        >
+          <Key className="h-3.5 w-3.5" />EA Settings
+        </DropdownMenuItem>
+        <DropdownMenuSeparator className="bg-border" />
+        <DropdownMenuItem
+          onClick={(e) => { e.stopPropagation(); onDelete?.(account); }}
+          className="gap-2 cursor-pointer text-destructive focus:text-destructive"
+        >
+          <Trash2 className="h-3.5 w-3.5" />Delete
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  </div>
+);
+
+// ── Main card ─────────────────────────────────────────────────
+export const AccountCard = ({ account, viewMode = "grid", onEdit, onDelete }) => {
+  const navigate = useNavigate();
+
+  // ── Correct field mapping per API spec ────────────────────
+  const isProp = account.type === "prop";
+
+  // Balance: prop shows firm capital (accountSize); normal/war shows live balance
+  const accountSize = isProp ? (account.accountSize ?? 0): (account.startingBalance ?? 0);
+
+  
+  // P&L: always from performance, never calculated
+  const pnl = account.performance?.totalPnl ?? 0;
+
+  // Performance stats — all from account.performance (0-100 for winRate)
+  const winRate     = account.performance?.winRate     ?? null;
+  const avgRR       = account.performance?.avgRR       ?? null;
+  const totalTrades = account.performance?.totalTrades ?? null;
+
+  // Prop metrics (null on normal/war)
+  const propMetrics = account.propMetrics ?? null;
+  const propRules   = account.propRules   ?? null;
+
+  // Current drawdown from propMetrics (not account root)
+  const currentDrawdown      = propMetrics?.currentDrawdownPercent      ?? 0;
+  const currentDailyDrawdown = propMetrics?.currentDailyDrawdownPercent ?? 0;
+  const currentProfit        = propMetrics?.currentProfitPercent        ?? 0;
+  const maxDrawdown          = propRules?.maxDrawdownPercent   ?? 0;
+  const dailyDrawdown        = propRules?.dailyDrawdownPercent ?? 0;
+  const profitTarget         = propRules?.profitTarget         ?? 0;
+
+  // Trading days
+  const tradingDaysDone = propMetrics?.tradingDaysCompleted ?? 0;
+  const tradingDaysMin  = propRules?.minTradingDays         ?? 0;
+
+  // Violations
+  const violations     = propRules?.violations?.violationLog ?? [];
+  const lastViolation  = violations[violations.length - 1];
+
+  // Payout
+  const payoutEligible       = account.payout?.eligible ?? false;
+  const totalPayoutsReceived = propMetrics?.totalPayoutsReceived ?? 0;
+
+  // EA status is fetched live from /ea/status by EAStatusChip below.
+
+ 
+
+  // Prop firm name
+  const propFirmDisplay = propRules?.propFirmName ?? account.propFirm ?? "Prop Firm";
+
+  // Challenge
+  const challengeType   = propRules?.programType ?? null;
+  const challengePhase  = account.challenge?.phase  ?? null;
+
+  // Behavioural flags
+  const hasFlags = account.behaviouralFlags &&
+    Object.values(account.behaviouralFlags).some(Boolean);
+
+  // ── List view ──────────────────────────────────────────────
   if (viewMode === "list") {
     return (
       <motion.div
@@ -137,52 +220,60 @@ export const AccountCard = ({ account, viewMode = "grid", onEdit, onDelete }) =>
         className="trading-card relative overflow-hidden flex items-center gap-4 cursor-pointer group"
         onClick={() => navigate(`/accounts/${account._id}`)}
       >
-        {/* Accent bar */}
-        <div className={cn("absolute left-0 top-0 h-full w-[3px]", TYPE_BAR_CLASS[account.type])} />
-
+        <div className={cn("absolute left-0 top-0 h-full w-[3px]", TYPE_BAR[account.type])} />
         <div className="pl-3 pr-4 py-3 flex items-center gap-4 w-full">
-          {/* Name + badge */}
           <div className="flex-1 min-w-0">
             <p className="text-sm font-semibold text-foreground truncate group-hover:text-primary transition-colors">
               {account.name}
             </p>
             <p className="text-xs text-muted-foreground truncate">
-              {account.type === "prop"
-                ? (account.propFirm ?? "Prop firm")
-                : (account.broker ?? account.platform ?? "—")}
+              {isProp ? propFirmDisplay : (account.broker ?? account.platform ?? "—")}
             </p>
           </div>
 
           <AccountTypeBadge type={account.type} />
+          <AccountStatusBadge status={account.status} />
 
-          {/* Balance */}
           <div className="text-right hidden sm:block w-32">
             <p className="text-sm font-bold font-mono text-foreground">
-              {formatCurrency(balance)}
+              {formatCurrency(accountSize)}
             </p>
-            <p className={cn("text-xs font-mono", getPnLColor(pnl))}>
-              {pnl >= 0 ? "+" : ""}{formatCurrency(pnl)}
-            </p>
+            {!isProp && (
+              <p className={cn("text-xs font-mono", getPnLColor(pnl))}>
+                {pnl >= 0 ? "+" : ""}{formatCurrency(Math.abs(pnl))}
+              </p>
+            )}
           </div>
 
-          {/* Stats */}
           <div className="hidden md:flex items-center gap-6">
-            <StatCell label="Win Rate" value={winRateDisplay} valueClass={winRateColor} />
-            <StatCell label="Avg RR"   value={avgRRDisplay}   valueClass={avgRRColor}   />
-            <StatCell label="Trades"   value={totalTrades ?? "—"} />
+            <StatCell
+              label="Win Rate"
+              value={winRate !== null ? `${winRate.toFixed(1)}%` : "—"}
+              valueClass={winRateColor(winRate)}
+            />
+            <StatCell
+              label="Avg R:R"
+              value={avgRR !== null ? `${avgRR.toFixed(2)}:1` : "—"}
+              valueClass={avgRRColor(avgRR)}
+            />
+            <StatCell
+              label={isProp ? "Days" : "Trades"}
+              value={isProp
+                ? `${tradingDaysDone}/${tradingDaysMin}`
+                : (totalTrades ?? "—")}
+            />
           </div>
 
-          {/* EA + actions */}
           <div className="flex items-center gap-2 ml-auto" onClick={(e) => e.stopPropagation()}>
-            <EASyncStatus isOnline={eaOnline} enabled={eaEnabled} />
-            <Actions />
+            <EAStatusChip account={account} />
+            <Actions account={account} onEdit={onEdit} onDelete={onDelete} navigate={navigate} />
           </div>
         </div>
       </motion.div>
     );
   }
 
-  // ── Grid view ───────────────────────────────────────────────
+  // ── Grid view ──────────────────────────────────────────────
   return (
     <motion.div
       variants={staggerItemVariants}
@@ -191,80 +282,164 @@ export const AccountCard = ({ account, viewMode = "grid", onEdit, onDelete }) =>
       className="trading-card relative overflow-hidden flex flex-col cursor-pointer group"
       onClick={() => navigate(`/accounts/${account._id}`)}
     >
-      {/* Accent bar */}
-      <div className={cn("absolute left-0 top-0 h-full w-[3px]", TYPE_BAR_CLASS[account.type])} />
+      <div className={cn("absolute left-0 top-0 h-full w-[3px]", TYPE_BAR[account.type])} />
 
       <div className="p-4 pl-5 flex flex-col gap-3">
-        {/* Header: name + type badge */}
+        {/* ── Header ─────────────────────────────── */}
         <div className="flex items-start justify-between gap-2">
-          <div className="min-w-0">
+          <div className="min-w-0 flex-1">
             <p className="text-sm font-semibold text-foreground truncate group-hover:text-primary transition-colors">
               {account.name}
             </p>
             <p className="text-xs text-muted-foreground truncate mt-0.5">
-              {account.type === "prop"
-                ? (account.propFirm ?? "Prop firm")
-                : (account.broker ?? account.platform ?? "—")}
+              {isProp
+                ? `${propFirmDisplay} · ${account.platform ?? "—"}`
+                : account.broker
+                ? `${account.broker} · ${account.platform ?? "—"}`
+                : (account.platform ?? "—")}
             </p>
           </div>
-          <AccountTypeBadge type={account.type} />
+          <div className="flex items-center gap-1 flex-shrink-0">
+            <AccountTypeBadge type={account.type} />
+            <AccountStatusBadge status={account.status} />
+          </div>
         </div>
 
-        {/* Balance */}
+        {/* ── Balance / Account Size ─────────────── */}
         <div>
           <div className="flex items-center gap-1 mb-0.5">
-            <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Balance</p>
-            <InfoTooltip content="Current account balance" side="top" />
+            <p className="text-[10px] text-muted-foreground uppercase tracking-wider">
+              {isProp ? "Account Size" : "Starting Balance"}
+            </p>
+            <InfoTooltip
+              content={isProp
+                ? "The prop firm's funded capital. This is not your personal money."
+                : "Current account balance"}
+              side="top"
+            />
           </div>
           <p className="text-xl font-bold font-mono text-foreground leading-none">
-            {formatCurrency(balance)}
+            {formatCurrency(accountSize)}
           </p>
-          <p className={cn("text-xs font-mono mt-0.5", getPnLColor(pnl))}>
-            {pnl >= 0 ? "+" : ""}{formatCurrency(pnl)}
-          </p>
+          {isProp ? (
+            <p className={cn(
+              "text-xs font-mono mt-0.5",
+              currentProfit >= 0
+                ? "text-[var(--profit)]"
+                : "text-[var(--loss)]"
+            )}>
+              {currentProfit >= 0 ? "+" : ""}{currentProfit.toFixed(2)}% profit
+            </p>
+          ) : (
+            <p className={cn("text-xs font-mono mt-0.5", getPnLColor(pnl))}>
+              {pnl >= 0 ? "+" : ""}{formatCurrency(Math.abs(pnl))}
+            </p>
+          )}
         </div>
 
-        {/* Stats row */}
-        <div className="grid grid-cols-3 gap-2 pt-1 border-t border-border">
+        {/* ── Stats row ──────────────────────────── */}
+        <div className="grid grid-cols-3 gap-2 pt-2 border-t border-border">
           <StatCell
             label="Win Rate"
-            value={winRateDisplay}
-            valueClass={winRateColor}
-            tooltip="Win rate over all closed trades"
+            value={winRate !== null ? `${winRate.toFixed(1)}%` : "—"}
+            valueClass={winRateColor(winRate)}
+            tooltip="Win rate from all closed trades"
           />
           <StatCell
-            label="Avg RR"
-            value={avgRRDisplay}
-            valueClass={avgRRColor}
-            tooltip="Average Risk:Reward ratio"
+            label="Avg R:R"
+            value={avgRR !== null ? `${avgRR.toFixed(2)}:1` : "—"}
+            valueClass={avgRRColor(avgRR)}
+            tooltip="Average reward to risk ratio"
           />
           <StatCell
-            label="Trades"
-            value={totalTrades ?? "—"}
-            tooltip="Total closed trades"
+            label={isProp ? "Trade Days" : "Trades"}
+            value={isProp
+              ? `${tradingDaysDone}/${tradingDaysMin}`
+              : (totalTrades ?? "—")}
+            tooltip={isProp
+              ? "Trading days completed vs minimum required"
+              : "Total closed trades"}
           />
         </div>
 
-        {/* Prop-only: drawdown bar + challenge status */}
-        {account.type === "prop" && (
-          <div className="space-y-2">
-            <DrawdownBar current={currentDrawdown} max={maxDrawdown} />
-            {propStatus && (
-              <Badge variant="outline" className={cn("text-[10px]", propStatus.cls)}>
-                {propStatus.label}
-              </Badge>
+        {/* ── Prop challenge section ─────────────── */}
+        {isProp && propRules && propMetrics && (
+          <div className="space-y-2 pt-1 border-t border-border">
+            {/* Challenge label */}
+            {challengeType && challengePhase && (
+              <p className="text-[10px] text-muted-foreground uppercase tracking-wider">
+                {challengeType.replace("_", "-")} · Phase {challengePhase}
+              </p>
             )}
+
+            {/* Profit Target */}
+            <PropBar
+              label="Profit Target"
+              current={currentProfit}
+              target={profitTarget}
+              colorMode="profit"
+              tooltip={`Current profit vs target needed to pass. Need ${profitTarget}% to pass this phase.`}
+            />
+
+            {/* Max Drawdown */}
+            <PropBar
+              label="Max Drawdown"
+              current={currentDrawdown}
+              target={maxDrawdown}
+              colorMode="drawdown"
+              tooltip={`Current drawdown vs maximum allowed. Account blown at ${maxDrawdown}%.`}
+            />
+
+            {/* Daily Drawdown */}
+            {dailyDrawdown > 0 && (
+              <PropBar
+                label="Daily Drawdown"
+                current={currentDailyDrawdown}
+                target={dailyDrawdown}
+                colorMode="drawdown"
+                tooltip="Today's drawdown vs daily limit."
+              />
+            )}
+
+            {/* Payout */}
+            <div className="flex items-center justify-between pt-1">
+              {payoutEligible ? (
+                <Badge
+                  variant="outline"
+                  className="text-[10px] bg-[var(--profit)]/10 text-[var(--profit)] border-[var(--profit)]/20"
+                >
+                  Payout Eligible ✓
+                </Badge>
+              ) : (
+                <p className="text-[10px] text-muted-foreground">Not eligible yet</p>
+              )}
+              {totalPayoutsReceived > 0 && (
+                <p className="text-[10px] text-muted-foreground font-mono">
+                  Earned: {formatCurrency(totalPayoutsReceived)}
+                </p>
+              )}
+            </div>
           </div>
         )}
 
-        {/* Footer: EA status + actions */}
+        {/* ── Footer: EA + actions ───────────────── */}
         <div
           className="flex items-center justify-between pt-1 border-t border-border"
           onClick={(e) => e.stopPropagation()}
         >
-          <EASyncStatus isOnline={eaOnline} enabled={eaEnabled} />
-          <Actions />
+          <EAStatusChip account={account} />
+          <Actions account={account} onEdit={onEdit} onDelete={onDelete} navigate={navigate} />
         </div>
+
+        {/* ── Behavioural warning ────────────────── */}
+        {hasFlags && (
+          <div className="flex items-center gap-1.5 px-2 py-1.5 rounded-md bg-[var(--warning)]/10 border border-[var(--warning)]/20 -mx-1">
+            <span className="text-xs">⚠</span>
+            <p className="text-[11px] text-[var(--warning)] font-medium">
+              Behavioural alert detected
+            </p>
+          </div>
+        )}
       </div>
     </motion.div>
   );

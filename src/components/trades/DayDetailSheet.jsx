@@ -1,4 +1,4 @@
-import { format } from "date-fns";
+﻿import { format } from "date-fns";
 import { X } from "lucide-react";
 import {
   Sheet, SheetContent, SheetHeader, SheetTitle,
@@ -19,8 +19,6 @@ export const DayDetailSheet = ({
 }) => {
   const stats = getDayStats(trades);
   const parsedDate = dateStr ? new Date(dateStr) : null;
-
-  const totalCommission = trades.reduce((s, t) => s + (t.commission ?? 0), 0);
 
   return (
     <Sheet open={isOpen} onOpenChange={(open) => !open && onClose?.()}>
@@ -69,9 +67,9 @@ export const DayDetailSheet = ({
                     W / L
                   </p>
                   <p className="text-sm font-mono font-bold">
-                    <span className="text-[hsl(var(--profit))]">{stats.wins}W</span>
+                    <span className="text-[var(--profit)]">{stats.wins}W</span>
                     <span className="text-muted-foreground mx-1">/</span>
-                    <span className="text-[hsl(var(--loss))]">{stats.losses}L</span>
+                    <span className="text-[var(--loss)]">{stats.losses}L</span>
                   </p>
                 </div>
               </div>
@@ -134,10 +132,6 @@ export const DayDetailSheet = ({
                 <div className="space-y-2.5 text-sm">
                   {[
                     {
-                      label: "Win Rate",
-                      value: `${((stats.wins / stats.count) * 100).toFixed(1)}%`,
-                    },
-                    {
                       label: "Best Trade",
                       value: formatPnL(stats.bestTrade),
                       cls:   getPnLColor(stats.bestTrade),
@@ -146,11 +140,6 @@ export const DayDetailSheet = ({
                       label: "Worst Trade",
                       value: formatPnL(stats.worstTrade),
                       cls:   getPnLColor(stats.worstTrade),
-                    },
-                    {
-                      label: "Total Commission",
-                      value: `–${formatCurrency(totalCommission)}`,
-                      cls:   "text-muted-foreground",
                     },
                   ].map(({ label, value, cls }) => (
                     <div key={label} className="flex items-center justify-between">

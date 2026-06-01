@@ -201,6 +201,7 @@ export const NotificationPanel = () => {
                               notification={n}
                               onRead={(id) => markAsRead.mutate(id)}
                               onDelete={(id) => deleteNotif.mutate(id)}
+                              onAction={handleClose}
                               compact
                             />
                           </motion.div>

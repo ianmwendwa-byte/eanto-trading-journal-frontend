@@ -1,17 +1,17 @@
-import { cn } from "@/lib/utils";
+﻿import { cn } from "@/lib/utils";
 import { InfoTooltip } from "@/components/shared/InfoTooltip";
 
 export const DrawdownBar = ({ current = 0, max = 10, className }) => {
   const pct = max > 0 ? Math.min(100, (current / max) * 100) : 0;
 
   const barColor =
-    pct >= 70 ? "bg-[hsl(var(--loss))]"
-    : pct >= 50 ? "bg-[hsl(var(--warning))]"
-    : "bg-[hsl(var(--profit))]";
+    pct >= 70 ? "bg-[var(--loss)]"
+    : pct >= 50 ? "bg-[var(--warning)]"
+    : "bg-[var(--profit)]";
 
   const textColor =
-    pct >= 70 ? "text-[hsl(var(--loss))]"
-    : pct >= 50 ? "text-[hsl(var(--warning))]"
+    pct >= 70 ? "text-[var(--loss)]"
+    : pct >= 50 ? "text-[var(--warning)]"
     : "text-muted-foreground";
 
   return (

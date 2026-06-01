@@ -34,9 +34,10 @@ export const notificationKeys = {
 };
 
 export const scoreKeys = {
-  account: (id)    => ["score", "account", id],
-  user:    ()      => ["score", "user"],
-  history: (id, w) => ["score", "history", id, w],
+  account:     (id)    => ["score", "account", id],
+  user:        ()      => ["score", "user"],
+  history:     (id, w) => ["score", "history", id, w],
+  userHistory: (weeks) => ["score", "user", "history", weeks],
 };
 
 export const importKeys = {
@@ -49,4 +50,15 @@ export const importKeys = {
 export const userKeys = {
   profile:     () => ["user", "profile"],
   preferences: () => ["user", "preferences"],
+};
+
+export const dashboardKeys = {
+  overview:    (params) => ["dashboard", "overview", params],
+  preferences: ()       => ["dashboard", "preferences"],
+};
+
+export const eaKeys = {
+  status:  (id) => ["ea", "status", id],
+  history: (id) => ["ea", "history", id],
+  config:  (id) => ["ea", "config", id],
 };

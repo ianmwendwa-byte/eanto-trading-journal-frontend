@@ -1,4 +1,4 @@
-import { motion } from "framer-motion";
+﻿import { motion } from "framer-motion";
 import {
   TrendingUp, Wallet, Zap, Star, BarChart3,
   CheckCircle2, ArrowUpRight,
@@ -67,7 +67,7 @@ const BrandPanel = () => (
             <p className="text-xs text-muted-foreground">Total Portfolio Balance</p>
             <p className="text-2xl font-bold font-mono text-foreground mt-0.5">$48,250.00</p>
           </div>
-          <div className="flex items-center gap-1 text-xs font-mono text-[hsl(var(--profit))] bg-[hsl(var(--profit)/0.1)] px-2 py-1 rounded-md">
+          <div className="flex items-center gap-1 text-xs font-mono text-[var(--profit)] bg-[var(--profit)]/10 px-2 py-1 rounded-md">
             <ArrowUpRight className="h-3 w-3" />
             +12.4%
           </div>
@@ -81,9 +81,9 @@ const BrandPanel = () => (
         {/* Mini stats row */}
         <div className="grid grid-cols-3 gap-2 pt-3 border-t border-border/50">
           {[
-            { label: "Win Rate", value: "67.4%", color: "text-[hsl(var(--profit))]" },
+            { label: "Win Rate", value: "67.4%", color: "text-[var(--profit)]" },
             { label: "Accounts", value: "5 active", color: "text-foreground" },
-            { label: "Net P&L", value: "+$5.8K", color: "text-[hsl(var(--profit))]" },
+            { label: "Net P&L", value: "+$5.8K", color: "text-[var(--profit)]" },
           ].map((stat) => (
             <div key={stat.label} className="text-center">
               <p className={`text-sm font-mono font-semibold ${stat.color}`}>{stat.value}</p>

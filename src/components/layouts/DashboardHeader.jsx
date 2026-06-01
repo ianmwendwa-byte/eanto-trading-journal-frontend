@@ -90,13 +90,31 @@ export const DashboardHeader = ({ onMobileMenuOpen }) => {
               )}
             </button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" sideOffset={8} className="min-w-48">
-            <div className="px-2 py-1.5">
-              <p className="text-sm font-medium truncate">{displayName}</p>
-              <p className="text-xs text-muted-foreground truncate">
-                {mongoUser?.email ?? ""}
-              </p>
+          <DropdownMenuContent align="end" sideOffset={8} className="min-w-52 bg-card border-border">
+            {/* User header */}
+            <div className="flex items-center gap-2.5 px-3 py-2.5">
+              <div className="h-8 w-8 rounded-full bg-primary/20 border border-primary/30 flex items-center justify-center shrink-0">
+                {photoUrl ? (
+                  <img src={photoUrl} alt={displayName} className="w-full h-full rounded-full object-cover" />
+                ) : (
+                  <span className="text-[10px] font-bold text-primary">{initials}</span>
+                )}
+              </div>
+              <div className="min-w-0">
+                <p className="text-sm font-medium truncate">{displayName}</p>
+                <p className="text-xs text-muted-foreground truncate">{mongoUser?.email ?? ""}</p>
+              </div>
             </div>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem asChild>
+              <Link to="/settings?section=profile">Profile</Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link to="/settings?section=trading">Trading</Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link to="/settings?section=notifications">Preferences</Link>
+            </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild>
               <Link to="/settings">Settings</Link>
@@ -106,7 +124,7 @@ export const DashboardHeader = ({ onMobileMenuOpen }) => {
               onClick={logout}
               className="text-destructive focus:text-destructive"
             >
-              Log out
+              Sign Out
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

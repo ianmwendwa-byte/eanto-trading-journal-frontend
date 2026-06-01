@@ -7,8 +7,16 @@ import { cn } from "@/lib/utils";
 const TYPE_LABELS = { normal: "Normal", prop: "Prop", war: "War" };
 
 const AccountRow = ({ account }) => {
-  const pnl = (account.currentBalance) - (account.startingBalance);
-  console.log(account);
+  const isProp = account.type === "prop";
+
+  // Balance: prop shows firm capital (accountSize); personal shows live balance (balanceSnapshot).
+  // Never mix — these are fundamentally different money.
+  const displayBalance = isProp
+    ? (account.accountSize ?? account.startingBalance ?? 0)
+    : (account.balanceSnapshot ?? account.startingBalance ?? 0);
+
+  // PnL comes directly from the API's performance cache — never calculated in the frontend.
+  const pnl = account.performance?.totalPnl ?? null;
 
   return (
     <Link to={`/accounts/${account._id}`}>
@@ -34,12 +42,15 @@ const AccountRow = ({ account }) => {
         </div>
         <div className="text-right shrink-0">
           <p className="text-sm font-mono font-medium text-foreground">
-            {formatCurrency(account.currentBalance ?? account.startingBalance ?? 0)}
+            {formatCurrency(displayBalance)}
           </p>
-          <p className={cn("text-[11px] font-mono", getPnLColor(pnl))}>
-            {pnl >= 0 ? "+" : ""}
-            {formatCurrency(pnl)}
-          </p>
+          {isProp ? (
+            <p className="text-[10px] text-muted-foreground">Firm capital</p>
+          ) : pnl !== null ? (
+            <p className={cn("text-[11px] font-mono", getPnLColor(pnl))}>
+              {pnl >= 0 ? "+" : ""}{formatCurrency(Math.abs(pnl))}
+            </p>
+          ) : null}
         </div>
       </div>
     </Link>

@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+﻿import { useEffect } from "react";
 import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
 import { InfoTooltip } from "@/components/shared/InfoTooltip";
@@ -9,7 +9,7 @@ const SCORE_BANDS = {
   needs_work:  { label: "Needs Work",  color: "text-destructive" },
   developing:  { label: "Developing",  color: "text-orange-400" },
   progressing: { label: "Progressing", color: "text-warning" },
-  solid:       { label: "Solid",       color: "text-[hsl(var(--profit))]" },
+  solid:       { label: "Solid",       color: "text-[var(--profit)]" },
   elite:       { label: "Elite",       color: "text-blue-400" },
 };
 
@@ -68,11 +68,10 @@ export const StatCards = ({
     if (scoreIsError) toast.error("Failed to load business score. Please try again.");
   }, [scoreIsError]);
 
-  const nonWarAccounts = (accounts ?? []).filter((a) => a.type !== "war");
-  const totalBalance = nonWarAccounts.reduce(
-    (sum, a) => sum + (a.currentBalance ?? a.startingBalance ?? 0),
-    0
-  );
+  // Prop firm capital and personal account balances cannot be summed — they are
+  // different money (prop = firm's capital; personal = your own capital).
+  // Use the dashboard overview API (overview.portfolio.*) for account-type-scoped totals.
+  const accountCount = (accounts ?? []).length;
 
   const todayPnl = tradeStats?.todayPnl ?? tradeStats?.todaysPnl ?? null;
   const winRate   = tradeStats?.winRate ?? null;
@@ -90,11 +89,11 @@ export const StatCards = ({
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
       <StatCard
-        label="Total Balance"
-        tooltip="Combined balance across all your active trading accounts in USD"
+        label="Active Accounts"
+        tooltip="Total number of active trading accounts (personal + prop). Use the Portfolio widgets for type-separated totals."
         loading={accountsLoading}
-        value={formatCurrency(totalBalance)}
-        subValue={`${nonWarAccounts.length} account${nonWarAccounts.length !== 1 ? "s" : ""}`}
+        value={accountCount > 0 ? String(accountCount) : "—"}
+        subValue={accountCount > 0 ? `${accountCount} account${accountCount !== 1 ? "s" : ""}` : undefined}
       />
       <StatCard
         label="Today's P&L"

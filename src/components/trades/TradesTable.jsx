@@ -5,19 +5,32 @@ import {
   DropdownMenu, DropdownMenuContent,
   DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { InfoTooltip } from "@/components/shared/InfoTooltip";
-import { DirectionBadge } from "./DirectionBadge";
-import { OutcomeBadge }   from "./OutcomeBadge";
-import { SessionBadge }   from "./SessionBadge";
-import { GradeStars }     from "./GradeStars";
+import { InfoTooltip }        from "@/components/shared/InfoTooltip";
+import { DirectionBadge }     from "./DirectionBadge";
+import { OutcomeBadge }       from "./OutcomeBadge";
+import { SessionBadge }       from "./SessionBadge";
+import { GradeStars }         from "./GradeStars";
+import { PropComplianceBadge } from "./PropComplianceBadge";
 import { formatPnL, getPnLColor } from "@/utils/format";
-import { cn } from "@/lib/utils";
+import { getTradeDuration }   from "@/utils/tradeDuration";
+import { cn }    from "@/lib/utils";
 import { format } from "date-fns";
 
-const formatDate   = (v) => v ? format(new Date(v), "MMM d, HH:mm") : "—";
+const formatDate   = (v) => v ? format(new Date(v), "MMM d, yyyy") : "—";
+const formatTime   = (v) => v ? format(new Date(v), "HH:mm")       : "";
 const formatPrice  = (v) => v != null ? Number(v).toFixed(5) : "—";
 const formatLots   = (v) => v != null ? Number(v).toFixed(2)  : "—";
-const formatRR     = (v) => v != null ? `${Number(v).toFixed(2)}R` : "—";
+const formatRR     = (v) => {
+  if (v == null) return "—";
+  const n = Number(v);
+  if (n > 100) return `⚡ ${n.toFixed(2)}:1`;
+  return `${n.toFixed(2)}:1`;
+};
+
+const SOURCE_BADGE = {
+  ea:         { label: "EA",  cls: "bg-blue-500/10 text-blue-400 border-blue-500/20"   },
+  csv_import: { label: "CSV", cls: "bg-muted text-muted-foreground border-border"       },
+};
 
 const SORTABLE_COLS = ["closedAt", "pair", "pnl", "netPnl", "realizedRR"];
 
@@ -56,7 +69,7 @@ const Th = ({ children, col, sort, onSort, right = false, className }) => {
 
 const Td = ({ children, right = false, mono = false, className }) => (
   <td className={cn(
-    "px-3 py-0 h-[44px] align-middle text-sm border-b border-border whitespace-nowrap",
+    "px-3 py-2 align-middle text-sm border-b border-border whitespace-nowrap",
     right && "text-right",
     mono  && "font-mono",
     className
@@ -82,7 +95,7 @@ export const TradesTableSkeleton = () => (
         {Array.from({ length: 8 }).map((_, i) => (
           <tr key={i} className="border-b border-border">
             {[120, 80, 70, 50, 90, 90, 90, 90, 60, 80, 60, 70, 32].map((w, j) => (
-              <td key={j} className="px-3 h-[44px]">
+              <td key={j} className="px-3 py-3">
                 <Skeleton className="h-4 rounded" style={{ width: w }} />
               </td>
             ))}
@@ -107,12 +120,7 @@ export const TradesTable = ({
 }) => {
   if (isLoading) return <TradesTableSkeleton />;
 
-  // Summary row totals
-  const totalPnL    = trades.reduce((s, t) => s + (t.pnl    ?? 0), 0);
-  const totalNetPnL = trades.reduce((s, t) => s + (t.netPnl ?? t.pnl ?? 0), 0);
-  const avgRR = trades.length
-    ? trades.reduce((s, t) => s + (t.realizedRR ?? 0), 0) / trades.length
-    : 0;
+  const wins = trades.filter((t) => t.outcome === "win").length;
 
   return (
     <div className={cn(
@@ -123,14 +131,13 @@ export const TradesTable = ({
         <table className="w-full">
           <thead className="sticky top-0 bg-card z-10 border-b border-border">
             <tr>
-              <Th col="closedAt" sort={sort} onSort={onSort}>Date / Time</Th>
+              <Th col="closedAt" sort={sort} onSort={onSort}>Date</Th>
               <Th col="pair"     sort={sort} onSort={onSort}>Pair</Th>
               <Th col="direction">Dir</Th>
               <Th col="lotSize"  right>Lots</Th>
               <Th col="entryPrice" right>Entry</Th>
               <Th col="exitPrice"  right>Exit</Th>
-              <Th col="pnl"     sort={sort} onSort={onSort} right>P&amp;L</Th>
-              <Th col="netPnl"  sort={sort} onSort={onSort} right>
+              <Th col="netPnl" sort={sort} onSort={onSort} right>
                 <span className="inline-flex items-center gap-1">
                   Net P&amp;L
                   <InfoTooltip content="P&L after commission and swap costs" />
@@ -138,22 +145,24 @@ export const TradesTable = ({
               </Th>
               <Th col="realizedRR" sort={sort} onSort={onSort} right>
                 <span className="inline-flex items-center gap-1">
-                  RR
+                  R:R
                   <InfoTooltip content="Realized reward:risk ratio" />
                 </span>
               </Th>
               <Th col="session"  className="hidden lg:table-cell">Session</Th>
               <Th col="outcome">Outcome</Th>
-              <Th col="grade"   className="hidden xl:table-cell">Grade</Th>
+              <Th col="compliance" className="hidden xl:table-cell">Compliance</Th>
+              <Th col="grade" className="hidden xl:table-cell">Quality</Th>
               <Th col="actions" className="w-8" />
             </tr>
           </thead>
 
           <tbody>
             {trades.map((trade) => {
-              const selected = trade._id === selectedTradeId;
-              const pnlVal   = trade.pnl    ?? 0;
-              const netPnlVal = trade.netPnl ?? pnlVal;
+              const selected  = trade._id === selectedTradeId;
+              const netPnlVal = trade.netPnl ?? trade.pnl ?? 0;
+              const duration  = getTradeDuration(trade.openedAt, trade.closedAt);
+              const source    = SOURCE_BADGE[trade.source];
 
               return (
                 <tr
@@ -166,42 +175,71 @@ export const TradesTable = ({
                       : "hover:bg-muted/40"
                   )}
                 >
-                  <Td className="text-muted-foreground text-xs">
-                    {formatDate(trade.closedAt)}
+                  {/* Date + duration */}
+                  <Td>
+                    <div>
+                      <p className="text-sm text-foreground">{formatDate(trade.closedAt)}</p>
+                      <p className="text-[10px] text-muted-foreground font-mono">
+                        {formatTime(trade.closedAt)} · {duration}
+                      </p>
+                    </div>
                   </Td>
-                  <Td mono className="font-semibold text-foreground">
-                    {trade.pair ?? "—"}
+
+                  {/* Pair + source */}
+                  <Td>
+                    <div>
+                      <p className="font-mono font-semibold text-foreground">{trade.pair ?? "—"}</p>
+                      {source && (
+                        <span className={cn(
+                          "inline-flex items-center px-1 py-0 rounded text-[9px] font-medium border mt-0.5",
+                          source.cls
+                        )}>
+                          {source.label}
+                        </span>
+                      )}
+                    </div>
                   </Td>
+
                   <Td>
                     <DirectionBadge direction={trade.direction} />
                   </Td>
+
                   <Td mono right className="text-muted-foreground">
                     {formatLots(trade.lotSize)}
                   </Td>
+
                   <Td mono right className="text-muted-foreground text-xs">
                     {formatPrice(trade.entryPrice)}
                   </Td>
+
                   <Td mono right className="text-muted-foreground text-xs">
                     {formatPrice(trade.exitPrice)}
                   </Td>
-                  <Td mono right className={cn("font-bold", getPnLColor(pnlVal))}>
-                    {formatPnL(pnlVal)}
-                  </Td>
-                  <Td mono right className={cn("text-sm", getPnLColor(netPnlVal))}>
+
+                  <Td mono right className={cn("font-bold", getPnLColor(netPnlVal))}>
                     {formatPnL(netPnlVal)}
                   </Td>
-                  <Td mono right className="text-muted-foreground">
+
+                  <Td mono right className="text-muted-foreground text-sm">
                     {formatRR(trade.realizedRR)}
                   </Td>
+
                   <Td className="hidden lg:table-cell">
                     <SessionBadge session={trade.session} />
                   </Td>
+
                   <Td>
                     <OutcomeBadge outcome={trade.outcome} />
                   </Td>
+
+                  <Td className="hidden xl:table-cell">
+                    <PropComplianceBadge propCompliance={trade.propCompliance} />
+                  </Td>
+
                   <Td className="hidden xl:table-cell">
                     <GradeStars value={trade.setupQualityRating ?? 0} readonly />
                   </Td>
+
                   <Td>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
@@ -222,9 +260,6 @@ export const TradesTable = ({
                         <DropdownMenuItem onClick={() => onRowClick?.(trade)}>
                           View Details
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => onEdit?.(trade)}>
-                          Edit Trade
-                        </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem
                           className="text-destructive focus:text-destructive"
@@ -240,23 +275,14 @@ export const TradesTable = ({
             })}
           </tbody>
 
-          {/* Summary row */}
+          {/* Page count row — count only, no aggregated PnL to avoid mixing account types */}
           {trades.length > 0 && (
             <tfoot>
-              <tr className="border-t-2 border-border bg-muted/30">
-                <td colSpan={6} className="px-3 py-2 text-xs font-medium text-muted-foreground">
-                  Total ({trades.length})
+              <tr className="border-t border-border bg-muted/20">
+                <td colSpan={13} className="px-3 py-2 text-xs text-muted-foreground">
+                  {trades.length} trade{trades.length !== 1 ? "s" : ""} on this page
+                  · {wins}W / {trades.length - wins}L
                 </td>
-                <td className={cn("px-3 py-2 text-right font-mono font-bold text-sm", getPnLColor(totalPnL))}>
-                  {formatPnL(totalPnL)}
-                </td>
-                <td className={cn("px-3 py-2 text-right font-mono text-sm", getPnLColor(totalNetPnL))}>
-                  {formatPnL(totalNetPnL)}
-                </td>
-                <td className="px-3 py-2 text-right font-mono text-xs text-muted-foreground">
-                  {avgRR.toFixed(2)}R
-                </td>
-                <td colSpan={4} />
               </tr>
             </tfoot>
           )}
