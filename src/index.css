@@ -371,6 +371,23 @@
   }
 
   .trading-grid {
+    /* Light mode: dark lines at low opacity */
+    background-image:
+      linear-gradient(
+        rgba(2, 6, 24, 0.05) 1px,
+        transparent 1px
+      ),
+      linear-gradient(
+        90deg,
+        rgba(2, 6, 24, 0.05) 1px,
+        transparent 1px
+      );
+
+    background-size: 24px 24px;
+  }
+
+  .dark .trading-grid {
+    /* Dark mode: white lines at low opacity */
     background-image:
       linear-gradient(
         rgba(255, 255, 255, 0.03) 1px,
@@ -381,7 +398,5 @@
         rgba(255, 255, 255, 0.03) 1px,
         transparent 1px
       );
-
-    background-size: 24px 24px;
   }
 }

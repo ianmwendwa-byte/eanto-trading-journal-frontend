@@ -1,7 +1,27 @@
-import { createBrowserRouter, Navigate } from "react-router-dom";
+import { createBrowserRouter, Navigate, Outlet } from "react-router-dom";
 import { ProtectedRoute } from "@/components/shared/ProtectedRoute";
 import { DashboardLayout } from "@/components/layouts/DashboardLayout";
+import { ScrollToTop } from "@/components/shared/ScrollToTop";
 import { useAuthStore } from "@/store/useAuthStore";
+
+// Landing page
+import { LandingPage }    from "@/pages/landing/LandingPage";
+
+// Legal pages
+import { DataPolicy as PrivacyPolicy } from "@/pages/legal/DataPolicy";
+import { TermsOfService }              from "@/pages/legal/TermsOfService";
+import { TrackingPolicy }              from "@/pages/legal/TrackingPolicy";
+
+// Marketing pages
+import { AboutPage }     from "@/pages/marketing/AboutPage";
+import { ContactPage }   from "@/pages/marketing/ContactPage";
+import { BlogPage }      from "@/pages/marketing/BlogPage";
+import { CommunityPage } from "@/pages/marketing/CommunityPage";
+
+// Feature pages
+import { WarPage }      from "@/pages/marketing/WarPage";
+import { EASyncPage }   from "@/pages/marketing/EASyncPage";
+import { ScorePage }    from "@/pages/marketing/ScorePage";
 
 // Auth pages
 import { Login }          from "@/pages/auth/Login";
@@ -21,8 +41,8 @@ import { Analytics }      from "@/pages/app/Analytics";
 import { Strategies }     from "@/pages/app/Strategies";
 import { Insights }       from "@/pages/app/Insights";
 import { Notifications }  from "@/pages/app/Notifications";
-import { Settings }      from "@/pages/app/Settings";
-import { EASync }        from "@/pages/app/EASync";
+import { Settings }       from "@/pages/app/Settings";
+import { EASync }         from "@/pages/app/EASync";
 
 const ComingSoonStub = ({ title }) => (
   <div className="p-6 flex items-center justify-center min-h-[60vh]">
@@ -45,13 +65,8 @@ const OnboardingRoute = ({ children }) => {
     );
   }
 
-  if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
-  }
-
-  if (onboardingComplete === true) {
-    return <Navigate to="/dashboard" replace />;
-  }
+  if (!isAuthenticated) return <Navigate to="/login" replace />;
+  if (onboardingComplete === true) return <Navigate to="/dashboard" replace />;
 
   return children;
 };
@@ -62,46 +77,76 @@ const AppRoot = () => (
   </ProtectedRoute>
 );
 
+// Root layout — renders ScrollToTop on every route change then the matched page
+const Root = () => (
+  <>
+    <ScrollToTop />
+    <Outlet />
+  </>
+);
+
 export const router = createBrowserRouter([
-  // Public auth routes
-  { path: "/login",           element: <Login /> },
-  { path: "/register",        element: <Register /> },
-  { path: "/forgot-password", element: <ForgotPassword /> },
-
-  // Onboarding — authenticated but not-yet-complete users
   {
-    path: "/onboarding",
-    element: (
-      <OnboardingRoute>
-        <Onboarding />
-      </OnboardingRoute>
-    ),
-  },
-
-  // Root redirect
-  { path: "/", element: <Navigate to="/dashboard" replace /> },
-
-  // Protected app routes — all wrapped with DashboardLayout
-  {
-    element: <AppRoot />,
+    element: <Root />,
     children: [
-      { path: "/dashboard",     element: <Dashboard /> },
-      { path: "/accounts",      element: <Accounts /> },
-      { path: "/accounts/:id",  element: <AccountDetail /> },
-      { path: "/analytics",     element: <Analytics /> },
-      { path: "/strategies",    element: <Strategies /> },
-      { path: "/insights",      element: <Insights /> },
-      { path: "/notifications", element: <Notifications /> },
-      { path: "/transactions",  element: <Transactions /> },
-      { path: "/trades",        element: <Trades /> },
-      { path: "/score",         element: <ComingSoonStub title="Business Score" /> },
-      { path: "/import",        element: <ComingSoonStub title="CSV Import" /> },
-      { path: "/ea",            element: <EASync /> },
-      { path: "/ai",            element: <ComingSoonStub title="AI Coach" /> },
-      { path: "/settings",      element: <Settings /> },
+      // Auth
+      { path: "/login",           element: <Login /> },
+      { path: "/register",        element: <Register /> },
+      { path: "/forgot-password", element: <ForgotPassword /> },
+
+      // Onboarding
+      {
+        path: "/onboarding",
+        element: (
+          <OnboardingRoute>
+            <Onboarding />
+          </OnboardingRoute>
+        ),
+      },
+
+      // Landing
+      { path: "/",        element: <LandingPage /> },
+      { path: "/landing", element: <LandingPage /> },
+
+      // Marketing
+      { path: "/about",     element: <AboutPage /> },
+      { path: "/contact",   element: <ContactPage /> },
+      { path: "/blog",      element: <BlogPage /> },
+      { path: "/community", element: <CommunityPage /> },
+
+      // Feature pages
+      { path: "/war-account",    element: <WarPage /> },
+      { path: "/ea-sync",        element: <EASyncPage /> },
+      { path: "/business-score", element: <ScorePage /> },
+
+      // Legal
+      { path: "/privacy", element: <PrivacyPolicy /> },
+      { path: "/terms",   element: <TermsOfService /> },
+      { path: "/cookies", element: <TrackingPolicy /> },
+
+      // Protected app routes
+      {
+        element: <AppRoot />,
+        children: [
+          { path: "/dashboard",     element: <Dashboard /> },
+          { path: "/accounts",      element: <Accounts /> },
+          { path: "/accounts/:id",  element: <AccountDetail /> },
+          { path: "/analytics",     element: <Analytics /> },
+          { path: "/strategies",    element: <Strategies /> },
+          { path: "/insights",      element: <Insights /> },
+          { path: "/notifications", element: <Notifications /> },
+          { path: "/transactions",  element: <Transactions /> },
+          { path: "/trades",        element: <Trades /> },
+          { path: "/score",         element: <ComingSoonStub title="Business Score" /> },
+          { path: "/import",        element: <ComingSoonStub title="CSV Import" /> },
+          { path: "/ea",            element: <EASync /> },
+          { path: "/ai",            element: <ComingSoonStub title="AI Coach" /> },
+          { path: "/settings",      element: <Settings /> },
+        ],
+      },
+
+      // Catch-all
+      { path: "*", element: <Navigate to="/dashboard" replace /> },
     ],
   },
-
-  // Catch all
-  { path: "*", element: <Navigate to="/dashboard" replace /> },
 ]);
