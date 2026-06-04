@@ -15,9 +15,13 @@ const SIZE_MAP = {
 const Logo = ({ variant = "horizontal", size = "md", className }) => {
   const { theme } = useTheme();
 
+  // Guard window.matchMedia for SSR — it does not exist in Node.js.
+  // suppressHydrationWarning on the img covers the case where the user's
+  // stored theme (light) differs from the SSR default (dark).
   const isDark =
     theme === "dark" ||
     (theme === "system" &&
+      typeof window !== "undefined" &&
       window.matchMedia("(prefers-color-scheme: dark)").matches);
 
   let src;
@@ -39,6 +43,7 @@ const Logo = ({ variant = "horizontal", size = "md", className }) => {
       style={{ height: `${height}px`, width: "auto" }}
       className={cn("flex-shrink-0", className)}
       draggable={false}
+      suppressHydrationWarning
     />
   );
 };

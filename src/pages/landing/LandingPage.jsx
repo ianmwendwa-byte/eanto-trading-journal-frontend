@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { LandingNavbar } from "@/components/landing/LandingNavbar";
 import { HeroSection } from "@/components/landing/HeroSection";
@@ -32,21 +32,33 @@ const useHashScroll = () => {
 // ── Landing Page ──────────────────────────────────────────────────────────────
 
 export const LandingPage = () => {
+  // Helmet is client-only: react-helmet-async v3 renders its children as React
+  // nodes during renderToString (they appear in the SSR HTML), but on the client
+  // Helmet renders null and uses effects to update document.head. This mismatch
+  // causes hydration error #418. By only mounting Helmet after the first client
+  // render, both SSR and the initial client render output the same DOM structure.
+  const [mounted, setMounted] = useState(false);
   useHashScroll();
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   return (
     <>
-      <Helmet>
-        <title>Kraviq — Forex Trading OS for Prop &amp; Manual Traders</title>
-        <meta
-          name="description"
-          content="Track every trade, manage prop firm challenges, and score your trading business. Kraviq is the all-in-one forex trading OS with EA sync, CSV import, and Business Score. Free to start."
-        />
-        <link rel="canonical" href="https://kraviq.app" />
-        <meta property="og:title" content="Kraviq — Forex Trading OS" />
-        <meta property="og:url" content="https://kraviq.app" />
-        <meta name="robots" content="index, follow" />
-      </Helmet>
+      {mounted && (
+        <Helmet>
+          <title>Kraviq — Forex Trading OS for Prop &amp; Manual Traders</title>
+          <meta
+            name="description"
+            content="Track every trade, manage prop firm challenges, and score your trading business. Kraviq is the all-in-one forex trading OS with EA sync, CSV import, and Business Score. Free to start."
+          />
+          <link rel="canonical" href="https://kraviq.app" />
+          <meta property="og:title" content="Kraviq — Forex Trading OS" />
+          <meta property="og:url" content="https://kraviq.app" />
+          <meta name="robots" content="index, follow" />
+        </Helmet>
+      )}
 
       <div className="min-h-screen bg-background text-foreground antialiased overflow-x-hidden">
         {/* Skip to main content (accessibility) */}

@@ -2,6 +2,8 @@ import { Link } from "react-router-dom";
 import { Share2, Play, MessageCircle } from "lucide-react";
 import Logo from "@/components/shared/Logo";
 
+const FOUNDING_YEAR = 2026;
+
 const LINKS = {
   Product: [
     { label: "Features",       href: "/#features" },
@@ -30,7 +32,9 @@ const SOCIALS = [
 ];
 
 export const LandingFooter = () => {
-  const year = new Date().getFullYear();
+  // Compute once at module load — same value for SSR and client initial render.
+  // Using a module-level constant avoids re-computing on every render.
+  const year = FOUNDING_YEAR;
 
   return (
     <footer
