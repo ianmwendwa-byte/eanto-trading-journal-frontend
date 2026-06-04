@@ -101,7 +101,7 @@ export const Register = () => {
         {/* Logo + heading */}
         <div className="space-y-1">
           <div className="mb-5">
-            <Logo variant="horizontal" size="md" />
+            <Logo variant="horizontal" size="lg" />
           </div>
           <h1 className="text-2xl font-bold font-heading tracking-tight">Create your Kraviq account</h1>
           <p className="text-muted-foreground text-sm">

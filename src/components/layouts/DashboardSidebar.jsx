@@ -147,7 +147,7 @@ export const DashboardSidebar = ({ collapsed, onToggle, mobile = false }) => {
         )}
       >
         {!collapsed && (
-          <Logo variant="horizontal" size="sm" />
+          <Logo variant="horizontal" size="lg" />
         )}
         {mobile ? (
           <button
