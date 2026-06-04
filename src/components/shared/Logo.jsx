@@ -1,3 +1,4 @@
+import { useTheme } from "@/components/theme-provider";
 import { cn } from "@/lib/utils";
 import logoHorizontalDark from "@/assets/icon_workmark_dark.svg";
 import logoHorizontalLight from "@/assets/icon_workmark_light.svg";
@@ -11,20 +12,21 @@ const SIZE_MAP = {
   icon:       { sm: 20, md: 28, lg: 36, xl: 48 },
 };
 
-const Logo = ({
-  variant   = "horizontal",
-  theme     = "dark",
-  size      = "md",
-  className,
-}) => {
-  let src;
+const Logo = ({ variant = "horizontal", size = "md", className }) => {
+  const { theme } = useTheme();
 
+  const isDark =
+    theme === "dark" ||
+    (theme === "system" &&
+      window.matchMedia("(prefers-color-scheme: dark)").matches);
+
+  let src;
   if (variant === "icon") {
     src = logoIcon;
   } else if (variant === "stacked") {
-    src = theme === "dark" ? logoStackedDark : logoStackedLight;
+    src = isDark ? logoStackedDark : logoStackedLight;
   } else {
-    src = theme === "dark" ? logoHorizontalDark : logoHorizontalLight;
+    src = isDark ? logoHorizontalDark : logoHorizontalLight;
   }
 
   const height = SIZE_MAP[variant]?.[size] ?? SIZE_MAP.horizontal.md;

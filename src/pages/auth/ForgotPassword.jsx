@@ -50,7 +50,7 @@ export const ForgotPassword = () => {
             className="space-y-8"
           >
             <div className="flex items-center gap-2">
-              <Logo variant="horizontal" theme="dark" size="md" />
+              <Logo variant="horizontal" size="md" />
             </div>
 
             <div className="bg-card border border-border rounded-2xl p-6 shadow-xl text-center space-y-4">
@@ -88,7 +88,7 @@ export const ForgotPassword = () => {
             {/* Logo + heading */}
             <div className="space-y-1">
               <div className="mb-5">
-                <Logo variant="horizontal" theme="dark" size="md" />
+                <Logo variant="horizontal" size="md" />
               </div>
               <h1 className="text-2xl font-bold font-heading tracking-tight">Reset your password</h1>
               <p className="text-muted-foreground text-sm">Enter your email for a reset link</p>

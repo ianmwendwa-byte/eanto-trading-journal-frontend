@@ -84,7 +84,7 @@ export const LandingNavbar = () => {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link to="/" className="flex items-center">
-            <Logo variant="horizontal" theme="dark" size="md" />
+            <Logo variant="horizontal" size="md" />
           </Link>
 
           {/* Center nav — desktop */}
@@ -132,7 +132,7 @@ export const LandingNavbar = () => {
             >
               {/* Logo — padded away from the close button */}
               <div className="mb-8 pt-1">
-                <Logo variant="horizontal" theme="dark" size="md" />
+                <Logo variant="horizontal" size="md" />
               </div>
 
               {/* Nav links */}

@@ -73,19 +73,19 @@
   --chart-4: #F59E0B;
   --chart-5: #8B5CF6;
 
-  /* ───────────────── SIDEBAR (stays dark for brand consistency) ───────────────── */
+  /* ───────────────── SIDEBAR — light ───────────────── */
 
-  --sidebar: #111118;
-  --sidebar-foreground: #F8F8FF;
+  --sidebar: #ffffff;
+  --sidebar-foreground: #0A0A0F;
 
   --sidebar-primary: #4F6EF7;
-  --sidebar-primary-foreground: #F8F8FF;
+  --sidebar-primary-foreground: #ffffff;
 
-  --sidebar-accent: rgba(79, 110, 247, 0.10);
+  --sidebar-accent: rgba(79, 110, 247, 0.08);
   --sidebar-accent-foreground: #4F6EF7;
 
-  --sidebar-border: #2A2A3E;
-  --sidebar-ring: rgba(79, 110, 247, 0.45);
+  --sidebar-border: rgba(10, 10, 15, 0.08);
+  --sidebar-ring: rgba(79, 110, 247, 0.35);
 
   /* ───────────────── TYPOGRAPHY ───────────────── */
 

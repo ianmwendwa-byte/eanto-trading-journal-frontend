@@ -239,7 +239,7 @@ export const Onboarding = () => {
       <div className="hidden lg:flex w-[38%] bg-card/60 border-r border-border flex-col p-8 justify-between">
         {/* Logo */}
         <div>
-          <Logo variant="horizontal" theme="dark" size="sm" />
+          <Logo variant="horizontal" size="sm" />
         </div>
 
         {/* Context content */}
@@ -292,7 +292,7 @@ export const Onboarding = () => {
       <div className="flex-1 flex flex-col">
         {/* Mobile logo */}
         <div className="lg:hidden flex items-center px-6 pt-6 pb-2">
-          <Logo variant="horizontal" theme="dark" size="sm" />
+          <Logo variant="horizontal" size="sm" />
         </div>
 
         {/* Content area */}
