@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { Helmet } from "react-helmet-async";
 import { LandingNavbar } from "@/components/landing/LandingNavbar";
 import { HeroSection } from "@/components/landing/HeroSection";
 import { ProblemStrip } from "@/components/landing/ProblemStrip";
@@ -13,118 +14,12 @@ import { FAQSection } from "@/components/landing/FAQSection";
 import { FinalCTASection } from "@/components/landing/FinalCTASection";
 import { LandingFooter } from "@/components/landing/LandingFooter";
 
-// ── SEO / Structured data ─────────────────────────────────────────────────────
-
-const useLandingPageSEO = () => {
-  useEffect(() => {
-    const prev = document.title;
-    document.title =
-      "Kraviq — The Operating System for Retail Forex Traders";
-
-    // Meta description
-    let meta = document.querySelector('meta[name="description"]');
-    if (!meta) {
-      meta = document.createElement("meta");
-      meta.name = "description";
-      document.head.appendChild(meta);
-    }
-    const prevDesc = meta.content;
-    meta.content =
-      "Track every forex trade, score your trading business with the 0–100 Business Score, manage prop firm challenges, and sync MT4/MT5 trades automatically. Free to start.";
-
-    // JSON-LD structured data
-    const schema = {
-      "@context": "https://schema.org",
-      "@graph": [
-        {
-          "@type": "Organization",
-          "@id": "https://kraviq.app/#organization",
-          name: "Kraviq",
-          url: "https://kraviq.app",
-          logo: "https://kraviq.app/logo.svg",
-          description:
-            "The operating system for retail forex traders. Multi-account management, Business Score, EA auto-sync, prop firm tracking.",
-        },
-        {
-          "@type": "SoftwareApplication",
-          name: "Kraviq",
-          applicationCategory: "FinanceApplication",
-          operatingSystem: "Web, MT4, MT5",
-          offers: [
-            {
-              "@type": "Offer",
-              name: "Free",
-              price: "0",
-              priceCurrency: "USD",
-            },
-            {
-              "@type": "Offer",
-              name: "Pro",
-              price: "29",
-              priceCurrency: "USD",
-            },
-          ],
-          description:
-            "Forex trading journal and business OS with Business Score, EA sync, prop firm tracking, and War Account system.",
-        },
-        {
-          "@type": "FAQPage",
-          mainEntity: [
-            {
-              "@type": "Question",
-              name: "Is Kraviq free to start?",
-              acceptedAnswer: {
-                "@type": "Answer",
-                text: "Yes. The Free plan gives you 1 trading account, up to 50 trades per month, and basic analytics — no credit card required.",
-              },
-            },
-            {
-              "@type": "Question",
-              name: "What is the Business Score?",
-              acceptedAnswer: {
-                "@type": "Answer",
-                text: "The Trading Business Score is a 0–100 composite metric measuring five pillars of your trading health: consistency, risk management, profitability, discipline, and growth.",
-              },
-            },
-            {
-              "@type": "Question",
-              name: "Does Kraviq support MT4 and MT5?",
-              acceptedAnswer: {
-                "@type": "Answer",
-                text: "Yes. Kraviq supports MT4 and MT5 via manual entry, CSV import, and automatic EA sync.",
-              },
-            },
-          ],
-        },
-      ],
-    };
-
-    let ld = document.getElementById("kraviq-ld");
-    if (!ld) {
-      ld = document.createElement("script");
-      ld.id = "kraviq-ld";
-      ld.type = "application/ld+json";
-      document.head.appendChild(ld);
-    }
-    ld.textContent = JSON.stringify(schema);
-
-    return () => {
-      document.title = prev;
-      if (meta) meta.content = prevDesc;
-      ld?.remove();
-    };
-  }, []);
-};
-
 // ── Hash-based section scroll ─────────────────────────────────────────────────
-// Runs once on mount. When the user arrives at /#features (etc.) from another
-// page, ScrollToTop skips its scroll and this effect handles positioning.
 
 const useHashScroll = () => {
   useEffect(() => {
-    const id = window.location.hash.slice(1); // strip leading '#'
+    const id = window.location.hash.slice(1);
     if (!id) return;
-    // Two rAF frames ensure the page has fully painted before scrolling
     const raf = requestAnimationFrame(() =>
       requestAnimationFrame(() => {
         document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
@@ -137,11 +32,23 @@ const useHashScroll = () => {
 // ── Landing Page ──────────────────────────────────────────────────────────────
 
 export const LandingPage = () => {
-  useLandingPageSEO();
   useHashScroll();
 
   return (
-    <div className="min-h-screen bg-background text-foreground antialiased overflow-x-hidden">
+    <>
+      <Helmet>
+        <title>Kraviq — Forex Trading OS for Prop &amp; Manual Traders</title>
+        <meta
+          name="description"
+          content="Track every trade, manage prop firm challenges, and score your trading business. Kraviq is the all-in-one forex trading OS with EA sync, CSV import, and Business Score. Free to start."
+        />
+        <link rel="canonical" href="https://kraviq.app" />
+        <meta property="og:title" content="Kraviq — Forex Trading OS" />
+        <meta property="og:url" content="https://kraviq.app" />
+        <meta name="robots" content="index, follow" />
+      </Helmet>
+
+      <div className="min-h-screen bg-background text-foreground antialiased overflow-x-hidden">
         {/* Skip to main content (accessibility) */}
         <a
           href="#main-content"
@@ -192,5 +99,6 @@ export const LandingPage = () => {
         {/* Footer */}
         <LandingFooter />
       </div>
+    </>
   );
 };

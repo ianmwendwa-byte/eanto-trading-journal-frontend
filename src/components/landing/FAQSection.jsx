@@ -39,13 +39,21 @@ const FAQS = [
 
 const FAQItem = ({ item, isOpen, onToggle }) => {
   return (
-    <div className="border-b border-border last:border-0">
+    <div
+      className="border-b border-border last:border-0"
+      itemScope
+      itemProp="mainEntity"
+      itemType="https://schema.org/Question"
+    >
       <button
         onClick={onToggle}
         className="w-full flex items-center justify-between py-5 text-left group"
         aria-expanded={isOpen}
       >
-        <span className="font-medium text-foreground group-hover:text-primary transition-colors pr-4">
+        <span
+          itemProp="name"
+          className="font-medium text-foreground group-hover:text-primary transition-colors pr-4"
+        >
           {item.q}
         </span>
         <motion.div
@@ -57,6 +65,16 @@ const FAQItem = ({ item, isOpen, onToggle }) => {
           <ChevronDown className="h-4 w-4 text-muted-foreground" />
         </motion.div>
       </button>
+
+      {/* Always-present answer for schema microdata crawlers */}
+      <div
+        className="sr-only"
+        itemScope
+        itemProp="acceptedAnswer"
+        itemType="https://schema.org/Answer"
+      >
+        <span itemProp="text">{item.a}</span>
+      </div>
 
       <AnimatePresence initial={false}>
         {isOpen && (
@@ -121,6 +139,8 @@ export const FAQSection = () => {
           className="bg-card border border-border rounded-2xl px-6 md:px-8"
           role="list"
           aria-label="Frequently asked questions"
+          itemScope
+          itemType="https://schema.org/FAQPage"
         >
           {FAQS.map((item, i) => (
             <div role="listitem" key={i}>

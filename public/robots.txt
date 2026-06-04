@@ -1,0 +1,15 @@
+User-agent: *
+Allow: /
+Allow: /login
+Allow: /register
+
+Disallow: /dashboard
+Disallow: /accounts
+Disallow: /trades
+Disallow: /transactions
+Disallow: /settings
+Disallow: /ea
+Disallow: /notifications
+Disallow: /onboarding
+
+Sitemap: https://kraviq.app/sitemap.xml

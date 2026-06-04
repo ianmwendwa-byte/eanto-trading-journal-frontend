@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Helmet } from "react-helmet-async";
 import { Link, useNavigate } from "react-router-dom";
 import { createUserWithEmailAndPassword, sendEmailVerification, signInWithPopup } from "firebase/auth";
 import { useForm } from "react-hook-form";
@@ -90,7 +91,12 @@ export const Register = () => {
   };
 
   return (
-    <AuthLayout>
+    <>
+      <Helmet>
+        <title>Create Account — Kraviq</title>
+        <meta name="robots" content="noindex, follow" />
+      </Helmet>
+      <AuthLayout>
       <div className="space-y-8">
         {/* Logo + heading */}
         <div className="space-y-1">
@@ -216,9 +222,10 @@ export const Register = () => {
         {/* Trust signal */}
         <div className="flex items-center justify-center gap-1.5 text-xs text-muted-foreground/60">
           <ShieldCheck className="h-3.5 w-3.5" />
-          Secured with Firebase 
+          Secured with Firebase
         </div>
       </div>
     </AuthLayout>
+    </>
   );
 };

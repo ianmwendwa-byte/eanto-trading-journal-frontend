@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Helmet } from "react-helmet-async";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
 import { useForm } from "react-hook-form";
@@ -84,7 +85,12 @@ export const Login = () => {
   };
 
   return (
-    <AuthLayout>
+    <>
+      <Helmet>
+        <title>Sign In — Kraviq</title>
+        <meta name="robots" content="noindex, follow" />
+      </Helmet>
+      <AuthLayout>
       <div className="space-y-8">
         {/* Logo + heading */}
         <div className="space-y-1">
@@ -190,5 +196,6 @@ export const Login = () => {
         </div>
       </div>
     </AuthLayout>
+    </>
   );
 };
