@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Geist:wght@100..900&family=JetBrains+Mono:wght@100..800&family=Space+Grotesk:wght@300..700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Space+Grotesk:wght@300;400;500;600;700&display=swap");
 
 @import "tailwindcss";
 @import "tw-animate-css";
@@ -7,106 +7,118 @@
 @custom-variant dark (&:is(.dark *));
 
 /* ─────────────────────────────────────────────
-   EANTO DESIGN SYSTEM
-   Institutional Trading UI
+   KRAVIQ DESIGN SYSTEM
+   "You Trade Well. Run It Like a Business."
 ───────────────────────────────────────────── */
 
 :root {
-  /* ───────────────── COLORS ───────────────── */
+  /* ───────────────── BRAND ───────────────── */
 
-  --background: #f8fafc;
-  --foreground: #020618;
+  --primary: #4F6EF7;
+  --primary-foreground: #F8F8FF;
+  --primary-600: #3654D4;
+  --primary-800: #1E3BAD;
 
-  --card: #ffffff;
-  --card-foreground: #020618;
+  /* ───────────────── BACKGROUNDS ───────────────── */
 
-  --popover: #ffffff;
-  --popover-foreground: #020618;
+  --background: #0A0A0F;
+  --foreground: #F8F8FF;
 
-  --primary: #173ded;
-  --primary-foreground: #ffffff;
+  --card: #111118;
+  --card-foreground: #F8F8FF;
 
-  --secondary: #051042;
-  --secondary-foreground: #ffffff;
+  --popover: #111118;
+  --popover-foreground: #F8F8FF;
 
-  --tertiary: #020618;
+  /* ───────────────── SURFACES ───────────────── */
 
-  --muted: #eef2ff;
-  --muted-foreground: #475569;
+  --secondary: #1E1E2E;
+  --secondary-foreground: #F8F8FF;
 
-  --accent: #dbeafe;
-  --accent-foreground: #173ded;
+  --muted: #1E1E2E;
+  --muted-foreground: #9898A8;
+  --subtle: #5A5A6A;
 
-  --destructive: #ef4444;
-  --destructive-foreground: #ffffff;
+  --accent: #1E1E2E;
+  --accent-foreground: #F8F8FF;
 
-  --success: #22c55e;
-  --warning: #f59e0b;
-  --danger: #ef4444;
-  --info: #0ea5e9;
+  /* ───────────────── BORDERS & INPUTS ───────────────── */
 
-  --profit: #22c55e;
-  --loss: #ef4444;
-  --breakeven: #f59e0b;
+  --border: #2A2A3E;
+  --input: #2A2A3E;
+  --ring: rgba(79, 110, 247, 0.45);
 
-  --border: rgba(2, 6, 24, 0.08);
-  --input: rgba(2, 6, 24, 0.06);
-  --ring: rgba(23, 61, 237, 0.35);
+  /* ───────────────── FEEDBACK ───────────────── */
+
+  --destructive: #EF4444;
+  --destructive-foreground: #F8F8FF;
+
+  /* ───────────────── TRADING STATUS (NEVER CHANGE) ───────────────── */
+
+  --profit: #22C55E;
+  --loss: #EF4444;
+  --warning: #F59E0B;
+  --breakeven: #6B7280;
+
+  /* ── Aliases for component compatibility ── */
+  --success: #22C55E;
+  --danger: #EF4444;
+  --info: #0EA5E9;
 
   /* ───────────────── CHART COLORS ───────────────── */
 
-  --chart-1: #173ded;
-  --chart-2: #22c55e;
-  --chart-3: #ef4444;
-  --chart-4: #f59e0b;
-  --chart-5: #8b5cf6;
+  --chart-1: #4F6EF7;
+  --chart-2: #22C55E;
+  --chart-3: #EF4444;
+  --chart-4: #F59E0B;
+  --chart-5: #8B5CF6;
 
   /* ───────────────── SIDEBAR ───────────────── */
 
-  --sidebar: #ffffff;
-  --sidebar-foreground: #020618;
+  --sidebar: #111118;
+  --sidebar-foreground: #F8F8FF;
 
-  --sidebar-primary: #173ded;
-  --sidebar-primary-foreground: #ffffff;
+  --sidebar-primary: #4F6EF7;
+  --sidebar-primary-foreground: #F8F8FF;
 
-  --sidebar-accent: rgba(23, 61, 237, 0.08);
-  --sidebar-accent-foreground: #173ded;
+  --sidebar-accent: rgba(79, 110, 247, 0.10);
+  --sidebar-accent-foreground: #4F6EF7;
 
-  --sidebar-border: rgba(2, 6, 24, 0.06);
-  --sidebar-ring: rgba(23, 61, 237, 0.35);
+  --sidebar-border: #2A2A3E;
+  --sidebar-ring: rgba(79, 110, 247, 0.45);
 
   /* ───────────────── TYPOGRAPHY ───────────────── */
 
-  --font-ui: "Geist", sans-serif;
+  --font-ui: "Inter", sans-serif;
   --font-heading: "Space Grotesk", sans-serif;
   --font-mono: "JetBrains Mono", monospace;
 
   /* ───────────────── RADII ───────────────── */
 
-  --radius: 0.85rem;
+  --radius: 0.5rem;
 
   /* ───────────────── SHADOWS ───────────────── */
 
-  --shadow-xs: 0 1px 2px rgba(2, 6, 24, 0.03);
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.18);
 
   --shadow-sm:
-    0 1px 2px rgba(2, 6, 24, 0.04),
-    0 1px 3px rgba(2, 6, 24, 0.06);
+    0 1px 2px rgba(0, 0, 0, 0.22),
+    0 1px 3px rgba(0, 0, 0, 0.25);
 
   --shadow-md:
-    0 4px 6px -1px rgba(2, 6, 24, 0.06),
-    0 2px 4px -2px rgba(2, 6, 24, 0.06);
+    0 4px 6px -1px rgba(0, 0, 0, 0.28),
+    0 2px 4px -2px rgba(0, 0, 0, 0.28);
 
   --shadow-lg:
-    0 10px 15px -3px rgba(2, 6, 24, 0.08),
-    0 4px 6px -4px rgba(2, 6, 24, 0.08);
+    0 10px 15px -3px rgba(0, 0, 0, 0.32),
+    0 4px 6px -4px rgba(0, 0, 0, 0.32);
 
   --shadow-xl:
-    0 20px 25px -5px rgba(2, 6, 24, 0.1),
-    0 8px 10px -6px rgba(2, 6, 24, 0.1);
+    0 20px 25px -5px rgba(0, 0, 0, 0.4),
+    0 8px 10px -6px rgba(0, 0, 0, 0.4);
 
   --shadow-2xl:
-    0 25px 50px -12px rgba(2, 6, 24, 0.18);
+    0 25px 50px -12px rgba(0, 0, 0, 0.5);
 
   /* ───────────────── LAYOUT ───────────────── */
 
@@ -115,72 +127,67 @@
 }
 
 /* ─────────────────────────────────────────────
-   DARK MODE
+   DARK MODE — same Kraviq brand values
+   (app is dark-first; toggle persists the theme)
 ───────────────────────────────────────────── */
 
 .dark {
-  --background: #020618;
-  --foreground: #ffffff;
+  --primary: #4F6EF7;
+  --primary-foreground: #F8F8FF;
+  --primary-600: #3654D4;
 
-  --card: #051042;
-  --card-foreground: #ffffff;
+  --background: #0A0A0F;
+  --foreground: #F8F8FF;
 
-  --popover: #051042;
-  --popover-foreground: #ffffff;
+  --card: #111118;
+  --card-foreground: #F8F8FF;
 
-  --primary: #173ded;
-  --primary-foreground: #ffffff;
+  --popover: #111118;
+  --popover-foreground: #F8F8FF;
 
-  --secondary: #0f172a;
-  --secondary-foreground: #ffffff;
+  --secondary: #1E1E2E;
+  --secondary-foreground: #F8F8FF;
 
-  --tertiary: #020618;
+  --muted: #1E1E2E;
+  --muted-foreground: #9898A8;
+  --subtle: #5A5A6A;
 
-  --muted: rgba(255, 255, 255, 0.04);
-  --muted-foreground: #94a3b8;
+  --accent: #1E1E2E;
+  --accent-foreground: #F8F8FF;
 
-  --accent: rgba(23, 61, 237, 0.12);
-  --accent-foreground: #60a5fa;
+  --border: #2A2A3E;
+  --input: #2A2A3E;
+  --ring: rgba(79, 110, 247, 0.45);
 
-  --destructive: #ef4444;
-  --destructive-foreground: #ffffff;
+  --destructive: #EF4444;
+  --destructive-foreground: #F8F8FF;
 
-  --success: #22c55e;
-  --warning: #f59e0b;
-  --danger: #ef4444;
-  --info: #0ea5e9;
+  --profit: #22C55E;
+  --loss: #EF4444;
+  --warning: #F59E0B;
+  --breakeven: #6B7280;
 
-  --profit: #22c55e;
-  --loss: #ef4444;
-  --breakeven: #f59e0b;
+  --success: #22C55E;
+  --danger: #EF4444;
+  --info: #0EA5E9;
 
-  --border: rgba(255, 255, 255, 0.08);
-  --input: rgba(255, 255, 255, 0.06);
-  --ring: rgba(23, 61, 237, 0.45);
+  --chart-1: #4F6EF7;
+  --chart-2: #22C55E;
+  --chart-3: #EF4444;
+  --chart-4: #F59E0B;
+  --chart-5: #8B5CF6;
 
-  /* ───────────────── CHART COLORS ───────────────── */
+  --sidebar: #111118;
+  --sidebar-foreground: #F8F8FF;
 
-  --chart-1: #173ded;
-  --chart-2: #22c55e;
-  --chart-3: #ef4444;
-  --chart-4: #f59e0b;
-  --chart-5: #8b5cf6;
+  --sidebar-primary: #4F6EF7;
+  --sidebar-primary-foreground: #F8F8FF;
 
-  /* ───────────────── SIDEBAR ───────────────── */
+  --sidebar-accent: rgba(79, 110, 247, 0.10);
+  --sidebar-accent-foreground: #4F6EF7;
 
-  --sidebar: #051042;
-  --sidebar-foreground: #ffffff;
-
-  --sidebar-primary: #173ded;
-  --sidebar-primary-foreground: #ffffff;
-
-  --sidebar-accent: rgba(23, 61, 237, 0.12);
-  --sidebar-accent-foreground: #60a5fa;
-
-  --sidebar-border: rgba(255, 255, 255, 0.06);
-  --sidebar-ring: rgba(23, 61, 237, 0.45);
-
-  /* ───────────────── SHADOWS ───────────────── */
+  --sidebar-border: #2A2A3E;
+  --sidebar-ring: rgba(79, 110, 247, 0.45);
 
   --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.18);
 
@@ -227,16 +234,22 @@
 
   --color-muted: var(--muted);
   --color-muted-foreground: var(--muted-foreground);
+  --color-subtle: var(--subtle);
 
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
 
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
+
   --color-success: var(--success);
   --color-warning: var(--warning);
   --color-danger: var(--danger);
   --color-info: var(--info);
+
+  --color-profit: var(--profit);
+  --color-loss: var(--loss);
+  --color-breakeven: var(--breakeven);
 
   --color-border: var(--border);
   --color-input: var(--input);
@@ -268,10 +281,10 @@
   --font-mono: var(--font-mono);
 
   /* radius */
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
+  --radius-sm: calc(var(--radius) - 2px);
+  --radius-md: var(--radius);
+  --radius-lg: calc(var(--radius) + 4px);
+  --radius-xl: calc(var(--radius) + 8px);
 
   /* shadows */
   --shadow-xs: var(--shadow-xs);
@@ -345,17 +358,28 @@
 
   .glass-panel {
     backdrop-filter: blur(14px);
-    background: rgba(255, 255, 255, 0.04);
+    background: rgba(17, 17, 24, 0.7);
   }
 
+  .kraviq-border {
+    border: 1px solid rgba(79, 110, 247, 0.12);
+  }
+
+  .kraviq-glow {
+    box-shadow:
+      0 0 0 1px rgba(79, 110, 247, 0.15),
+      0 0 18px rgba(79, 110, 247, 0.12);
+  }
+
+  /* Keep old utility names as aliases for backward compat */
   .eanto-border {
-    border: 1px solid rgba(23, 61, 237, 0.12);
+    border: 1px solid rgba(79, 110, 247, 0.12);
   }
 
   .eanto-glow {
     box-shadow:
-      0 0 0 1px rgba(23, 61, 237, 0.15),
-      0 0 18px rgba(23, 61, 237, 0.12);
+      0 0 0 1px rgba(79, 110, 247, 0.15),
+      0 0 18px rgba(79, 110, 247, 0.12);
   }
 
   .profit-text {
@@ -371,32 +395,17 @@
   }
 
   .trading-grid {
-    /* Light mode: dark lines at low opacity */
     background-image:
       linear-gradient(
-        rgba(2, 6, 24, 0.05) 1px,
+        rgba(255, 255, 255, 0.03) 1px,
         transparent 1px
       ),
       linear-gradient(
         90deg,
-        rgba(2, 6, 24, 0.05) 1px,
+        rgba(255, 255, 255, 0.03) 1px,
         transparent 1px
       );
 
     background-size: 24px 24px;
-  }
-
-  .dark .trading-grid {
-    /* Dark mode: white lines at low opacity */
-    background-image:
-      linear-gradient(
-        rgba(255, 255, 255, 0.03) 1px,
-        transparent 1px
-      ),
-      linear-gradient(
-        90deg,
-        rgba(255, 255, 255, 0.03) 1px,
-        transparent 1px
-      );
   }
 }

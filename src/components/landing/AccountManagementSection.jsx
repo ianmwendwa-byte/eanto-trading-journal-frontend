@@ -221,7 +221,7 @@ export const AccountManagementSection = () => {
             className="text-muted-foreground text-lg max-w-xl mx-auto"
           >
             Whether you're trading your own capital, managing prop firm
-            challenges, or testing experimental strategies — Tradecore has a
+            challenges, or testing experimental strategies — Kraviq has a
             dedicated account type for you.
           </motion.p>
         </div>

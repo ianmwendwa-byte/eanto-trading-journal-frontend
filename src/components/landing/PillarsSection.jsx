@@ -33,7 +33,7 @@ const PILLARS = [
     bg: "bg-primary/5",
     border: "border-primary/40",
     highlighted: true,
-    badge: "Unique to Tradecore",
+    badge: "Unique to Kraviq",
   },
   {
     icon: BarChart3,

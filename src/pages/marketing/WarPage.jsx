@@ -356,7 +356,7 @@ export const WarPage = () => (
           Start testing smarter.
         </motion.h2>
         <motion.p {...reveal(0.05)} className="text-muted-foreground mb-8">
-          War Accounts are available on all Tradecore plans. Free to start.
+          War Accounts are available on all Kraviq plans. Free to start.
         </motion.p>
         <motion.div {...reveal(0.1)}>
           <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="inline-block">

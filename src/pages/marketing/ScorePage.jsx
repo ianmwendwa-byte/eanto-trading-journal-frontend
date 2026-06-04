@@ -175,7 +175,7 @@ export const ScorePage = () => (
           className="text-lg text-muted-foreground max-w-2xl mx-auto mb-10 leading-relaxed"
         >
           The Trading Business Score is a 0–100 composite metric unique to
-          Tradecore. It tells you not just if you're profitable — but whether
+          Kraviq. It tells you not just if you're profitable — but whether
           you're running a sustainable trading business.
         </motion.p>
         <motion.div

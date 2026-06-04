@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
-import { TrendingUp, Share2, Play, MessageCircle } from "lucide-react";
+import { Share2, Play, MessageCircle } from "lucide-react";
+import Logo from "@/components/shared/Logo";
 
 const LINKS = {
   Product: [
@@ -44,16 +45,13 @@ export const LandingFooter = () => {
           <div>
             <Link
               to="/"
-              className="flex items-center gap-2 mb-4"
-              aria-label="Tradecore home"
+              className="flex items-center mb-4"
+              aria-label="Kraviq home"
             >
-              <TrendingUp className="h-5 w-5 text-primary" aria-hidden="true" />
-              <span className="font-heading font-semibold text-foreground text-lg">
-                Tradecore
-              </span>
+              <Logo variant="horizontal" theme="dark" size="sm" />
             </Link>
             <p className="text-sm text-muted-foreground leading-relaxed max-w-xs mb-6">
-              The operating system for the retail forex trader. Track, score,
+              The operating system for retail forex traders. Track, score,
               and scale your trading business.
             </p>
             <div className="flex gap-3">
@@ -97,7 +95,7 @@ export const LandingFooter = () => {
         {/* Bottom bar */}
         <div className="border-t border-border pt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-xs text-muted-foreground">
-            © {year} Tradecore. All rights reserved.
+            © {year} Kraviq. All rights reserved.
           </p>
           <p className="text-xs text-muted-foreground">
             Built for traders, by a trader.

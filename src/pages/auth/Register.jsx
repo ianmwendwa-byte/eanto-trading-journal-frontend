@@ -12,7 +12,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { Mail, Lock, Eye, EyeOff, TrendingUp, ShieldCheck } from "lucide-react";
+import { Mail, Lock, Eye, EyeOff, ShieldCheck } from "lucide-react";
+import Logo from "@/components/shared/Logo";
 
 const GoogleIcon = () => (
   <svg className="h-4 w-4" viewBox="0 0 24 24" aria-hidden="true">
@@ -93,13 +94,10 @@ export const Register = () => {
       <div className="space-y-8">
         {/* Logo + heading */}
         <div className="space-y-1">
-          <div className="flex items-center gap-2 mb-5">
-            <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
-              <TrendingUp className="h-4 w-4 text-primary-foreground" />
-            </div>
-            <span className="text-lg font-bold font-heading">Tradecore</span>
+          <div className="mb-5">
+            <Logo variant="horizontal" theme="dark" size="md" />
           </div>
-          <h1 className="text-2xl font-bold font-heading tracking-tight">Create your account</h1>
+          <h1 className="text-2xl font-bold font-heading tracking-tight">Create your Kraviq account</h1>
           <p className="text-muted-foreground text-sm">
             Start running your trading business professionally
           </p>

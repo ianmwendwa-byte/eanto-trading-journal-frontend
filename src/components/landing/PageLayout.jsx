@@ -9,7 +9,7 @@ import { LandingFooter } from "@/components/landing/LandingFooter";
 export const PageLayout = ({ title, children }) => {
   useEffect(() => {
     const prev = document.title;
-    document.title = `${title} — Tradecore`;
+    document.title = `${title} — Kraviq`;
     return () => {
       document.title = prev;
     };

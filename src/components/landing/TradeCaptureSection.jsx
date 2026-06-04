@@ -119,7 +119,7 @@ const STEPS = [
     badge: null,
     title: "Import your entire history",
     description:
-      "Export your trade history from MT4/MT5 and import it in seconds. Tradecore auto-detects your broker format and maps every field correctly.",
+      "Export your trade history from MT4/MT5 and import it in seconds. Kraviq auto-detects your broker format and maps every field correctly.",
     Mockup: CSVImportMockup,
   },
   {
@@ -129,7 +129,7 @@ const STEPS = [
     badge: "Automatic",
     title: "Zero-touch trade capture",
     description:
-      "Install the Tradecore EA on your MT4/MT5 chart. Every trade syncs automatically the moment it closes — pair, direction, P&L, session, and broker details.",
+      "Install the Kraviq EA on your MT4/MT5 chart. Every trade syncs automatically the moment it closes — pair, direction, P&L, session, and broker details.",
     Mockup: EASyncMockup,
   },
 ];
@@ -169,7 +169,7 @@ export const TradeCaptureSection = () => {
             transition={{ duration: 0.4, ease: "easeOut", delay: 0.1 }}
             className="text-muted-foreground text-lg max-w-lg mx-auto"
           >
-            Three ways to get your trades into Tradecore — choose one or use
+            Three ways to get your trades into Kraviq — choose one or use
             all three.
           </motion.p>
         </div>

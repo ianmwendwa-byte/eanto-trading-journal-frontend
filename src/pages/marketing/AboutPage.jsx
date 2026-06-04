@@ -15,22 +15,22 @@ const VALUES = [
   {
     icon: TrendingUp,
     title: "Data over emotion",
-    body: "Every trading decision should be backed by evidence. Tradecore exists to turn your raw trade history into clear, actionable truth — not guesswork.",
+    body: "Every trading decision should be backed by evidence. Kraviq exists to turn your raw trade history into clear, actionable truth — not guesswork.",
   },
   {
     icon: Target,
     title: "Business mindset",
-    body: "The best traders treat trading like a business. We built Tradecore to give retail traders the same discipline tools that institutional desks take for granted.",
+    body: "The best traders treat trading like a business. We built Kraviq to give retail traders the same discipline tools that institutional desks take for granted.",
   },
   {
     icon: Users,
     title: "Community first",
-    body: "Tradecore was built inside a trading community, for that community. Every feature came from real traders asking real questions about their real performance.",
+    body: "Kraviq was built inside a trading community, for that community. Every feature came from real traders asking real questions about their real performance.",
   },
   {
     icon: BarChart3,
     title: "Honest numbers",
-    body: "Gross P&L is a lie you tell yourself. Tradecore shows you true net P&L — after every commission, swap, withdrawal, and prop fee. No flattering the numbers.",
+    body: "Gross P&L is a lie you tell yourself. Kraviq shows you true net P&L — after every commission, swap, withdrawal, and prop fee. No flattering the numbers.",
   },
 ];
 
@@ -56,7 +56,7 @@ export const AboutPage = () => (
       />
       <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         <motion.p {...reveal(0)} className="text-xs uppercase tracking-widest text-primary font-medium mb-4">
-          About Tradecore
+          About Kraviq
         </motion.p>
         <motion.h1
           {...reveal(0.05)}
@@ -70,7 +70,7 @@ export const AboutPage = () => (
           {...reveal(0.1)}
           className="text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed"
         >
-          Tradecore started as a personal frustration — too many spreadsheets,
+          Kraviq started as a personal frustration — too many spreadsheets,
           too little clarity, and no single place to run a real trading business.
           So we built one.
         </motion.p>
@@ -113,7 +113,7 @@ export const AboutPage = () => (
                 streak?
               </p>
               <p>
-                Tradecore was built to answer both questions — and every question
+                Kraviq was built to answer both questions — and every question
                 in between.
               </p>
             </div>

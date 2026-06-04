@@ -201,7 +201,7 @@ const ActiveKeyState = ({ eaSync, onRevoke, onRegenerate, isRevoking, isRegenera
           <AlertDialogHeader>
             <AlertDialogTitle>Revoke EA API Key?</AlertDialogTitle>
             <AlertDialogDescription>
-              This will immediately disconnect your EA from Tradecore. Your sync history
+              This will immediately disconnect your EA from Kraviq. Your sync history
               will be preserved but no new trades will sync until you generate a new key.
             </AlertDialogDescription>
           </AlertDialogHeader>

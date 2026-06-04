@@ -4,16 +4,16 @@ import { ChevronDown } from "lucide-react";
 
 const FAQS = [
   {
-    q: "Is Tradecore free to start?",
+    q: "Is Kraviq free to start?",
     a: "Yes. The Free plan gives you 1 trading account, up to 50 trades per month, manual entry, and basic analytics — no credit card required. You can upgrade when you're ready.",
   },
   {
-    q: "Does Tradecore work with MetaTrader 4 and MT5?",
-    a: "Yes. Tradecore supports MT4 and MT5 via three methods: manual trade entry, CSV export/import from your broker terminal, and automatic EA sync through the Tradecore Expert Advisor you install on your chart.",
+    q: "Does Kraviq work with MetaTrader 4 and MT5?",
+    a: "Yes. Kraviq supports MT4 and MT5 via three methods: manual trade entry, CSV export/import from your broker terminal, and automatic EA sync through the Kraviq Expert Advisor you install on your chart.",
   },
   {
     q: "What is the Business Score?",
-    a: "The Trading Business Score is a 0–100 composite metric unique to Tradecore. It measures five pillars — consistency, risk management, profitability, discipline, and growth — and gives you a single number that reflects your overall trading business health. It updates weekly and requires at least 10 closed trades.",
+    a: "The Trading Business Score is a 0–100 composite metric unique to Kraviq. It measures five pillars — consistency, risk management, profitability, discipline, and growth — and gives you a single number that reflects your overall trading business health. It updates weekly and requires at least 10 closed trades.",
   },
   {
     q: "What is a War Account and why would I use one?",
@@ -21,15 +21,15 @@ const FAQS = [
   },
   {
     q: "Can I import my existing MT4/MT5 trade history?",
-    a: "Yes. Export a Statement from your MetaTrader terminal, upload it to Tradecore, and we'll auto-detect your broker format. You'll see a preview before confirming the import. We support all major broker statement formats.",
+    a: "Yes. Export a Statement from your MetaTrader terminal, upload it to Kraviq, and we'll auto-detect your broker format. You'll see a preview before confirming the import. We support all major broker statement formats.",
   },
   {
-    q: "Does Tradecore support prop firm accounts like FTMO?",
-    a: "Absolutely. Prop accounts in Tradecore track your challenge rules in real time — profit target, daily and overall drawdown limits, minimum trading days, and payout eligibility. We support FTMO, FundingPips, The Funded Trader, and more.",
+    q: "Does Kraviq support prop firm accounts like FTMO?",
+    a: "Absolutely. Prop accounts in Kraviq track your challenge rules in real time — profit target, daily and overall drawdown limits, minimum trading days, and payout eligibility. We support FTMO, FundingPips, The Funded Trader, and more.",
   },
   {
     q: "How does EA sync work?",
-    a: "Install the Tradecore Expert Advisor (EA) on your MT4/MT5 chart and configure it with your unique API key. Every time a trade closes, the EA automatically syncs the trade details to Tradecore — no manual input required. Your API key is shown once at generation and never again, so copy it safely.",
+    a: "Install the Kraviq Expert Advisor (EA) on your MT4/MT5 chart and configure it with your unique API key. Every time a trade closes, the EA automatically syncs the trade details to Kraviq — no manual input required. Your API key is shown once at generation and never again, so copy it safely.",
   },
   {
     q: "Can I cancel my subscription at any time?",

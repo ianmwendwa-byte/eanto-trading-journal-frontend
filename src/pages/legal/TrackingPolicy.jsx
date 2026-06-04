@@ -10,7 +10,7 @@ export const TrackingPolicy = () => (
   <LegalLayout
     title="Cookie Policy"
     lastUpdated="June 1, 2026"
-    description="How and why Tradecore uses cookies and similar technologies."
+    description="How and why Kraviq uses cookies and similar technologies."
   >
     {/* What are cookies */}
     <LegalSection id="what-are-cookies" title="1. What Are Cookies?">
@@ -21,7 +21,7 @@ export const TrackingPolicy = () => (
         state.
       </p>
       <p className="text-sm">
-        Tradecore also uses browser <strong className="text-foreground">localStorage</strong>,
+        Kraviq also uses browser <strong className="text-foreground">localStorage</strong>,
         which works similarly to cookies but is stored locally on your device and
         not sent with every HTTP request. We refer to cookies and localStorage
         collectively as "tracking technologies" in this policy.
@@ -29,9 +29,9 @@ export const TrackingPolicy = () => (
     </LegalSection>
 
     {/* How we use cookies */}
-    <LegalSection id="how-we-use" title="2. How Tradecore Uses Cookies">
+    <LegalSection id="how-we-use" title="2. How Kraviq Uses Cookies">
       <LegalNote>
-        Tradecore uses the minimum number of tracking technologies necessary to
+        Kraviq uses the minimum number of tracking technologies necessary to
         operate the platform. We do <strong>not</strong> use advertising cookies
         or sell cookie data to third parties.
       </LegalNote>
@@ -39,7 +39,7 @@ export const TrackingPolicy = () => (
       <LegalSubSection title="2.1 Strictly Necessary (Essential)">
         <p className="text-sm">
           These are required for the platform to function. You cannot opt out of
-          them while using Tradecore.
+          them while using Kraviq.
         </p>
         <div className="overflow-x-auto rounded-lg border border-border mt-3">
           <table className="w-full text-sm">
@@ -101,7 +101,7 @@ export const TrackingPolicy = () => (
             <tbody className="divide-y divide-border">
               {[
                 {
-                  name: "tradecore-ui",
+                  name: "kraviq-ui",
                   type: "localStorage",
                   purpose: "Saves your selected colour theme (light, dark, or system) so it persists between visits",
                   duration: "Persistent",
@@ -197,7 +197,7 @@ export const TrackingPolicy = () => (
       <LegalSubSection title="4.1 Browser Settings">
         <p className="text-sm">
           You can control and delete cookies through your browser settings. Note
-          that disabling essential cookies will prevent Tradecore from
+          that disabling essential cookies will prevent Kraviq from
           functioning — you will not be able to stay logged in.
         </p>
         <LegalList
@@ -212,8 +212,8 @@ export const TrackingPolicy = () => (
 
       <LegalSubSection title="4.2 localStorage">
         <p className="text-sm">
-          To clear Tradecore's localStorage data, open your browser's Developer
-          Tools (F12), go to Application → Local Storage → your Tradecore
+          To clear Kraviq's localStorage data, open your browser's Developer
+          Tools (F12), go to Application → Local Storage → your Kraviq
           domain, and delete individual keys or clear all entries. This will
           reset your theme preference, dashboard layout, and sidebar state.
         </p>
@@ -221,7 +221,7 @@ export const TrackingPolicy = () => (
 
       <LegalSubSection title="4.3 Clearing Your Session">
         <p className="text-sm">
-          Signing out of Tradecore clears your authentication session
+          Signing out of Kraviq clears your authentication session
           automatically. If you remain signed in, your session persists until
           you explicitly sign out or it expires.
         </p>
@@ -244,14 +244,14 @@ export const TrackingPolicy = () => (
         If you have questions about our use of browser storage, contact us at:
       </p>
       <div className="bg-card border border-border rounded-xl p-5 text-sm space-y-1">
-        <p className="text-foreground font-medium">Tradecore</p>
+        <p className="text-foreground font-medium">Kraviq</p>
         <p>
           Email:{" "}
           <a
-            href="mailto:privacy@tradecore.app"
+            href="mailto:privacy@kraviq.app"
             className="text-primary underline underline-offset-2"
           >
-            privacy@tradecore.app
+            privacy@kraviq.app
           </a>
         </p>
       </div>

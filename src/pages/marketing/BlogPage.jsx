@@ -51,7 +51,7 @@ const POSTS = [
     title:    "What Is the Trading Business Score? (A Full Breakdown)",
     excerpt:
       "A single number between 0 and 100 that measures your trading health across five pillars. Here's exactly how it's calculated and what each pillar means.",
-    tag:      "Tradecore",
+    tag:      "Kraviq",
     date:     "May 10, 2026",
     readTime: "9 min read",
     featured: false,
@@ -60,7 +60,7 @@ const POSTS = [
     slug:     "mt4-vs-mt5",
     title:    "MT4 vs MT5 in 2026: Which One Should You Use?",
     excerpt:
-      "Both platforms work with Tradecore's EA sync. But they're not the same. Here's a no-nonsense breakdown of what matters for retail forex traders today.",
+      "Both platforms work with Kraviq's EA sync. But they're not the same. Here's a no-nonsense breakdown of what matters for retail forex traders today.",
     tag:      "Tools",
     date:     "May 5, 2026",
     readTime: "5 min read",
@@ -73,7 +73,7 @@ const TAG_COLORS = {
   "Prop Firms": "bg-primary/10 text-primary border-primary/20",
   Finance:   "bg-success/10 text-success border-success/20",
   Strategy:  "bg-danger/10 text-danger border-danger/20",
-  Tradecore: "bg-primary/10 text-primary border-primary/20",
+  Kraviq: "bg-primary/10 text-primary border-primary/20",
   Tools:     "bg-muted text-muted-foreground border-border",
 };
 
@@ -131,7 +131,7 @@ export const BlogPage = () => {
             transition={{ duration: 0.4, ease: "easeOut" }}
             className="text-xs uppercase tracking-widest text-primary font-medium mb-4"
           >
-            The Tradecore Blog
+            The Kraviq Blog
           </motion.p>
           <motion.h1
             initial={{ opacity: 0, y: 16 }}

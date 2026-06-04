@@ -18,12 +18,12 @@ const BENEFITS = [
   {
     icon: TrendingUp,
     title: "Live trade reviews",
-    body: "Post your setups and get real feedback from traders who also use Tradecore. See exactly how others are reading price and managing risk.",
+    body: "Post your setups and get real feedback from traders who also use Kraviq. See exactly how others are reading price and managing risk.",
   },
   {
     icon: MessageCircle,
     title: "Direct platform access",
-    body: "Suggest features, report bugs, and influence the roadmap. The traders in this community built Tradecore — they should shape what comes next.",
+    body: "Suggest features, report bugs, and influence the roadmap. The traders in this community built Kraviq — they should shape what comes next.",
   },
   {
     icon: BookOpen,
@@ -102,7 +102,7 @@ export const CommunityPage = () => (
           transition={{ duration: 0.4, ease: "easeOut", delay: 0.1 }}
           className="text-lg text-muted-foreground max-w-xl mx-auto mb-10"
         >
-          The Tradecore community is where traders who take their craft seriously
+          The Kraviq community is where traders who take their craft seriously
           come to share, improve, and hold each other accountable.
         </motion.p>
         <motion.div
@@ -113,14 +113,14 @@ export const CommunityPage = () => (
         >
           <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
             <Button size="lg" asChild className="gap-2">
-              <a href="https://discord.gg/tradecore" target="_blank" rel="noopener noreferrer">
+              <a href="https://discord.gg/kraviq" target="_blank" rel="noopener noreferrer">
                 Join on Discord
                 <ArrowRight className="h-4 w-4" />
               </a>
             </Button>
           </motion.div>
           <Button variant="outline" size="lg" asChild>
-            <Link to="/register">Create your Tradecore account</Link>
+            <Link to="/register">Create your Kraviq account</Link>
           </Button>
         </motion.div>
       </div>
@@ -217,7 +217,7 @@ export const CommunityPage = () => (
               focused on improving their process and their numbers.
             </p>
             <Button asChild className="gap-2">
-              <a href="https://discord.gg/tradecore" target="_blank" rel="noopener noreferrer">
+              <a href="https://discord.gg/kraviq" target="_blank" rel="noopener noreferrer">
                 Open Discord
                 <ArrowRight className="h-4 w-4" />
               </a>
@@ -260,7 +260,7 @@ export const CommunityPage = () => (
           Ready to join?
         </motion.h2>
         <motion.p {...reveal(0.05)} className="text-muted-foreground mb-8">
-          The community is free. Tradecore is free to start. There's no reason
+          The community is free. Kraviq is free to start. There's no reason
           to trade alone.
         </motion.p>
         <motion.div
@@ -269,7 +269,7 @@ export const CommunityPage = () => (
         >
           <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
             <Button size="lg" asChild className="gap-2">
-              <a href="https://discord.gg/tradecore" target="_blank" rel="noopener noreferrer">
+              <a href="https://discord.gg/kraviq" target="_blank" rel="noopener noreferrer">
                 Join the community
                 <ArrowRight className="h-4 w-4" />
               </a>

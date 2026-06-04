@@ -9,7 +9,7 @@ import { useAccounts } from "@/hooks/useAccounts";
 import { useTradeStats } from "@/hooks/useTrades";
 import { cn } from "@/lib/utils";
 
-const LS_KEY = "tradecore_setup_dismissed";
+const LS_KEY = "kraviq_setup_dismissed";
 
 export const SetupProgressWidget = () => {
   const { mongoUser, onboardingComplete } = useAuthStore();

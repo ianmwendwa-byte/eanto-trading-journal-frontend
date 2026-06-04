@@ -108,7 +108,7 @@ export const SecuritySection = () => {
                 Delete Account
               </p>
               <p className="text-xs text-muted-foreground mt-1">
-                Permanently delete your Tradecore account.
+                Permanently delete your Kraviq account.
                 Your data will be marked for deletion. This action cannot be easily undone.
               </p>
             </div>

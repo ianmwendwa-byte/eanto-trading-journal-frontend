@@ -4,7 +4,7 @@ import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
-const LS_KEY = "tradecore_hints_seen";
+const LS_KEY = "kraviq_hints_seen";
 
 const getSeenHints = () => {
   try { return JSON.parse(localStorage.getItem(LS_KEY) ?? "{}"); }

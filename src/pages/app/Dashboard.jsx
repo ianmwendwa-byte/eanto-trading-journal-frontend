@@ -187,7 +187,7 @@ export const Dashboard = () => {
             <LayoutDashboard className="h-16 w-16 text-primary" />
           </div>
           <div className="space-y-2">
-            <h2 className="text-2xl font-bold text-foreground">Welcome to Tradecore</h2>
+            <h2 className="text-2xl font-bold text-foreground">Welcome to Kraviq</h2>
             <p className="text-muted-foreground font-medium">Your trading business OS is ready</p>
             <p className="text-sm text-muted-foreground max-w-md">
               Start by adding your first trading account. Track your performance, manage prop firm

@@ -356,7 +356,7 @@ export const HeroSection = () => {
               variants={item}
               className="text-lg text-muted-foreground max-w-md leading-relaxed mb-8"
             >
-              Tradecore is the operating system for serious retail forex
+              Kraviq is the operating system for serious retail forex
               traders. Track every trade, score your business, and grow with
               data — not guesswork.
             </motion.p>

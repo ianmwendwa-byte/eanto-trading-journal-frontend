@@ -11,12 +11,12 @@ export const TermsOfService = () => (
   <LegalLayout
     title="Terms of Service"
     lastUpdated="June 1, 2026"
-    description="The rules and conditions that govern your use of Tradecore."
+    description="The rules and conditions that govern your use of Kraviq."
   >
     {/* Acceptance */}
     <LegalSection id="acceptance" title="1. Acceptance of Terms">
       <p className="text-sm">
-        By creating an account on Tradecore or accessing any part of the
+        By creating an account on Kraviq or accessing any part of the
         platform, you agree to be bound by these Terms of Service ("Terms"),
         our{" "}
         <a href="/privacy" className="text-primary underline underline-offset-2">
@@ -30,7 +30,7 @@ export const TermsOfService = () => (
       </p>
       <p className="text-sm">
         These Terms constitute a legally binding agreement between you and
-        Tradecore. We may update these Terms from time to time — continued use
+        Kraviq. We may update these Terms from time to time — continued use
         after changes are posted constitutes acceptance.
       </p>
     </LegalSection>
@@ -38,8 +38,8 @@ export const TermsOfService = () => (
     {/* Disclaimer */}
     <LegalSection id="disclaimer" title="2. No Financial Advice">
       <LegalWarning>
-        <strong>Important:</strong> Tradecore is a trading journal and
-        performance-tracking platform. Nothing on Tradecore — including the
+        <strong>Important:</strong> Kraviq is a trading journal and
+        performance-tracking platform. Nothing on Kraviq — including the
         Business Score, analytics, insights, or any other feature — constitutes
         financial advice, investment advice, or a recommendation to buy or sell
         any financial instrument. Trading forex and CFDs carries significant
@@ -47,7 +47,7 @@ export const TermsOfService = () => (
         responsible for your trading decisions.
       </LegalWarning>
       <p className="text-sm">
-        Past trading performance recorded in Tradecore does not guarantee or
+        Past trading performance recorded in Kraviq does not guarantee or
         predict future results. The Business Score and all analytics are
         informational tools only.
       </p>
@@ -56,7 +56,7 @@ export const TermsOfService = () => (
     {/* Service description */}
     <LegalSection id="service" title="3. Description of Service">
       <p className="text-sm">
-        Tradecore provides a web-based platform that enables retail forex traders
+        Kraviq provides a web-based platform that enables retail forex traders
         to:
       </p>
       <LegalList
@@ -84,10 +84,10 @@ export const TermsOfService = () => (
           confidentiality of your credentials and for all activity that occurs
           under your account. Notify us immediately at{" "}
           <a
-            href="mailto:support@tradecore.app"
+            href="mailto:support@kraviq.app"
             className="text-primary underline underline-offset-2"
           >
-            support@tradecore.app
+            support@kraviq.app
           </a>{" "}
           if you suspect unauthorised access.
         </p>
@@ -95,7 +95,7 @@ export const TermsOfService = () => (
 
       <LegalSubSection title="4.2 One Account Per Person">
         <p className="text-sm">
-          Each individual may hold only one Tradecore account. Creating multiple
+          Each individual may hold only one Kraviq account. Creating multiple
           accounts to circumvent plan limits or free-trial restrictions is a
           violation of these Terms.
         </p>
@@ -103,7 +103,7 @@ export const TermsOfService = () => (
 
       <LegalSubSection title="4.3 Account Security">
         <p className="text-sm">
-          You are responsible for keeping your password secure. Tradecore uses
+          You are responsible for keeping your password secure. Kraviq uses
           Firebase Authentication — we never store or have access to your
           plain-text password. EA API keys are shown only once at generation and
           should be stored securely; treat them like passwords.
@@ -127,7 +127,7 @@ export const TermsOfService = () => (
         ]}
       />
       <LegalNote>
-        The Tradecore Expert Advisor (EA) is provided solely to sync your own
+        The Kraviq Expert Advisor (EA) is provided solely to sync your own
         trading data. Using it to transmit data for other traders' accounts is
         not permitted without explicit written authorisation.
       </LegalNote>
@@ -137,7 +137,7 @@ export const TermsOfService = () => (
     <LegalSection id="billing" title="6. Subscriptions & Billing">
       <LegalSubSection title="6.1 Plans">
         <p className="text-sm">
-          Tradecore offers a free plan and paid subscription tiers (Starter,
+          Kraviq offers a free plan and paid subscription tiers (Starter,
           Pro, Elite). The features available on each plan are described on our{" "}
           <a href="/#pricing" className="text-primary underline underline-offset-2">
             Pricing page
@@ -174,10 +174,10 @@ export const TermsOfService = () => (
           partial billing periods. If you believe you were charged in error,
           contact{" "}
           <a
-            href="mailto:billing@tradecore.app"
+            href="mailto:billing@kraviq.app"
             className="text-primary underline underline-offset-2"
           >
-            billing@tradecore.app
+            billing@kraviq.app
           </a>{" "}
           within 14 days of the charge.
         </p>
@@ -188,7 +188,7 @@ export const TermsOfService = () => (
     <LegalSection id="user-content" title="7. Your Data & Content">
       <p className="text-sm">
         You retain full ownership of all trading data, notes, and content you
-        enter into Tradecore. By using the platform, you grant Tradecore a
+        enter into Kraviq. By using the platform, you grant Kraviq a
         limited, non-exclusive, royalty-free licence to store, process, and
         display your data solely to provide the service to you.
       </p>
@@ -204,9 +204,9 @@ export const TermsOfService = () => (
     <LegalSection id="intellectual-property" title="8. Intellectual Property">
       <p className="text-sm">
         All platform software, design, trademarks, trade names, logos, and
-        content created by Tradecore are the exclusive property of Tradecore and
+        content created by Kraviq are the exclusive property of Kraviq and
         are protected by applicable intellectual property laws. Nothing in these
-        Terms grants you any right to use Tradecore's brand assets without prior
+        Terms grants you any right to use Kraviq's brand assets without prior
         written permission.
       </p>
     </LegalSection>
@@ -221,11 +221,11 @@ export const TermsOfService = () => (
         </p>
       </LegalSubSection>
 
-      <LegalSubSection title="9.2 By Tradecore">
+      <LegalSubSection title="9.2 By Kraviq">
         <p className="text-sm">
           We may suspend or terminate your account immediately and without notice
           if you breach these Terms, engage in fraudulent activity, or if
-          continued access would expose Tradecore or other users to harm or legal
+          continued access would expose Kraviq or other users to harm or legal
           risk. We may also terminate accounts that have been inactive for more
           than 12 months on the free plan, with at least 30 days' prior notice.
         </p>
@@ -235,7 +235,7 @@ export const TermsOfService = () => (
     {/* Liability */}
     <LegalSection id="liability" title="10. Limitation of Liability">
       <LegalWarning>
-        To the maximum extent permitted by applicable law, Tradecore and its
+        To the maximum extent permitted by applicable law, Kraviq and its
         officers, directors, employees, and affiliates will not be liable for
         any indirect, incidental, special, consequential, or punitive damages —
         including loss of profits, trading losses, loss of data, or business
@@ -245,7 +245,7 @@ export const TermsOfService = () => (
       <p className="text-sm">
         Our total liability to you for any claim arising from these Terms or
         your use of the platform shall not exceed the greater of (a) the amount
-        you paid to Tradecore in the 12 months preceding the claim, or (b)
+        you paid to Kraviq in the 12 months preceding the claim, or (b)
         USD $50.
       </p>
     </LegalSection>
@@ -253,7 +253,7 @@ export const TermsOfService = () => (
     {/* Warranties */}
     <LegalSection id="warranties" title="11. Disclaimer of Warranties">
       <p className="text-sm">
-        Tradecore is provided "as is" and "as available" without warranty of
+        Kraviq is provided "as is" and "as available" without warranty of
         any kind, express or implied, including — but not limited to — warranties
         of merchantability, fitness for a particular purpose, and
         non-infringement. We do not warrant that the platform will be
@@ -277,7 +277,7 @@ export const TermsOfService = () => (
       <p className="text-sm">
         We may update these Terms at any time. For material changes, we will
         provide at least 14 days' notice via email or an in-app banner. Your
-        continued use of Tradecore after the effective date of changes
+        continued use of Kraviq after the effective date of changes
         constitutes acceptance of the updated Terms.
       </p>
     </LegalSection>
@@ -288,23 +288,23 @@ export const TermsOfService = () => (
         For questions about these Terms, contact us at:
       </p>
       <div className="bg-card border border-border rounded-xl p-5 text-sm space-y-1">
-        <p className="text-foreground font-medium">Tradecore</p>
+        <p className="text-foreground font-medium">Kraviq</p>
         <p>
           Email:{" "}
           <a
-            href="mailto:legal@tradecore.app"
+            href="mailto:legal@kraviq.app"
             className="text-primary underline underline-offset-2"
           >
-            legal@tradecore.app
+            legal@kraviq.app
           </a>
         </p>
         <p>
           Support:{" "}
           <a
-            href="mailto:support@tradecore.app"
+            href="mailto:support@kraviq.app"
             className="text-primary underline underline-offset-2"
           >
-            support@tradecore.app
+            support@kraviq.app
           </a>
         </p>
       </div>

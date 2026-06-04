@@ -19,7 +19,7 @@ const useLandingPageSEO = () => {
   useEffect(() => {
     const prev = document.title;
     document.title =
-      "Tradecore — The Operating System for Retail Forex Traders";
+      "Kraviq — The Operating System for Retail Forex Traders";
 
     // Meta description
     let meta = document.querySelector('meta[name="description"]');
@@ -38,16 +38,16 @@ const useLandingPageSEO = () => {
       "@graph": [
         {
           "@type": "Organization",
-          "@id": "https://tradecore.app/#organization",
-          name: "Tradecore",
-          url: "https://tradecore.app",
-          logo: "https://tradecore.app/logo.svg",
+          "@id": "https://kraviq.app/#organization",
+          name: "Kraviq",
+          url: "https://kraviq.app",
+          logo: "https://kraviq.app/logo.svg",
           description:
             "The operating system for retail forex traders. Multi-account management, Business Score, EA auto-sync, prop firm tracking.",
         },
         {
           "@type": "SoftwareApplication",
-          name: "Tradecore",
+          name: "Kraviq",
           applicationCategory: "FinanceApplication",
           operatingSystem: "Web, MT4, MT5",
           offers: [
@@ -72,7 +72,7 @@ const useLandingPageSEO = () => {
           mainEntity: [
             {
               "@type": "Question",
-              name: "Is Tradecore free to start?",
+              name: "Is Kraviq free to start?",
               acceptedAnswer: {
                 "@type": "Answer",
                 text: "Yes. The Free plan gives you 1 trading account, up to 50 trades per month, and basic analytics — no credit card required.",
@@ -88,10 +88,10 @@ const useLandingPageSEO = () => {
             },
             {
               "@type": "Question",
-              name: "Does Tradecore support MT4 and MT5?",
+              name: "Does Kraviq support MT4 and MT5?",
               acceptedAnswer: {
                 "@type": "Answer",
-                text: "Yes. Tradecore supports MT4 and MT5 via manual entry, CSV import, and automatic EA sync.",
+                text: "Yes. Kraviq supports MT4 and MT5 via manual entry, CSV import, and automatic EA sync.",
               },
             },
           ],
@@ -99,10 +99,10 @@ const useLandingPageSEO = () => {
       ],
     };
 
-    let ld = document.getElementById("tradecore-ld");
+    let ld = document.getElementById("kraviq-ld");
     if (!ld) {
       ld = document.createElement("script");
-      ld.id = "tradecore-ld";
+      ld.id = "kraviq-ld";
       ld.type = "application/ld+json";
       document.head.appendChild(ld);
     }
@@ -161,7 +161,7 @@ export const LandingPage = () => {
           {/* 2. Problem Strip */}
           <ProblemStrip />
 
-          {/* 3. What is Tradecore — 3 Pillars */}
+          {/* 3. What is Kraviq — 3 Pillars */}
           <PillarsSection />
 
           {/* 4. Account Management */}

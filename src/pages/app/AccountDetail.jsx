@@ -345,7 +345,7 @@ const EASyncTab = ({ accountId }) => {
           <Key className="h-4 w-4 text-muted-foreground" />
           <p className="text-sm font-semibold text-foreground">EA API Key</p>
           <InfoTooltip
-            content="Generate a key to connect your MT4/MT5 EA to Tradecore. The key is shown once after generation and cannot be retrieved again."
+            content="Generate a key to connect your MT4/MT5 EA to Kraviq. The key is shown once after generation and cannot be retrieved again."
           />
         </div>
 

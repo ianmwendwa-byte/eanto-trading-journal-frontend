@@ -12,7 +12,7 @@ import "./index.css";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
-    <ThemeProvider defaultTheme="dark" storageKey="tradecore-ui">
+    <ThemeProvider defaultTheme="dark" storageKey="kraviq-ui">
       <QueryClientProvider client={queryClient}>
         <TooltipProvider>
           <AuthProvider>

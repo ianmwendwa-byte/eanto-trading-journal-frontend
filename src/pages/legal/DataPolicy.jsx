@@ -10,25 +10,25 @@ export const DataPolicy = () => (
   <LegalLayout
     title="Privacy Policy"
     lastUpdated="June 1, 2026"
-    description="How Tradecore collects, uses, and protects your personal information."
+    description="How Kraviq collects, uses, and protects your personal information."
   >
     {/* Intro */}
     <LegalSection id="introduction" title="1. Introduction">
       <p className="text-sm">
-        Tradecore ("<strong className="text-foreground">we</strong>", "
+        Kraviq ("<strong className="text-foreground">we</strong>", "
         <strong className="text-foreground">us</strong>", "
         <strong className="text-foreground">our</strong>") operates the
-        Tradecore platform — a trading journal and business-management tool for
+        Kraviq platform — a trading journal and business-management tool for
         retail forex traders. This Privacy Policy explains what personal data we
         collect, why we collect it, how we use it, and the choices you have.
       </p>
       <p className="text-sm">
-        By creating an account or using any part of Tradecore, you agree to the
+        By creating an account or using any part of Kraviq, you agree to the
         practices described in this policy. If you do not agree, please do not
         use the platform.
       </p>
       <LegalNote>
-        Tradecore is a trading journal platform. We do not provide financial
+        Kraviq is a trading journal platform. We do not provide financial
         advice, manage funds, or execute trades on your behalf.
       </LegalNote>
     </LegalSection>
@@ -52,7 +52,7 @@ export const DataPolicy = () => (
 
       <LegalSubSection title="2.2 Trading Data">
         <p className="text-sm">
-          The core of Tradecore is your trading journal. We store:
+          The core of Kraviq is your trading journal. We store:
         </p>
         <LegalList
           items={[
@@ -84,7 +84,7 @@ export const DataPolicy = () => (
 
       <LegalSubSection title="2.4 EA (Expert Advisor) Data">
         <p className="text-sm">
-          If you install the Tradecore EA on your MetaTrader 4 or MT5 terminal,
+          If you install the Kraviq EA on your MetaTrader 4 or MT5 terminal,
           the EA sends trade data to our servers using a unique API key you
           generate. Data transmitted includes:
         </p>
@@ -117,7 +117,7 @@ export const DataPolicy = () => (
     <LegalSection id="how-we-use" title="3. How We Use Your Information">
       <LegalList
         items={[
-          "Providing and maintaining the Tradecore platform and all its features",
+          "Providing and maintaining the Kraviq platform and all its features",
           "Calculating your Trading Business Score and pillar breakdowns",
           "Enabling EA trade synchronisation to your accounts",
           "Sending system notifications (trade sync alerts, drawdown warnings, security events)",
@@ -186,7 +186,7 @@ export const DataPolicy = () => (
       <p className="text-sm">
         We may disclose your information if required by law, court order, or
         governmental authority, or to protect the rights, property, or safety of
-        Tradecore, our users, or the public.
+        Kraviq, our users, or the public.
       </p>
     </LegalSection>
 
@@ -222,10 +222,10 @@ export const DataPolicy = () => (
       <p className="text-sm">
         To exercise any of these rights, contact us at{" "}
         <a
-          href="mailto:privacy@tradecore.app"
+          href="mailto:privacy@kraviq.app"
           className="text-primary underline underline-offset-2"
         >
-          privacy@tradecore.app
+          privacy@kraviq.app
         </a>
         . We will respond within 30 days.
       </p>
@@ -255,7 +255,7 @@ export const DataPolicy = () => (
     {/* Children */}
     <LegalSection id="children" title="8. Children's Privacy">
       <p className="text-sm">
-        Tradecore is not directed at children under the age of 18. We do not
+        Kraviq is not directed at children under the age of 18. We do not
         knowingly collect personal information from minors. If you believe a
         minor has created an account, please contact us and we will delete it
         promptly.
@@ -269,7 +269,7 @@ export const DataPolicy = () => (
         material changes, we will notify you via email or a prominent notice
         within the app at least 7 days before the changes take effect. The "Last
         updated" date at the top of this page reflects the most recent revision.
-        Continued use of Tradecore after changes take effect constitutes your
+        Continued use of Kraviq after changes take effect constitutes your
         acceptance of the updated policy.
       </p>
     </LegalSection>
@@ -281,23 +281,23 @@ export const DataPolicy = () => (
         Policy, contact us at:
       </p>
       <div className="bg-card border border-border rounded-xl p-5 text-sm space-y-1">
-        <p className="text-foreground font-medium">Tradecore</p>
+        <p className="text-foreground font-medium">Kraviq</p>
         <p>
           Email:{" "}
           <a
-            href="mailto:privacy@tradecore.app"
+            href="mailto:privacy@kraviq.app"
             className="text-primary underline underline-offset-2"
           >
-            privacy@tradecore.app
+            privacy@kraviq.app
           </a>
         </p>
         <p>
           Support:{" "}
           <a
-            href="mailto:support@tradecore.app"
+            href="mailto:support@kraviq.app"
             className="text-primary underline underline-offset-2"
           >
-            support@tradecore.app
+            support@kraviq.app
           </a>
         </p>
       </div>

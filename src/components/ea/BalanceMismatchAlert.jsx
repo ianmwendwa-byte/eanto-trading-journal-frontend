@@ -19,7 +19,7 @@ export const BalanceMismatchAlert = ({ eaSync, accountId }) => {
         <div className="flex-1">
           <p className="text-sm font-semibold text-[var(--warning)]">Balance Mismatch Detected</p>
           <p className="text-xs text-muted-foreground mt-0.5">
-            Your EA reported a balance different from what Tradecore has on record.
+            Your EA reported a balance different from what Kraviq has on record.
           </p>
         </div>
       </div>

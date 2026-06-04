@@ -11,7 +11,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { fadeVariants } from "@/lib/animations";
-import { Mail, TrendingUp, ShieldCheck, ArrowLeft } from "lucide-react";
+import { Mail, ShieldCheck, ArrowLeft } from "lucide-react";
+import Logo from "@/components/shared/Logo";
 
 const schema = z.object({
   email: z.string().email("Invalid email address"),
@@ -49,10 +50,7 @@ export const ForgotPassword = () => {
             className="space-y-8"
           >
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
-                <TrendingUp className="h-4 w-4 text-primary-foreground" />
-              </div>
-              <span className="text-lg font-bold font-heading">Tradecore</span>
+              <Logo variant="horizontal" theme="dark" size="md" />
             </div>
 
             <div className="bg-card border border-border rounded-2xl p-6 shadow-xl text-center space-y-4">
@@ -89,13 +87,10 @@ export const ForgotPassword = () => {
           >
             {/* Logo + heading */}
             <div className="space-y-1">
-              <div className="flex items-center gap-2 mb-5">
-                <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
-                  <TrendingUp className="h-4 w-4 text-primary-foreground" />
-                </div>
-                <span className="text-lg font-bold font-heading">Tradecore</span>
+              <div className="mb-5">
+                <Logo variant="horizontal" theme="dark" size="md" />
               </div>
-              <h1 className="text-2xl font-bold font-heading tracking-tight">Reset password</h1>
+              <h1 className="text-2xl font-bold font-heading tracking-tight">Reset your password</h1>
               <p className="text-muted-foreground text-sm">Enter your email for a reset link</p>
             </div>
 

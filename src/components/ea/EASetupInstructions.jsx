@@ -9,8 +9,8 @@ import { cn } from "@/lib/utils";
 const STEPS = [
   {
     icon: Download,
-    title: "Download Tradecore EA",
-    content: "The Tradecore EA file (.ex5 for MT5, .ex4 for MT4) can be downloaded from your account dashboard.",
+    title: "Download Kraviq EA",
+    content: "The Kraviq EA file (.ex5 for MT5, .ex4 for MT4) can be downloaded from your account dashboard.",
     note: "coming_soon",
   },
   {
@@ -26,14 +26,14 @@ const STEPS = [
         <span className="font-mono text-[11px] bg-muted px-1.5 py-0.5 rounded">
           MQL4/Experts
         </span>{" "}
-        (for MT4). Copy the Tradecore EA file into this folder, then restart MetaTrader or press F5 to refresh.
+        (for MT4). Copy the Kraviq EA file into this folder, then restart MetaTrader or press F5 to refresh.
       </span>
     ),
   },
   {
     icon: BarChart2,
     title: "Attach EA to a Chart",
-    content: "Open any chart in MetaTrader. In the Navigator panel, find 'Tradecore EA' under Expert Advisors. Double-click or drag it onto the chart.",
+    content: "Open any chart in MetaTrader. In the Navigator panel, find 'Kraviq EA' under Expert Advisors. Double-click or drag it onto the chart.",
   },
   {
     icon: Key,
@@ -48,7 +48,7 @@ const STEPS = [
   {
     icon: CheckCircle2,
     title: "Verify Connection",
-    content: "Return to Tradecore. Within 30 seconds, your EA status should change to 'Online' and broker details will appear.",
+    content: "Return to Kraviq. Within 30 seconds, your EA status should change to 'Online' and broker details will appear.",
   },
 ];
 

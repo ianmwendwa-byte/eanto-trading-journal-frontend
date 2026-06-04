@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { TrendingUp, Menu, Sun, Moon } from "lucide-react";
+import { Menu, Sun, Moon } from "lucide-react";
+import Logo from "@/components/shared/Logo";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -82,11 +83,8 @@ export const LandingNavbar = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-2">
-            <TrendingUp className="h-5 w-5 text-primary" aria-hidden="true" />
-            <span className="font-heading font-semibold text-foreground text-lg">
-              Tradecore
-            </span>
+          <Link to="/" className="flex items-center">
+            <Logo variant="horizontal" theme="dark" size="md" />
           </Link>
 
           {/* Center nav — desktop */}
@@ -133,14 +131,8 @@ export const LandingNavbar = () => {
               className="w-80 bg-background border-border p-6 flex flex-col"
             >
               {/* Logo — padded away from the close button */}
-              <div className="flex items-center gap-2 mb-8 pt-1">
-                <TrendingUp
-                  className="h-5 w-5 text-primary"
-                  aria-hidden="true"
-                />
-                <span className="font-heading font-semibold text-foreground text-lg">
-                  Tradecore
-                </span>
+              <div className="mb-8 pt-1">
+                <Logo variant="horizontal" theme="dark" size="md" />
               </div>
 
               {/* Nav links */}

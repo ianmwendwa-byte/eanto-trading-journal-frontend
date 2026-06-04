@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
-import { TrendingUp, ArrowRight } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import Logo from "@/components/shared/Logo";
 
 const tagline1 = ["The", "Operating", "System", "for"];
 const tagline2 = ["Retail", "Forex", "Traders"];
@@ -35,14 +36,9 @@ export const WelcomeStep = ({ onStart }) => (
         initial={{ opacity: 0, scale: 0.8 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.4, ease: "easeOut" }}
-        className="flex items-center gap-3 mb-10"
+        className="mb-10"
       >
-        <div className="h-12 w-12 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center">
-          <TrendingUp className="h-6 w-6 text-primary" />
-        </div>
-        <span className="text-2xl font-heading font-bold text-foreground tracking-tight">
-          Tradecore
-        </span>
+        <Logo variant="stacked" theme="dark" size="lg" />
       </motion.div>
 
       {/* Tagline */}

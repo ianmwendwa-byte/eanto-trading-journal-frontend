@@ -42,7 +42,7 @@ export const ContinueSetupBanner = () => {
               </span>
             </div>
             <p className="text-sm text-muted-foreground truncate">
-              Complete your profile to unlock all Tradecore features
+              Complete your profile to unlock all Kraviq features
             </p>
           </div>
 

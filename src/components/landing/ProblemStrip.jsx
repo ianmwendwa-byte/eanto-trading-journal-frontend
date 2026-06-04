@@ -126,7 +126,7 @@ export const ProblemStrip = () => {
           transition={{ duration: 0.5, ease: "easeOut", delay: 0.2 }}
           className="text-xl font-heading font-semibold text-primary"
         >
-          Tradecore fixes all of this.
+          Kraviq fixes all of this.
         </motion.p>
       </div>
     </section>

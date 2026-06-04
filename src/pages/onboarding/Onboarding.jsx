@@ -1,7 +1,8 @@
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { TrendingUp, ArrowLeft, ArrowRight } from "lucide-react";
+import { ArrowLeft, ArrowRight } from "lucide-react";
+import Logo from "@/components/shared/Logo";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
@@ -95,7 +96,7 @@ const DEFAULT_WIZARD = {
 };
 
 // ── Draft helpers ─────────────────────────────────────────────
-const makeDraftKey = (userId) => `tc_onboarding_draft_${userId ?? "guest"}`;
+const makeDraftKey = (userId) => `kv_onboarding_draft_${userId ?? "guest"}`;
 
 const loadDraft = (key) => {
   try {
@@ -218,7 +219,7 @@ export const Onboarding = () => {
       // Clear saved draft — setup is fully complete
       clearDraft(draftKey);
 
-      toast.success("Welcome to Tradecore! 🎉");
+      toast.success("Welcome to Kraviq. Let's get to work.");
       navigate("/dashboard");
     } catch {
       setIsSubmitting(false);
@@ -237,9 +238,8 @@ export const Onboarding = () => {
       {/* ── Left context panel (desktop only) ───── */}
       <div className="hidden lg:flex w-[38%] bg-card/60 border-r border-border flex-col p-8 justify-between">
         {/* Logo */}
-        <div className="flex items-center gap-2">
-          <TrendingUp className="h-5 w-5 text-primary" />
-          <span className="font-heading font-bold text-foreground">Tradecore</span>
+        <div>
+          <Logo variant="horizontal" theme="dark" size="sm" />
         </div>
 
         {/* Context content */}
@@ -291,9 +291,8 @@ export const Onboarding = () => {
       {/* ── Right content panel ──────────────────── */}
       <div className="flex-1 flex flex-col">
         {/* Mobile logo */}
-        <div className="lg:hidden flex items-center gap-2 px-6 pt-6 pb-2">
-          <TrendingUp className="h-4 w-4 text-primary" />
-          <span className="font-heading font-bold text-sm text-foreground">Tradecore</span>
+        <div className="lg:hidden flex items-center px-6 pt-6 pb-2">
+          <Logo variant="horizontal" theme="dark" size="sm" />
         </div>
 
         {/* Content area */}

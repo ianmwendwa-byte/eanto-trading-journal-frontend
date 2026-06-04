@@ -18,10 +18,10 @@ const schema = z.object({
 });
 
 const TOPICS = [
-  { label: "General inquiry",    email: "hello@tradecore.app" },
-  { label: "Technical support",  email: "support@tradecore.app" },
-  { label: "Billing question",   email: "billing@tradecore.app" },
-  { label: "Data / privacy",     email: "privacy@tradecore.app" },
+  { label: "General inquiry",    email: "hello@kraviq.app" },
+  { label: "Technical support",  email: "support@kraviq.app" },
+  { label: "Billing question",   email: "billing@kraviq.app" },
+  { label: "Data / privacy",     email: "privacy@kraviq.app" },
 ];
 
 const reveal = (delay = 0) => ({

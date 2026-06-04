@@ -5,6 +5,7 @@ import {
   BarChart3, Upload, Cpu, Trophy, Target, Lightbulb,
   Bot, ChevronLeft, ChevronRight, LogOut, X,
 } from "lucide-react";
+import Logo from "@/components/shared/Logo";
 import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useAuth } from "@/hooks/useAuth";
@@ -146,9 +147,7 @@ export const DashboardSidebar = ({ collapsed, onToggle, mobile = false }) => {
         )}
       >
         {!collapsed && (
-          <span className="font-heading font-bold text-base text-sidebar-foreground tracking-tight">
-            Tradecore
-          </span>
+          <Logo variant="horizontal" theme="dark" size="sm" />
         )}
         {mobile ? (
           <button

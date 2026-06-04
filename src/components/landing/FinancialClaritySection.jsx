@@ -211,7 +211,7 @@ export const FinancialClaritySection = () => {
             transition={{ duration: 0.4, ease: "easeOut", delay: 0.1 }}
             className="text-muted-foreground text-lg max-w-xl mx-auto"
           >
-            Most traders confuse gross profit with real profit. Tradecore shows
+            Most traders confuse gross profit with real profit. Kraviq shows
             you the full picture — every cost, every withdrawal, every dollar.
           </motion.p>
         </div>
@@ -317,7 +317,7 @@ export const FinancialClaritySection = () => {
           transition={{ duration: 0.4, ease: "easeOut", delay: 0.2 }}
           className="text-sm text-muted-foreground italic text-center max-w-sm mx-auto"
         >
-          TradeZella shows you P&L. Tradecore shows you the truth.
+          TradeZella shows you P&L. Kraviq shows you the truth.
         </motion.p>
       </div>
     </section>

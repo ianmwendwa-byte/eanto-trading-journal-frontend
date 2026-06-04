@@ -16,7 +16,7 @@ const STEPS = [
     num: "01",
     icon: Key,
     title: "Generate your API key",
-    desc: "In Tradecore, open your account settings and generate an EA API key. It is shown once — copy it and keep it safe. We store only a secure hash.",
+    desc: "In Kraviq, open your account settings and generate an EA API key. It is shown once — copy it and keep it safe. We store only a secure hash.",
     mockup: (
       <div className="bg-card border border-border rounded-xl p-4 text-sm shadow-lg max-w-xs w-full">
         <p className="text-xs text-muted-foreground mb-3 font-medium">EA API Key</p>
@@ -36,7 +36,7 @@ const STEPS = [
     num: "02",
     icon: RefreshCw,
     title: "Install the EA on your chart",
-    desc: "Attach the Tradecore Expert Advisor to any chart in MT4 or MT5. Enter your API key in the EA input settings. No coding required.",
+    desc: "Attach the Kraviq Expert Advisor to any chart in MT4 or MT5. Enter your API key in the EA input settings. No coding required.",
     mockup: (
       <div className="bg-card border border-border rounded-xl p-4 text-sm shadow-lg max-w-xs w-full">
         <p className="text-xs text-muted-foreground mb-3 font-medium">Expert Advisor — Inputs</p>
@@ -60,7 +60,7 @@ const STEPS = [
     num: "03",
     icon: Wifi,
     title: "Trades sync automatically",
-    desc: "That's it. Every trade that closes in MT4/MT5 is pushed to Tradecore instantly — pair, direction, lot size, P&L, open and close times, and balance snapshot.",
+    desc: "That's it. Every trade that closes in MT4/MT5 is pushed to Kraviq instantly — pair, direction, lot size, P&L, open and close times, and balance snapshot.",
     mockup: (
       <div className="bg-card border border-border rounded-xl p-4 text-sm shadow-lg max-w-xs w-full">
         <div className="flex items-center justify-between mb-4">
@@ -109,12 +109,12 @@ const SECURITY = [
   {
     icon: Shield,
     title: "Hash-only storage",
-    body: "Tradecore stores only a cryptographic hash of your API key. Even if our database were compromised, your key could not be reconstructed.",
+    body: "Kraviq stores only a cryptographic hash of your API key. Even if our database were compromised, your key could not be reconstructed.",
   },
   {
     icon: CheckCircle,
     title: "Per-account scoping",
-    body: "Each API key is scoped to a single Tradecore account. An EA key for Account A cannot write trades to Account B.",
+    body: "Each API key is scoped to a single Kraviq account. An EA key for Account A cannot write trades to Account B.",
   },
 ];
 
@@ -159,7 +159,7 @@ export const EASyncPage = () => (
           transition={{ duration: 0.4, ease: "easeOut", delay: 0.1 }}
           className="text-lg text-muted-foreground max-w-2xl mx-auto mb-10 leading-relaxed"
         >
-          Install the Tradecore Expert Advisor on any MT4 or MT5 chart. Every
+          Install the Kraviq Expert Advisor on any MT4 or MT5 chart. Every
           trade that closes syncs to your journal instantly — automatically,
           with zero manual input.
         </motion.p>
@@ -277,7 +277,7 @@ export const EASyncPage = () => (
             </h2>
             <p className="text-muted-foreground leading-relaxed mb-6">
               When a trade closes in your MetaTrader terminal, the EA
-              immediately pushes the full trade record to Tradecore. Nothing is
+              immediately pushes the full trade record to Kraviq. Nothing is
               missed, nothing needs to be entered manually.
             </p>
             <ul className="space-y-2">
