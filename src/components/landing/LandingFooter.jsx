@@ -48,7 +48,7 @@ export const LandingFooter = () => {
               className="flex items-center mb-4"
               aria-label="Kraviq home"
             >
-              <Logo variant="horizontal" size="sm" />
+              <Logo variant="horizontal" size="lg" />
             </Link>
             <p className="text-sm text-muted-foreground leading-relaxed max-w-xs mb-6">
               The operating system for retail forex traders. Track, score,
