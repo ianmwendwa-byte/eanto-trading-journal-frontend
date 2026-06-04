@@ -15,43 +15,43 @@
   /* ───────────────── BRAND ───────────────── */
 
   --primary: #4F6EF7;
-  --primary-foreground: #F8F8FF;
+  --primary-foreground: #ffffff;
   --primary-600: #3654D4;
   --primary-800: #1E3BAD;
 
-  /* ───────────────── BACKGROUNDS ───────────────── */
+  /* ───────────────── LIGHT BACKGROUNDS ───────────────── */
 
-  --background: #0A0A0F;
-  --foreground: #F8F8FF;
+  --background: #F5F5FA;
+  --foreground: #0A0A0F;
 
-  --card: #111118;
-  --card-foreground: #F8F8FF;
+  --card: #ffffff;
+  --card-foreground: #0A0A0F;
 
-  --popover: #111118;
-  --popover-foreground: #F8F8FF;
+  --popover: #ffffff;
+  --popover-foreground: #0A0A0F;
 
   /* ───────────────── SURFACES ───────────────── */
 
-  --secondary: #1E1E2E;
-  --secondary-foreground: #F8F8FF;
+  --secondary: #EEEEF6;
+  --secondary-foreground: #0A0A0F;
 
-  --muted: #1E1E2E;
-  --muted-foreground: #9898A8;
-  --subtle: #5A5A6A;
+  --muted: #EEEEF6;
+  --muted-foreground: #5A5A6A;
+  --subtle: #9898A8;
 
-  --accent: #1E1E2E;
-  --accent-foreground: #F8F8FF;
+  --accent: #EEF1FE;
+  --accent-foreground: #4F6EF7;
 
   /* ───────────────── BORDERS & INPUTS ───────────────── */
 
-  --border: #2A2A3E;
-  --input: #2A2A3E;
-  --ring: rgba(79, 110, 247, 0.45);
+  --border: rgba(10, 10, 15, 0.10);
+  --input: rgba(10, 10, 15, 0.08);
+  --ring: rgba(79, 110, 247, 0.35);
 
   /* ───────────────── FEEDBACK ───────────────── */
 
   --destructive: #EF4444;
-  --destructive-foreground: #F8F8FF;
+  --destructive-foreground: #ffffff;
 
   /* ───────────────── TRADING STATUS (NEVER CHANGE) ───────────────── */
 
@@ -73,7 +73,7 @@
   --chart-4: #F59E0B;
   --chart-5: #8B5CF6;
 
-  /* ───────────────── SIDEBAR ───────────────── */
+  /* ───────────────── SIDEBAR (stays dark for brand consistency) ───────────────── */
 
   --sidebar: #111118;
   --sidebar-foreground: #F8F8FF;
@@ -99,26 +99,26 @@
 
   /* ───────────────── SHADOWS ───────────────── */
 
-  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.18);
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.04);
 
   --shadow-sm:
-    0 1px 2px rgba(0, 0, 0, 0.22),
-    0 1px 3px rgba(0, 0, 0, 0.25);
+    0 1px 2px rgba(0, 0, 0, 0.06),
+    0 1px 3px rgba(0, 0, 0, 0.06);
 
   --shadow-md:
-    0 4px 6px -1px rgba(0, 0, 0, 0.28),
-    0 2px 4px -2px rgba(0, 0, 0, 0.28);
+    0 4px 6px -1px rgba(0, 0, 0, 0.08),
+    0 2px 4px -2px rgba(0, 0, 0, 0.06);
 
   --shadow-lg:
-    0 10px 15px -3px rgba(0, 0, 0, 0.32),
-    0 4px 6px -4px rgba(0, 0, 0, 0.32);
+    0 10px 15px -3px rgba(0, 0, 0, 0.10),
+    0 4px 6px -4px rgba(0, 0, 0, 0.08);
 
   --shadow-xl:
-    0 20px 25px -5px rgba(0, 0, 0, 0.4),
-    0 8px 10px -6px rgba(0, 0, 0, 0.4);
+    0 20px 25px -5px rgba(0, 0, 0, 0.12),
+    0 8px 10px -6px rgba(0, 0, 0, 0.08);
 
   --shadow-2xl:
-    0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    0 25px 50px -12px rgba(0, 0, 0, 0.18);
 
   /* ───────────────── LAYOUT ───────────────── */
 
@@ -397,6 +397,21 @@
   .trading-grid {
     background-image:
       linear-gradient(
+        rgba(10, 10, 15, 0.05) 1px,
+        transparent 1px
+      ),
+      linear-gradient(
+        90deg,
+        rgba(10, 10, 15, 0.05) 1px,
+        transparent 1px
+      );
+
+    background-size: 24px 24px;
+  }
+
+  .dark .trading-grid {
+    background-image:
+      linear-gradient(
         rgba(255, 255, 255, 0.03) 1px,
         transparent 1px
       ),
@@ -405,7 +420,5 @@
         rgba(255, 255, 255, 0.03) 1px,
         transparent 1px
       );
-
-    background-size: 24px 24px;
   }
 }
