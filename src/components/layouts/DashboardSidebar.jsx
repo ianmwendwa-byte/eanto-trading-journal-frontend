@@ -47,7 +47,7 @@ const NAV_SECTIONS = [
   },
 ];
 
-const NavItem = ({ item, collapsed, eaBadge }) => {
+const NavItem = ({ item, collapsed, eaBadge, onClose }) => {
   const location = useLocation();
   const { label, icon: Icon, path, soon } = item;
   const isActive =
@@ -106,7 +106,7 @@ const NavItem = ({ item, collapsed, eaBadge }) => {
   );
 
   if (soon) return content;
-  return <Link to={path}>{content}</Link>;
+  return <Link to={path} onClick={onClose}>{content}</Link>;
 };
 
 const useEAOnlineCount = () => {
@@ -193,6 +193,7 @@ export const DashboardSidebar = ({ collapsed, onToggle, mobile = false }) => {
                   item={item}
                   collapsed={collapsed}
                   eaBadge={item.path === "/ea" ? { onlineCount, hasEA, allOffline } : null}
+                  onClose={mobile ? onToggle : undefined}
                 />
               ))}
             </div>
