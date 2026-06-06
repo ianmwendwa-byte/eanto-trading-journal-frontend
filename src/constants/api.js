@@ -14,7 +14,7 @@ export const API = {
     PROFILE:                   "/user/profile",
     PREFERENCES_AI:            "/user/preferences/ai",
     PREFERENCES_NOTIFICATIONS: "/user/preferences/notifications",
-    FEATURE_FLAGS:             "/user/feature-flags",
+    FEATURE_FLAGS:             "/user/preferences/feature-flags",
     ONBOARDING_COMPLETE:       "/user/onboarding/complete",
     ONBOARDING_SKIP:           "/user/onboarding/skip",
   },

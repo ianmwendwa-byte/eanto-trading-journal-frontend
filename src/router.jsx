@@ -45,6 +45,7 @@ const Insights       = lazy(() => import("@/pages/app/Insights").then(m => ({ de
 const Notifications  = lazy(() => import("@/pages/app/Notifications").then(m => ({ default: m.Notifications })));
 const Settings       = lazy(() => import("@/pages/app/Settings").then(m => ({ default: m.Settings })));
 const EASync         = lazy(() => import("@/pages/app/EASync").then(m => ({ default: m.EASync })));
+const Score          = lazy(() => import("@/pages/app/Score").then(m => ({ default: m.Score })));
 
 const AppPageFallback = () => (
   <div className="min-h-[60vh] flex items-center justify-center">
@@ -152,7 +153,7 @@ export const router = createBrowserRouter([
               { path: "/notifications", element: <Notifications /> },
               { path: "/transactions",  element: <Transactions /> },
               { path: "/trades",        element: <Trades /> },
-              { path: "/score",         element: <ComingSoonStub title="Business Score" /> },
+              { path: "/score",         element: <Score /> },
               { path: "/import",        element: <ComingSoonStub title="CSV Import" /> },
               { path: "/ea",            element: <EASync /> },
               { path: "/ai",            element: <ComingSoonStub title="AI Coach" /> },

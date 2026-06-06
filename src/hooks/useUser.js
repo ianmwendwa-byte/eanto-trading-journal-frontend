@@ -72,32 +72,44 @@ export const useUpdateNotificationSettings = () => {
   });
 };
 
-// ── Update feature flags (graceful fallback if endpoint missing) ──
+// ── Update feature flags ──────────────────────────────────────
 export const useUpdateFeatureFlags = () => {
   const qc = useQueryClient();
-  const { setMongoUser, mongoUser } = useAuthStore();
+  const { setMongoUser } = useAuthStore();
   return useMutation({
     mutationFn: async (data) => {
       try {
         return await api.patch(API.USER.FEATURE_FLAGS, data);
       } catch (err) {
-        if (err?.status === 404 || err?.status === 405 || err?.status === 501) {
-          console.log("Feature flag endpoint needed");
-          toast.info("Feature flag update coming soon");
-          return null;
-        }
+        // Endpoint not yet deployed — treat as soft-success so the
+        // optimistic update from onMutate stays in the store.
+        if (err?.status === 404 || err?.status === 405) return null;
         throw err;
       }
     },
+    // Optimistically apply new flags to the store immediately so
+    // pages that read featureFlags (e.g. /score) react without waiting.
+    onMutate: (newFlags) => {
+      const prev = useAuthStore.getState().mongoUser;
+      if (prev) {
+        setMongoUser({
+          ...prev,
+          featureFlags: { ...prev.featureFlags, ...newFlags },
+        });
+      }
+      return { prev };
+    },
     onSuccess: (response) => {
-      if (!response) return;
       qc.invalidateQueries({ queryKey: userKeys.profile() });
       const user = response?.user ?? response?.data ?? response;
       if (user && typeof user === "object" && user._id) {
         setMongoUser(user);
-      } else if (mongoUser) {
-        setMongoUser({ ...mongoUser });
       }
+    },
+    onError: (err, _vars, context) => {
+      // Roll back optimistic update
+      if (context?.prev) setMongoUser(context.prev);
+      toast.error(err?.message ?? "Failed to update feature flags");
     },
   });
 };

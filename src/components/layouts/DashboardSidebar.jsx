@@ -34,7 +34,7 @@ const NAV_SECTIONS = [
     items: [
       { label: "CSV Import",      icon: Upload,  path: "/import", soon: true },
       { label: "EA Sync",         icon: Cpu,     path: "/ea"     },
-      { label: "Business Score",  icon: Trophy,  path: "/score",  soon: true },
+      { label: "Business Score",  icon: Trophy,  path: "/score"           },
     ],
   },
   {
