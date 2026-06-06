@@ -2,7 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import api from "@/lib/axios";
-import { tradeKeys, accountKeys, scoreKeys } from "@/lib/queryKeys";
+import { tradeKeys, accountKeys, scoreKeys, dashboardKeys } from "@/lib/queryKeys";
 import { API } from "@/constants/api";
 import { useAuthStore } from "@/store/useAuthStore";
 
@@ -154,10 +154,11 @@ export const useCreateTrade = () => {
   return useMutation({
     mutationFn: (data) => api.post(API.TRADE.BASE, data),
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: tradeKeys.lists() });
-      qc.invalidateQueries({ queryKey: ["trades", "calendar"] });
+      qc.invalidateQueries({ queryKey: tradeKeys.all() });
       qc.invalidateQueries({ queryKey: accountKeys.all() });
       qc.invalidateQueries({ queryKey: scoreKeys.user() });
+      qc.invalidateQueries({ queryKey: dashboardKeys.overview({}) });
+      qc.invalidateQueries({ queryKey: ["dashboard", "overview"] });
       toast.success("Trade added successfully");
     },
     onError: (error) =>

@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   TrendingUp, TrendingDown, AlertCircle, Check,
-  ChevronLeft, ChevronRight,
+  ChevronLeft, ChevronRight, DollarSign,
 } from "lucide-react";
 import { format } from "date-fns";
 import {
@@ -31,21 +31,21 @@ import { cn } from "@/lib/utils";
 
 // ── Constants ─────────────────────────────────────────────────
 const STEPS = [
-  { label: "Setup",  subtitle: "Pair & direction" },
-  { label: "Entry",  subtitle: "Prices & P&L"     },
-  { label: "Review", subtitle: "Notes & submit"   },
+  { label: "Setup",     subtitle: "Account, pair & direction" },
+  { label: "Execution", subtitle: "Prices, P&L & risk"        },
+  { label: "Review",    subtitle: "Notes & submit"             },
 ];
 
 const STEP_FIELDS = [
   ["accountId", "pair", "direction"],
-  ["entryPrice", "exitPrice", "lotSize", "pnl", "openedAt", "closedAt"],
+  ["entryPrice", "exitPrice", "lotSize", "pnl", "riskAmount", "openedAt", "closedAt"],
   [],
 ];
 
 const PAIR_ROW1 = ["EURUSD", "GBPUSD", "USDJPY", "AUDUSD", "USDCAD"];
 const PAIR_ROW2 = ["XAUUSD", "GBPJPY", "EURJPY", "USDCHF", "NZDUSD"];
 const LOT_PRESETS  = ["0.01", "0.05", "0.10", "0.25", "0.50", "1.00"];
-const RISK_PRESETS = ["0.5", "1", "2", "5", "10"];
+const RISK_PRESETS = ["10", "25", "50", "100", "200", "500"];
 const COMMON_TAGS  = ["breakout", "trend_follow", "reversal", "range", "scalp", "swing", "news"];
 
 const SESSIONS = [
@@ -111,6 +111,13 @@ const StepIndicator = ({ currentStep }) => (
   </div>
 );
 
+// ── Section label ─────────────────────────────────────────────
+const SectionLabel = ({ children }) => (
+  <p className="text-[10px] uppercase tracking-widest text-muted-foreground font-semibold pt-1">
+    {children}
+  </p>
+);
+
 // ── Field wrapper ─────────────────────────────────────────────
 const FF = ({ label, required, error, helper, children }) => (
   <div className="space-y-1.5">
@@ -118,7 +125,7 @@ const FF = ({ label, required, error, helper, children }) => (
       {label}{required && <span className="text-destructive ml-0.5">*</span>}
     </Label>
     {children}
-    {helper && <p className="text-[10px] text-muted-foreground">{helper}</p>}
+    {helper && <p className="text-[10px] text-muted-foreground leading-relaxed">{helper}</p>}
     {error && (
       <p className="flex items-center gap-1 text-xs text-destructive">
         <AlertCircle className="h-3 w-3 flex-shrink-0" />
@@ -134,7 +141,7 @@ const Chip = ({ label, onClick, active = false }) => (
     type="button"
     onClick={onClick}
     className={cn(
-      "px-2 py-0.5 rounded text-[10px] font-mono border transition-all",
+      "px-2.5 py-1 rounded text-[10px] font-mono border transition-all",
       active
         ? "bg-primary/15 border-primary/40 text-primary"
         : "border-border text-muted-foreground hover:text-foreground hover:border-primary/30 hover:bg-primary/5"
@@ -145,13 +152,15 @@ const Chip = ({ label, onClick, active = false }) => (
 );
 
 // ── Trade summary card (step 3) ───────────────────────────────
-const TradeSummaryCard = ({ direction, pair, lotSize, entryPrice, exitPrice, pnl, session, openedAt, closedAt }) => {
+const TradeSummaryCard = ({ direction, pair, lotSize, entryPrice, exitPrice, pnl, riskAmount, session, openedAt, closedAt }) => {
   const duration = getTradeDuration(
     openedAt ? new Date(openedAt).toISOString() : null,
     closedAt ? new Date(closedAt).toISOString() : null
   );
-  const pnlNum = parseFloat(pnl);
-  const hasPnl = !isNaN(pnlNum);
+  const pnlNum  = parseFloat(pnl);
+  const hasPnl  = !isNaN(pnlNum);
+  const riskNum = parseFloat(riskAmount);
+  const hasRisk = !isNaN(riskNum) && riskNum > 0;
 
   return (
     <div className="rounded-xl border border-border bg-muted/30 p-4 space-y-3">
@@ -178,9 +187,16 @@ const TradeSummaryCard = ({ direction, pair, lotSize, entryPrice, exitPrice, pnl
         ) : (
           <span className="text-muted-foreground text-sm">—</span>
         )}
-        {duration !== "—" && (
-          <span className="text-xs font-mono text-muted-foreground">{duration}</span>
-        )}
+        <div className="flex items-center gap-3">
+          {hasRisk && (
+            <span className="text-xs font-mono text-muted-foreground">
+              Risk: <span className="text-foreground">${riskNum.toFixed(2)}</span>
+            </span>
+          )}
+          {duration !== "—" && (
+            <span className="text-xs font-mono text-muted-foreground">{duration}</span>
+          )}
+        </div>
       </div>
     </div>
   );
@@ -196,7 +212,7 @@ export const AddTradeSheet = ({ isOpen, onClose, defaultAccountId }) => {
   const accounts = accountsData?.accounts ?? [];
 
   const {
-    register, control, handleSubmit, watch, setValue, trigger, reset,
+    register, control, handleSubmit, watch, setValue, trigger, reset, getValues,
     formState: { errors },
   } = useForm({
     resolver: zodResolver(tradeFormSchema),
@@ -215,17 +231,21 @@ export const AddTradeSheet = ({ isOpen, onClose, defaultAccountId }) => {
       session:            "",
       commission:         "",
       swap:               "",
-      riskPercent:        "",
+      riskAmount:         "",
       note:               "",
       tags:               [],
       setupQualityRating: "",
     },
   });
 
-  const [direction, closedAt, gradeVal, pair, openedAt, session, tags, lotsStr, pnlStr, entryStr, exitStr, slStr, tpStr] = watch([
+  const [
+    direction, closedAt, gradeVal,
+    pair, openedAt, session, tags,
+    lotsStr, pnlStr, entryStr, exitStr, slStr, tpStr, riskAmountStr,
+  ] = watch([
     "direction", "closedAt", "setupQualityRating",
     "pair", "openedAt", "session", "tags",
-    "lotSize", "pnl", "entryPrice", "exitPrice", "stopLoss", "takeProfit",
+    "lotSize", "pnl", "entryPrice", "exitPrice", "stopLoss", "takeProfit", "riskAmount",
   ]);
 
   // Auto-detect session from closedAt
@@ -234,7 +254,7 @@ export const AddTradeSheet = ({ isOpen, onClose, defaultAccountId }) => {
     if (detected) setValue("session", detected, { shouldValidate: false });
   }, [closedAt, setValue]);
 
-  // Live RR preview (entry/SL/TP — display only, backend recalculates)
+  // Live planned RR preview (display only)
   const estimatedRR = (() => {
     const entry = parseFloat(entryStr);
     const sl    = parseFloat(slStr);
@@ -244,6 +264,10 @@ export const AddTradeSheet = ({ isOpen, onClose, defaultAccountId }) => {
     const reward = direction === "buy" ? tp - entry : entry - tp;
     return risk > 0 ? reward / risk : null;
   })();
+
+  const pnlValue = parseFloat(pnlStr);
+  const pnlIsProfit = !isNaN(pnlValue) && pnlValue > 0;
+  const pnlIsLoss   = !isNaN(pnlValue) && pnlValue < 0;
 
   const goNext = async () => {
     const fields = STEP_FIELDS[step];
@@ -260,8 +284,10 @@ export const AddTradeSheet = ({ isOpen, onClose, defaultAccountId }) => {
     setStep((s) => Math.max(s - 1, 0));
   };
 
-  const onSubmit = (data) => {
-    createTrade(transformTradeForm(data), {
+  const onSubmit = () => {
+    const raw = getValues();
+    const payload = transformTradeForm(raw);
+    createTrade(payload, {
       onSuccess: () => {
         reset();
         setStep(0);
@@ -323,7 +349,7 @@ export const AddTradeSheet = ({ isOpen, onClose, defaultAccountId }) => {
                       control={control}
                       render={({ field }) => (
                         <Select value={field.value} onValueChange={field.onChange}>
-                          <SelectTrigger className="bg-background border-border h-10">
+                          <SelectTrigger className="bg-background border-border h-11">
                             <SelectValue placeholder="Select your account" />
                           </SelectTrigger>
                           <SelectContent className="bg-card border-border">
@@ -370,13 +396,13 @@ export const AddTradeSheet = ({ isOpen, onClose, defaultAccountId }) => {
                       render={({ field }) => (
                         <div className="grid grid-cols-2 gap-3">
                           {[
-                            { value: "buy",  label: "▲ BUY",  sub: "Long Position",  Icon: TrendingUp  },
-                            { value: "sell", label: "▼ SELL", sub: "Short Position", Icon: TrendingDown },
+                            { value: "buy",  label: "BUY",  sub: "Long Position",  Icon: TrendingUp  },
+                            { value: "sell", label: "SELL", sub: "Short Position", Icon: TrendingDown },
                           ].map(({ value: v, label, sub, Icon }) => (
                             <motion.button
                               key={v}
                               type="button"
-                              whileTap={{ scale: 0.98 }}
+                              whileTap={{ scale: 0.97 }}
                               onClick={() => field.onChange(v)}
                               className={cn(
                                 "h-20 rounded-xl border-2 flex flex-col items-center justify-center gap-1.5 transition-all duration-150",
@@ -384,10 +410,10 @@ export const AddTradeSheet = ({ isOpen, onClose, defaultAccountId }) => {
                                   ? v === "buy"
                                     ? "bg-[var(--profit)]/15 border-[var(--profit)] text-[var(--profit)]"
                                     : "bg-[var(--loss)]/15 border-[var(--loss)] text-[var(--loss)]"
-                                  : "border-border text-muted-foreground hover:border-border/60 hover:text-foreground"
+                                  : "border-border text-muted-foreground hover:border-border/60 hover:text-foreground hover:bg-muted/30"
                               )}
                             >
-                              <Icon className="h-6 w-6" />
+                              <Icon className="h-5 w-5" />
                               <span className="font-mono font-bold text-lg leading-none">{label}</span>
                               <span className="text-[10px] opacity-70 leading-none">{sub}</span>
                             </motion.button>
@@ -404,169 +430,199 @@ export const AddTradeSheet = ({ isOpen, onClose, defaultAccountId }) => {
                 <>
                   <div className="space-y-1">
                     <h3 className="font-heading font-bold text-xl text-foreground">How did it execute?</h3>
-                    <p className="text-sm text-muted-foreground">Prices, P&L, and trade details</p>
+                    <p className="text-sm text-muted-foreground">Prices, P&L, and risk details</p>
                   </div>
 
-                  {/* Entry / Exit */}
-                  <div className="grid grid-cols-2 gap-3">
-                    <FF label="Entry Price" required error={errors.entryPrice}>
-                      <Input
-                        {...register("entryPrice")}
-                        type="number" step="any" placeholder="1.08542"
-                        className="bg-background border-border font-mono h-11 text-base"
-                      />
-                    </FF>
-                    <FF label="Exit Price" required error={errors.exitPrice}>
-                      <Input
-                        {...register("exitPrice")}
-                        type="number" step="any" placeholder="1.09012"
-                        className="bg-background border-border font-mono h-11 text-base"
-                      />
-                    </FF>
-                  </div>
+                  {/* ─── Execution ─────────────────────────── */}
+                  <div className="space-y-4">
+                    <SectionLabel>Execution</SectionLabel>
 
-                  {/* P&L — required, entered by user from broker */}
-                  <FF
-                    label="P&L"
-                    required
-                    error={errors.pnl}
-                    helper="Enter the actual P&L from your broker (negative = loss)"
-                  >
-                    <Input
-                      {...register("pnl")}
-                      type="number"
-                      step="any"
-                      placeholder="-150.00"
-                      className={cn(
-                        "bg-background border-border font-mono h-12 text-lg font-bold",
-                        pnlStr && !isNaN(parseFloat(pnlStr)) && parseFloat(pnlStr) > 0
-                          ? "text-[var(--profit)]"
-                          : pnlStr && !isNaN(parseFloat(pnlStr)) && parseFloat(pnlStr) < 0
-                            ? "text-[var(--loss)]"
-                            : ""
-                      )}
-                    />
-                  </FF>
-
-                  {/* Lot size */}
-                  <FF label="Lot Size" required error={errors.lotSize}>
-                    <Input
-                      {...register("lotSize")}
-                      type="number" step="any" placeholder="0.10"
-                      className="bg-background border-border font-mono h-10"
-                    />
-                    <div className="flex flex-wrap gap-1.5 mt-1.5">
-                      {LOT_PRESETS.map((l) => (
-                        <Chip key={l} label={l} active={String(lotsStr) === l}
-                          onClick={() => setValue("lotSize", l, { shouldValidate: true })} />
-                      ))}
+                    {/* Entry / Exit */}
+                    <div className="grid grid-cols-2 gap-3">
+                      <FF label="Entry Price" required error={errors.entryPrice}>
+                        <Input
+                          {...register("entryPrice")}
+                          type="number" step="any" placeholder="1.08542"
+                          className="bg-background border-border font-mono h-11"
+                        />
+                      </FF>
+                      <FF label="Exit Price" required error={errors.exitPrice}>
+                        <Input
+                          {...register("exitPrice")}
+                          type="number" step="any" placeholder="1.09012"
+                          className="bg-background border-border font-mono h-11"
+                        />
+                      </FF>
                     </div>
-                  </FF>
 
-                  {/* SL / TP */}
-                  <div className="grid grid-cols-2 gap-3">
-                    <FF label="Stop Loss" error={errors.stopLoss}>
+                    {/* Lot size */}
+                    <FF label="Lot Size" required error={errors.lotSize}>
                       <Input
-                        {...register("stopLoss")}
-                        type="number" step="any" placeholder="1.08200"
-                        className="bg-background border-border font-mono h-10"
+                        {...register("lotSize")}
+                        type="number" step="any" placeholder="0.10"
+                        className="bg-background border-border font-mono h-11"
                       />
+                      <div className="flex flex-wrap gap-1.5 mt-1.5">
+                        {LOT_PRESETS.map((l) => (
+                          <Chip key={l} label={l} active={String(lotsStr) === l}
+                            onClick={() => setValue("lotSize", l, { shouldValidate: true })} />
+                        ))}
+                      </div>
                     </FF>
-                    <FF label="Take Profit" error={errors.takeProfit}>
+
+                    {/* P&L */}
+                    <FF
+                      label="P&L"
+                      required
+                      error={errors.pnl}
+                      helper="Enter the actual P&L from your broker — use a negative value for a loss"
+                    >
                       <Input
-                        {...register("takeProfit")}
-                        type="number" step="any" placeholder="1.09500"
-                        className="bg-background border-border font-mono h-10"
+                        {...register("pnl")}
+                        type="number"
+                        step="any"
+                        placeholder="-150.00"
+                        className={cn(
+                          "bg-background font-mono h-12 text-lg font-bold transition-colors duration-200",
+                          pnlIsProfit ? "border-[var(--profit)]/50 text-[var(--profit)]"
+                            : pnlIsLoss  ? "border-[var(--loss)]/50 text-[var(--loss)]"
+                            : "border-border"
+                        )}
                       />
                     </FF>
                   </div>
 
-                  {/* Live planned RR preview (display only) */}
-                  <AnimatePresence>
-                    {estimatedRR !== null && (
-                      <motion.div
-                        initial={{ opacity: 0, y: -8 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -8 }}
-                        className="px-4 py-2.5 rounded-lg border border-border bg-muted/30 text-center"
-                      >
-                        <p className="text-xs font-mono text-muted-foreground">
-                          Planned R:R <span className="text-foreground font-semibold">1:{estimatedRR.toFixed(2)}</span>
-                        </p>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
+                  <Separator />
 
-                  {/* Timing */}
-                  <div className="grid grid-cols-2 gap-3">
-                    <FF label="Opened At" required error={errors.openedAt}>
-                      <Input
-                        {...register("openedAt")}
-                        type="datetime-local"
-                        className="bg-background border-border text-sm h-10"
-                      />
-                    </FF>
-                    <FF label="Closed At" required error={errors.closedAt}>
-                      <Input
-                        {...register("closedAt")}
-                        type="datetime-local"
-                        className="bg-background border-border text-sm h-10"
-                      />
-                    </FF>
-                  </div>
+                  {/* ─── Risk Management ───────────────────── */}
+                  <div className="space-y-4">
+                    <SectionLabel>Risk Management</SectionLabel>
 
-                  {/* Costs */}
-                  <div className="grid grid-cols-2 gap-3">
-                    <FF label="Commission" error={errors.commission}>
-                      <Input
-                        {...register("commission")}
-                        type="number" step="any" placeholder="3.50"
-                        className="bg-background border-border font-mono h-10"
-                      />
+                    {/* Risk Amount — required */}
+                    <FF
+                      label="Risk Amount"
+                      required
+                      error={errors.riskAmount}
+                      helper="Dollar amount at risk on this trade"
+                    >
+                      <div className="relative">
+                        <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+                        <Input
+                          {...register("riskAmount")}
+                          type="number" step="any" placeholder="50.00"
+                          className="bg-background border-border font-mono h-11 pl-8"
+                        />
+                      </div>
+                      <div className="flex flex-wrap gap-1.5 mt-1.5">
+                        {RISK_PRESETS.map((r) => (
+                          <Chip key={r} label={`$${r}`} active={String(riskAmountStr) === r}
+                            onClick={() => setValue("riskAmount", r, { shouldValidate: true })} />
+                        ))}
+                      </div>
                     </FF>
-                    <FF label="Swap" error={errors.swap}>
-                      <Input
-                        {...register("swap")}
-                        type="number" step="any" placeholder="0.00"
-                        className="bg-background border-border font-mono h-10"
-                      />
-                    </FF>
-                  </div>
 
-                  {/* Risk % */}
-                  <FF label="Risk %" error={errors.riskPercent} helper="% of account balance risked">
-                    <Input
-                      {...register("riskPercent")}
-                      type="number" step="any" placeholder="1.0"
-                      className="bg-background border-border font-mono h-10"
-                    />
-                    <div className="flex flex-wrap gap-1.5 mt-1.5">
-                      {RISK_PRESETS.map((r) => (
-                        <Chip key={r} label={`${r}%`} active={String(watch("riskPercent")) === r}
-                          onClick={() => setValue("riskPercent", r, { shouldValidate: true })} />
-                      ))}
+                    {/* SL / TP */}
+                    <div className="grid grid-cols-2 gap-3">
+                      <FF label="Stop Loss" error={errors.stopLoss}>
+                        <Input
+                          {...register("stopLoss")}
+                          type="number" step="any" placeholder="1.08200"
+                          className="bg-background border-border font-mono h-11"
+                        />
+                      </FF>
+                      <FF label="Take Profit" error={errors.takeProfit}>
+                        <Input
+                          {...register("takeProfit")}
+                          type="number" step="any" placeholder="1.09500"
+                          className="bg-background border-border font-mono h-11"
+                        />
+                      </FF>
                     </div>
-                  </FF>
 
-                  {/* Session (auto-detected) */}
-                  <FF label="Session" error={errors.session} helper="Auto-detected from close time">
-                    <Controller
-                      name="session"
-                      control={control}
-                      render={({ field }) => (
-                        <Select value={field.value ?? ""} onValueChange={field.onChange}>
-                          <SelectTrigger className="bg-background border-border text-sm h-10">
-                            <SelectValue placeholder="Auto-detected" />
-                          </SelectTrigger>
-                          <SelectContent className="bg-card border-border">
-                            {SESSIONS.map((s) => (
-                              <SelectItem key={s.value} value={s.value}>{s.label}</SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
+                    {/* Live planned RR preview */}
+                    <AnimatePresence>
+                      {estimatedRR !== null && (
+                        <motion.div
+                          initial={{ opacity: 0, y: -6 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -6 }}
+                          className="px-4 py-2.5 rounded-lg border border-border bg-muted/30 text-center"
+                        >
+                          <p className="text-xs font-mono text-muted-foreground">
+                            Planned R:R{" "}
+                            <span className="text-foreground font-semibold">1:{estimatedRR.toFixed(2)}</span>
+                          </p>
+                        </motion.div>
                       )}
-                    />
-                  </FF>
+                    </AnimatePresence>
+                  </div>
+
+                  <Separator />
+
+                  {/* ─── Timing ────────────────────────────── */}
+                  <div className="space-y-4">
+                    <SectionLabel>Timing</SectionLabel>
+
+                    <div className="grid grid-cols-2 gap-3">
+                      <FF label="Opened At" required error={errors.openedAt}>
+                        <Input
+                          {...register("openedAt")}
+                          type="datetime-local"
+                          className="bg-background border-border text-sm h-11"
+                        />
+                      </FF>
+                      <FF label="Closed At" required error={errors.closedAt}>
+                        <Input
+                          {...register("closedAt")}
+                          type="datetime-local"
+                          className="bg-background border-border text-sm h-11"
+                        />
+                      </FF>
+                    </div>
+
+                    <FF label="Session" error={errors.session} helper="Auto-detected from close time">
+                      <Controller
+                        name="session"
+                        control={control}
+                        render={({ field }) => (
+                          <Select value={field.value ?? ""} onValueChange={field.onChange}>
+                            <SelectTrigger className="bg-background border-border text-sm h-11">
+                              <SelectValue placeholder="Auto-detected" />
+                            </SelectTrigger>
+                            <SelectContent className="bg-card border-border">
+                              {SESSIONS.map((s) => (
+                                <SelectItem key={s.value} value={s.value}>{s.label}</SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        )}
+                      />
+                    </FF>
+                  </div>
+
+                  <Separator />
+
+                  {/* ─── Trade Costs ───────────────────────── */}
+                  <div className="space-y-4">
+                    <SectionLabel>Trade Costs</SectionLabel>
+
+                    <div className="grid grid-cols-2 gap-3">
+                      <FF label="Commission" error={errors.commission}>
+                        <Input
+                          {...register("commission")}
+                          type="number" step="any" placeholder="3.50"
+                          className="bg-background border-border font-mono h-11"
+                        />
+                      </FF>
+                      <FF label="Swap" error={errors.swap}>
+                        <Input
+                          {...register("swap")}
+                          type="number" step="any" placeholder="0.00"
+                          className="bg-background border-border font-mono h-11"
+                        />
+                      </FF>
+                    </div>
+                  </div>
                 </>
               )}
 
@@ -578,7 +634,7 @@ export const AddTradeSheet = ({ isOpen, onClose, defaultAccountId }) => {
                     <p className="text-sm text-muted-foreground">Optional — you can always add these later</p>
                   </div>
 
-                  {/* Trade summary (uses real form values) */}
+                  {/* Trade summary */}
                   <TradeSummaryCard
                     direction={direction}
                     pair={pair}
@@ -586,6 +642,7 @@ export const AddTradeSheet = ({ isOpen, onClose, defaultAccountId }) => {
                     entryPrice={entryStr}
                     exitPrice={exitStr}
                     pnl={pnlStr}
+                    riskAmount={riskAmountStr}
                     session={session}
                     openedAt={openedAt}
                     closedAt={closedAt}
@@ -631,7 +688,7 @@ export const AddTradeSheet = ({ isOpen, onClose, defaultAccountId }) => {
                               );
                             }}
                             className={cn(
-                              "px-2 py-0.5 rounded-md text-xs border transition-all",
+                              "px-2.5 py-1 rounded-md text-xs border transition-all",
                               active
                                 ? "bg-primary/10 text-primary border-primary/20"
                                 : "border-border text-muted-foreground hover:text-foreground hover:border-border/60"
