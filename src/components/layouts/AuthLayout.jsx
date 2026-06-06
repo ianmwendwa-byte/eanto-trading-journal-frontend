@@ -105,13 +105,13 @@ const BrandPanel = () => (
 );
 
 export const AuthLayout = ({ children }) => (
-  <div className="min-h-screen flex bg-background">
+  <div className="h-screen flex overflow-hidden bg-background">
     {/* Left: Form panel */}
     <motion.div
       variants={fadeVariants}
       initial="initial"
       animate="animate"
-      className="flex-1 lg:flex-none lg:w-[480px] xl:w-[520px] flex items-center justify-center p-6 sm:p-10 relative overflow-hidden"
+      className="flex-1 lg:flex-none lg:w-120 xl:w-130 flex flex-col overflow-y-auto overflow-x-hidden p-6 sm:p-10 relative"
     >
       {/* Radial glow behind form */}
       <div className="absolute inset-0 pointer-events-none"
@@ -120,7 +120,7 @@ export const AuthLayout = ({ children }) => (
             "radial-gradient(ellipse 640px 640px at 50% 40%, rgba(23,61,237,0.07) 0%, transparent 70%)",
         }}
       />
-      <div className="relative w-full max-w-sm">
+      <div className="relative w-full max-w-sm mx-auto my-auto">
         {children}
       </div>
     </motion.div>

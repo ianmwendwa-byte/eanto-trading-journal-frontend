@@ -1,11 +1,11 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { Switch } from "@/components/ui/switch";
 import { Badge }  from "@/components/ui/badge";
-import { Zap, Swords, Star, Users, AlertCircle } from "lucide-react";
-import { AutoSaveIndicator } from "@/components/settings/AutoSaveIndicator";
-import { useAutoSave }       from "@/hooks/useAutoSave";
+import { Button } from "@/components/ui/button";
+import { Zap, Swords, Star, Users, Save, Loader2 } from "lucide-react";
 import { useUpdateFeatureFlags } from "@/hooks/useUser";
-import { useAuthStore }      from "@/store/useAuthStore";
+import { useAuthStore }          from "@/store/useAuthStore";
+import { toast }                 from "sonner";
 import { cn } from "@/lib/utils";
 
 const FEATURES = [
@@ -41,30 +41,41 @@ const FEATURES = [
 
 export const BetaSection = ({ onDirtyChange }) => {
   const { mongoUser } = useAuthStore();
-  const { mutateAsync: updateFlags } = useUpdateFeatureFlags();
+  const { mutateAsync, isPending } = useUpdateFeatureFlags();
 
   const flags = mongoUser?.featureFlags ?? {};
 
   const init = useCallback(() => ({
-    betaEASync:             flags?.betaEASync             === true,
-    betaWarAccount:         flags?.betaWarAccount         === true,
-    betaBusinessScore:      flags?.betaBusinessScore      === true,
-    betaMentorMarketplace:  flags?.betaMentorMarketplace  === true,
-  }), [mongoUser?._id]); // eslint-disable-line react-hooks/exhaustive-deps
+    betaEASync:            flags?.betaEASync            === true,
+    betaWarAccount:        flags?.betaWarAccount        === true,
+    betaBusinessScore:     flags?.betaBusinessScore     === true,
+    betaMentorMarketplace: flags?.betaMentorMarketplace === true,
+  }), [mongoUser]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const [data, setData] = useState(init);
   useEffect(() => { setData(init()); }, [mongoUser?._id]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const { save, status, error, isDirty } = useAutoSave({
-    mutationFn: (d) => updateFlags(d),
-  });
+  const saved = useMemo(() => init(), [init]);
+
+  const isDirty = useMemo(() => (
+    data.betaEASync            !== saved.betaEASync            ||
+    data.betaWarAccount        !== saved.betaWarAccount        ||
+    data.betaBusinessScore     !== saved.betaBusinessScore     ||
+    data.betaMentorMarketplace !== saved.betaMentorMarketplace
+  ), [data, saved]);
 
   useEffect(() => { onDirtyChange?.(isDirty); }, [isDirty]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const handleToggle = (key, value) => {
-    const next = { ...data, [key]: value };
-    setData(next);
-    save(next);
+  const handleToggle = (key, value) => setData((d) => ({ ...d, [key]: value }));
+
+  const handleSave = async () => {
+    try {
+      await mutateAsync(data);
+      toast.success("Beta features saved");
+    } catch (err) {
+      const msg = err?.response?.data?.message ?? err?.message ?? "Failed to save changes";
+      toast.error(msg);
+    }
   };
 
   return (
@@ -79,16 +90,7 @@ export const BetaSection = ({ onDirtyChange }) => {
             Beta features may change or be unstable.
           </p>
         </div>
-        <AutoSaveIndicator status={status} className="ml-auto shrink-0" />
       </div>
-
-      {error && (
-        <p className="text-xs flex items-center gap-1 p-2 rounded-md bg-destructive/10"
-           style={{ color: "var(--loss)" }}>
-          <AlertCircle className="h-3.5 w-3.5" />
-          {error}
-        </p>
-      )}
 
       <div className="space-y-3">
         {FEATURES.map(({ key, icon: Icon, label, description, status: featureStatus }) => {
@@ -104,7 +106,7 @@ export const BetaSection = ({ onDirtyChange }) => {
               )}
             >
               <div className="h-9 w-9 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center shrink-0">
-                <Icon className="h-4.5 w-4.5 text-primary" style={{ height: 18, width: 18 }} />
+                <Icon style={{ height: 18, width: 18 }} className="text-primary" />
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 flex-wrap">
@@ -133,6 +135,25 @@ export const BetaSection = ({ onDirtyChange }) => {
             </div>
           );
         })}
+      </div>
+
+      {/* ── Save footer ─────────────────────────── */}
+      <div className="pt-4 border-t border-border flex flex-col-reverse sm:flex-row sm:items-center gap-3">
+        {isDirty && (
+          <p className="text-xs text-muted-foreground text-center sm:text-left">Unsaved changes</p>
+        )}
+        <Button
+          onClick={handleSave}
+          disabled={!isDirty || isPending}
+          size="sm"
+          className="sm:ml-auto w-full sm:w-auto min-h-[44px] sm:min-h-0"
+        >
+          {isPending ? (
+            <><Loader2 className="h-3.5 w-3.5 mr-2 animate-spin" />Saving...</>
+          ) : (
+            <><Save className="h-3.5 w-3.5 mr-2" />Save Changes</>
+          )}
+        </Button>
       </div>
     </div>
   );

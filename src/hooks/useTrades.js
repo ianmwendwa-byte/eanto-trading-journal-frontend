@@ -118,7 +118,7 @@ export const useTradeSessionStats = (filters = {}) => {
   return useQuery({
     queryKey:  tradeKeys.stats({ ...filters, _type: "sessions" }),
     queryFn:   () => api.get(API.TRADE.STATS_SESSIONS, { params: filters }),
-    select:    (data) => data?.data ?? [],
+    select:    (data) => data?.sessions ?? data?.data ?? [],
     enabled:   isAuthenticated,
     staleTime: 2 * 60 * 1000,
   });
@@ -130,7 +130,7 @@ export const useTradeWeekdayStats = (filters = {}) => {
   return useQuery({
     queryKey:  tradeKeys.stats({ ...filters, _type: "weekdays" }),
     queryFn:   () => api.get(API.TRADE.STATS_WEEKDAYS, { params: filters }),
-    select:    (data) => data?.data ?? [],
+    select:    (data) => data?.weekdays ?? data?.data ?? [],
     enabled:   isAuthenticated,
     staleTime: 2 * 60 * 1000,
   });
@@ -142,7 +142,7 @@ export const useTradeMonthlyStats = (filters = {}) => {
   return useQuery({
     queryKey:  tradeKeys.stats({ ...filters, _type: "monthly" }),
     queryFn:   () => api.get(API.TRADE.STATS_MONTHLY, { params: filters }),
-    select:    (data) => data?.data ?? [],
+    select:    (data) => data?.monthly ?? data?.data ?? [],
     enabled:   isAuthenticated,
     staleTime: 2 * 60 * 1000,
   });

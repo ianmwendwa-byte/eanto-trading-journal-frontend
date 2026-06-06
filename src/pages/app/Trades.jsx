@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Plus } from "lucide-react";
@@ -13,7 +13,7 @@ import { TradesCalendar }   from "@/components/trades/TradesCalendar";
 import { TradeDetailPanel } from "@/components/trades/TradeDetailPanel";
 import { AddTradeSheet }    from "@/components/trades/AddTradeSheet";
 import { DayDetailSheet }   from "@/components/trades/DayDetailSheet";
-import { useTrades, useCalendarTrades, useTradeStats } from "@/hooks/useTrades";
+import { useTrades, useTrade, useCalendarTrades, useTradeStats } from "@/hooks/useTrades";
 import { useAccounts } from "@/hooks/useAccounts";
 import { groupTradesByDate } from "@/utils/calendar";
 import { formatPnL, getPnLColor } from "@/utils/format";
@@ -46,6 +46,15 @@ export const Trades = () => {
   const [view, setView]               = useState(() => searchParams.get("view") ?? "table");
   const [selectedTrade, setSelectedTrade] = useState(null);
   const [isAddOpen, setIsAddOpen]     = useState(() => searchParams.get("add") === "true");
+
+  // Auto-open detail panel when ?trade=<id> is in the URL (e.g. from dashboard widget)
+  const linkedTradeId = searchParams.get("trade");
+  const { data: linkedTrade } = useTrade(linkedTradeId);
+  useEffect(() => {
+    if (linkedTrade && (!selectedTrade || selectedTrade._id !== linkedTrade._id)) {
+      setSelectedTrade(linkedTrade);
+    }
+  }, [linkedTrade]);
   const [calYear,  setCalYear]        = useState(now.getFullYear());
   const [calMonth, setCalMonth]       = useState(now.getMonth());
   const [dayDetail, setDayDetail]     = useState(null);
@@ -112,6 +121,13 @@ export const Trades = () => {
 
   // ── Handlers ──────────────────────────────────────────────────
   const isPanelOpen = !!selectedTrade;
+
+  const handlePanelClose = () => {
+    setSelectedTrade(null);
+    const params = new URLSearchParams(searchParams);
+    params.delete("trade");
+    setSearchParams(params, { replace: true });
+  };
 
   const handleRowClick = (trade) => {
     setSelectedTrade((prev) => (prev?._id === trade._id ? null : trade));
@@ -269,8 +285,8 @@ export const Trades = () => {
           >
             <TradeDetailPanel
               trade={selectedTrade}
-              onClose={() => setSelectedTrade(null)}
-              onDelete={() => setSelectedTrade(null)}
+              onClose={handlePanelClose}
+              onDelete={handlePanelClose}
             />
           </motion.div>
         )}

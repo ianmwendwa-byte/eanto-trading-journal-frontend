@@ -166,7 +166,7 @@ export const Dashboard = () => {
         <div>
           <h1 className="text-2xl font-bold text-foreground">Dashboard</h1>
           <p className="text-sm text-muted-foreground mt-0.5">
-            {getGreeting()}{firstName ? `, ${firstName}` : ""}! 👋
+            {getGreeting()}{firstName ? `, ${firstName}` : ""}! 
           </p>
         </div>
       </div>

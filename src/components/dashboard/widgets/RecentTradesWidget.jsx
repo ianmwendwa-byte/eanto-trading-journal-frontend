@@ -28,7 +28,7 @@ const TradeRow = ({ trade }) => {
   const accountName = trade.accountId?.name ?? "Unknown";
 
   return (
-    <Link to={`/trades/${trade._id}`}>
+    <Link to={`/trades?trade=${trade._id}`}>
       <div className="flex items-center gap-3 py-2 px-1 rounded-lg hover:bg-muted/40 transition-colors cursor-pointer">
         <div className="flex-1 min-w-0">
           <p className="text-sm font-mono font-semibold text-foreground truncate">

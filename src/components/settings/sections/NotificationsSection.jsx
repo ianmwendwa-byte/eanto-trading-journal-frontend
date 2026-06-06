@@ -1,19 +1,19 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { Switch } from "@/components/ui/switch";
+import { Button } from "@/components/ui/button";
 import {
   Select, SelectContent, SelectItem,
   SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { AlertCircle, Lock, ChevronDown, ChevronRight } from "lucide-react";
-import { AutoSaveIndicator } from "@/components/settings/AutoSaveIndicator";
-import { useAutoSave }       from "@/hooks/useAutoSave";
+import { Lock, ChevronDown, ChevronRight, Save, Loader2 } from "lucide-react";
 import { useNotificationPreferences } from "@/hooks/useNotifications";
 import {
   useUpdateNotificationSettings,
   useSilentUpdateNotificationPreferences,
 } from "@/hooks/useUser";
-import { useAuthStore }      from "@/store/useAuthStore";
+import { useAuthStore } from "@/store/useAuthStore";
+import { toast }        from "sonner";
 import { cn } from "@/lib/utils";
 
 const CRITICAL_TYPES = new Set([
@@ -35,10 +35,10 @@ const GRANULAR_CATEGORIES = [
     key:   "account_health",
     label: "Account Health",
     types: [
-      { key: "account_blown",    label: "Account Blown",       critical: true },
-      { key: "balance_mismatch", label: "Balance Mismatch",    critical: true },
-      { key: "daily_drawdown_hit",label: "Daily Drawdown Hit", critical: true },
-      { key: "drawdown_warning", label: "Drawdown Warning",    critical: false },
+      { key: "account_blown",     label: "Account Blown",       critical: true  },
+      { key: "balance_mismatch",  label: "Balance Mismatch",    critical: true  },
+      { key: "daily_drawdown_hit",label: "Daily Drawdown Hit",  critical: true  },
+      { key: "drawdown_warning",  label: "Drawdown Warning",    critical: false },
     ],
   },
   {
@@ -54,17 +54,17 @@ const GRANULAR_CATEGORIES = [
     key:   "trading_activity",
     label: "Trading Activity",
     types: [
-      { key: "trade_flagged",   label: "Trade Flagged",    critical: false },
-      { key: "ea_disconnected", label: "EA Disconnected",  critical: false },
-      { key: "ea_connected",    label: "EA Connected",     critical: false },
+      { key: "trade_flagged",   label: "Trade Flagged",   critical: false },
+      { key: "ea_disconnected", label: "EA Disconnected", critical: false },
+      { key: "ea_connected",    label: "EA Connected",    critical: false },
     ],
   },
   {
     key:   "milestones",
     label: "Milestones",
     types: [
-      { key: "streak_milestone",    label: "Win Streak Milestone",  critical: false },
-      { key: "score_improvement",   label: "Score Improved",        critical: false },
+      { key: "streak_milestone",  label: "Win Streak Milestone", critical: false },
+      { key: "score_improvement", label: "Score Improved",       critical: false },
     ],
   },
   {
@@ -80,10 +80,7 @@ const GRANULAR_CATEGORIES = [
 
 const GranularCategory = ({ category, overrides, onToggle, onMasterToggle }) => {
   const [expanded, setExpanded] = useState(false);
-  // Overrides format: { typeKey: { enabled: bool } }
-  const allEnabled = category.types.every((t) =>
-    overrides[t.key]?.enabled !== false
-  );
+  const allEnabled = category.types.every((t) => overrides[t.key]?.enabled !== false);
 
   return (
     <div className="border border-border rounded-lg overflow-hidden">
@@ -91,18 +88,15 @@ const GranularCategory = ({ category, overrides, onToggle, onMasterToggle }) => 
         <button
           type="button"
           onClick={() => setExpanded(!expanded)}
-          className="flex items-center gap-2 text-sm font-medium text-foreground flex-1 text-left"
+          className="flex items-center gap-2 text-sm font-medium text-foreground flex-1 text-left min-h-[44px]"
         >
           {expanded
-            ? <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
-            : <ChevronRight className="h-3.5 w-3.5 text-muted-foreground" />
+            ? <ChevronDown  className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+            : <ChevronRight className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
           }
           {category.label}
         </button>
-        <Switch
-          checked={allEnabled}
-          onCheckedChange={(v) => onMasterToggle(category, v)}
-        />
+        <Switch checked={allEnabled} onCheckedChange={(v) => onMasterToggle(category, v)} />
       </div>
 
       {expanded && (
@@ -111,15 +105,10 @@ const GranularCategory = ({ category, overrides, onToggle, onMasterToggle }) => 
             const isCritical = CRITICAL_TYPES.has(type.key) || type.critical;
             const isEnabled  = overrides[type.key]?.enabled !== false;
             return (
-              <div key={type.key} className="flex items-center justify-between px-6 py-2.5">
+              <div key={type.key} className="flex items-center justify-between px-6 py-3 min-h-[52px]">
                 <div className="flex items-center gap-2">
-                  {isCritical && (
-                    <Lock className="h-3 w-3 text-muted-foreground shrink-0" />
-                  )}
-                  <p className={cn(
-                    "text-xs",
-                    isCritical ? "text-muted-foreground" : "text-foreground"
-                  )}>
+                  {isCritical && <Lock className="h-3 w-3 text-muted-foreground shrink-0" />}
+                  <p className={cn("text-xs", isCritical ? "text-muted-foreground" : "text-foreground")}>
                     {type.label}
                   </p>
                 </div>
@@ -139,14 +128,13 @@ const GranularCategory = ({ category, overrides, onToggle, onMasterToggle }) => 
 
 export const NotificationsSection = ({ onDirtyChange }) => {
   const { mongoUser } = useAuthStore();
-  const { mutateAsync: updateNotifSettings } = useUpdateNotificationSettings();
-  const { mutateAsync: updateGranular }      = useSilentUpdateNotificationPreferences();
-  const { data: granularPrefs }              = useNotificationPreferences();
+  const { mutateAsync: updateNotifSettings, isPending: notifPending }   = useUpdateNotificationSettings();
+  const { mutateAsync: updateGranular,      isPending: granularPending } = useSilentUpdateNotificationPreferences();
+  const { data: granularPrefs } = useNotificationPreferences();
 
-  // General toggles live under mongoUser.notifications (not notificationPreferences)
   const notifPrefs = mongoUser?.notifications ?? {};
 
-  const init = useCallback(() => ({
+  const initGeneral = useCallback(() => ({
     emailDigest:      notifPrefs?.emailDigest      ?? "weekly",
     tradeAlerts:      notifPrefs?.tradeAlerts      !== false,
     drawdownWarnings: notifPrefs?.drawdownWarnings !== false,
@@ -154,91 +142,76 @@ export const NotificationsSection = ({ onDirtyChange }) => {
     challengeUpdates: notifPrefs?.challengeUpdates !== false,
     mentorMessages:   notifPrefs?.mentorMessages   !== false,
     pushEnabled:      notifPrefs?.pushEnabled      === true,
-  }), [mongoUser?._id]); // eslint-disable-line react-hooks/exhaustive-deps
+  }), [mongoUser]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const [data, setData]         = useState(init);
+  const [data,      setData]      = useState(initGeneral);
   const [overrides, setOverrides] = useState({});
 
-  useEffect(() => { setData(init()); }, [mongoUser?._id]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => { setData(initGeneral()); }, [mongoUser?._id]); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => {
-    if (granularPrefs?.overrides) {
-      setOverrides(granularPrefs.overrides);
-    }
+    if (granularPrefs?.overrides) setOverrides(granularPrefs.overrides);
   }, [granularPrefs]);
 
-  const { save, status, error, isDirty } = useAutoSave({
-    mutationFn: (d) => updateNotifSettings(d),
-  });
+  const savedGeneral = useMemo(() => initGeneral(), [initGeneral]);
+  const savedOverrides = useMemo(() => granularPrefs?.overrides ?? {}, [granularPrefs]);
 
-  const { save: saveGranular, status: granularStatus, isDirty: granularDirty } = useAutoSave({
-    mutationFn: (d) => updateGranular(d),
-  });
+  const generalDirty   = useMemo(() => Object.keys(data).some((k) => data[k] !== savedGeneral[k]), [data, savedGeneral]);
+  const overridesDirty = useMemo(() => JSON.stringify(overrides) !== JSON.stringify(savedOverrides), [overrides, savedOverrides]);
+  const isDirty        = generalDirty || overridesDirty;
+  const isPending      = notifPending || granularPending;
 
-  useEffect(() => {
-    onDirtyChange?.(isDirty || granularDirty);
-  }, [isDirty, granularDirty]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => { onDirtyChange?.(isDirty); }, [isDirty]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const update = (field, value) => {
-    const next = { ...data, [field]: value };
-    setData(next);
-    save(next);
-  };
+  const update = (field, value) => setData((d) => ({ ...d, [field]: value }));
 
   const handleOverride = (typeKey, enabled) => {
     if (CRITICAL_TYPES.has(typeKey)) return;
-    // Overrides format expected by backend: { typeKey: { enabled: bool } }
-    const next = { ...overrides, [typeKey]: { enabled } };
-    setOverrides(next);
-    saveGranular({ overrides: next });
+    setOverrides((o) => ({ ...o, [typeKey]: { enabled } }));
   };
 
   const handleMasterToggle = (category, enabled) => {
-    const next = { ...overrides };
-    category.types.forEach((t) => {
-      if (!CRITICAL_TYPES.has(t.key)) {
-        next[t.key] = { enabled };
-      }
+    setOverrides((prev) => {
+      const next = { ...prev };
+      category.types.forEach((t) => {
+        if (!CRITICAL_TYPES.has(t.key)) next[t.key] = { enabled };
+      });
+      return next;
     });
-    setOverrides(next);
-    saveGranular({ overrides: next });
+  };
+
+  const handleSave = async () => {
+    try {
+      const saves = [];
+      if (generalDirty)   saves.push(updateNotifSettings(data));
+      if (overridesDirty) saves.push(updateGranular({ overrides }));
+      await Promise.all(saves);
+      toast.success("Notification settings saved");
+    } catch (err) {
+      const msg = err?.response?.data?.message ?? err?.message ?? "Failed to save changes";
+      toast.error(msg);
+    }
   };
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <p className="text-sm font-medium text-foreground">Notification Settings</p>
-        <AutoSaveIndicator status={status} />
-      </div>
-
-      {error && (
-        <p className="text-xs flex items-center gap-1 p-2 rounded-md bg-destructive/10"
-           style={{ color: "var(--loss)" }}>
-          <AlertCircle className="h-3.5 w-3.5" />
-          {error}
-        </p>
-      )}
-
       <Tabs defaultValue="general">
-        <TabsList className="bg-muted/50">
-          <TabsTrigger value="general">General</TabsTrigger>
-          <TabsTrigger value="granular">Granular Controls</TabsTrigger>
+        <TabsList className="bg-muted/50 w-full sm:w-auto">
+          <TabsTrigger value="general"  className="flex-1 sm:flex-none">General</TabsTrigger>
+          <TabsTrigger value="granular" className="flex-1 sm:flex-none">Granular Controls</TabsTrigger>
         </TabsList>
 
         {/* ── General ─────────────────────────────── */}
         <TabsContent value="general" className="mt-4 space-y-4">
           {/* Email Digest */}
-          <div className="flex items-center justify-between py-3 border-b border-border">
-            <div>
+          <div className="flex items-center justify-between py-3 border-b border-border gap-4">
+            <div className="min-w-0">
               <p className="text-sm font-medium text-foreground">Email Digest</p>
               <p className="text-xs text-muted-foreground mt-0.5">
                 How often to receive email summaries
               </p>
             </div>
-            <Select
-              value={data.emailDigest}
-              onValueChange={(v) => update("emailDigest", v)}
-            >
-              <SelectTrigger className="h-8 text-xs w-28 bg-background border-border">
+            <Select value={data.emailDigest} onValueChange={(v) => update("emailDigest", v)}>
+              <SelectTrigger className="h-9 text-xs w-28 shrink-0 bg-background border-border">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent className="bg-card border-border">
@@ -253,15 +226,12 @@ export const NotificationsSection = ({ onDirtyChange }) => {
           {/* Quick toggles */}
           <div className="trading-card divide-y divide-border">
             {QUICK_TOGGLES.map(({ key, label, desc }) => (
-              <div key={key} className="flex items-start justify-between gap-4 px-4 py-3">
+              <div key={key} className="flex items-start justify-between gap-4 px-4 py-3 min-h-[60px]">
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-foreground">{label}</p>
                   <p className="text-xs text-muted-foreground mt-0.5">{desc}</p>
                 </div>
-                <Switch
-                  checked={!!data[key]}
-                  onCheckedChange={(v) => update(key, v)}
-                />
+                <Switch checked={!!data[key]} onCheckedChange={(v) => update(key, v)} />
               </div>
             ))}
           </div>
@@ -269,15 +239,12 @@ export const NotificationsSection = ({ onDirtyChange }) => {
 
         {/* ── Granular Controls ────────────────────── */}
         <TabsContent value="granular" className="mt-4 space-y-3">
-          <div className="flex items-center justify-between mb-1">
-            <p className="text-xs text-muted-foreground">
-              Fine-tune which events trigger notifications.
-              <span className="inline-flex items-center gap-1 ml-2">
-                <Lock className="h-3 w-3" /> = cannot be disabled
-              </span>
-            </p>
-            <AutoSaveIndicator status={granularStatus} />
-          </div>
+          <p className="text-xs text-muted-foreground mb-3">
+            Fine-tune which events trigger notifications.
+            <span className="inline-flex items-center gap-1 ml-2">
+              <Lock className="h-3 w-3" /> = cannot be disabled
+            </span>
+          </p>
 
           {GRANULAR_CATEGORIES.map((cat) => (
             <GranularCategory
@@ -290,6 +257,25 @@ export const NotificationsSection = ({ onDirtyChange }) => {
           ))}
         </TabsContent>
       </Tabs>
+
+      {/* ── Save footer ─────────────────────────── */}
+      <div className="pt-4 border-t border-border flex flex-col-reverse sm:flex-row sm:items-center gap-3">
+        {isDirty && (
+          <p className="text-xs text-muted-foreground text-center sm:text-left">Unsaved changes</p>
+        )}
+        <Button
+          onClick={handleSave}
+          disabled={!isDirty || isPending}
+          size="sm"
+          className="sm:ml-auto w-full sm:w-auto min-h-[44px] sm:min-h-0"
+        >
+          {isPending ? (
+            <><Loader2 className="h-3.5 w-3.5 mr-2 animate-spin" />Saving...</>
+          ) : (
+            <><Save className="h-3.5 w-3.5 mr-2" />Save Changes</>
+          )}
+        </Button>
+      </div>
     </div>
   );
 };

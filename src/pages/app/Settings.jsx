@@ -29,6 +29,10 @@ const SECTION_COMPONENTS = {
   subscription: SubscriptionSection,
 };
 
+// Settings page header is py-4 + text-xl (28px) + mt-0.5 + text-sm (20px) + border = ~84px
+// Desktop sidebar and mobile tabs use this offset to stick below the header
+const HEADER_HEIGHT = 84;
+
 export const Settings = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const rawSection = searchParams.get("section") ?? "profile";
@@ -39,7 +43,7 @@ export const Settings = () => {
   const [dirtySections, setDirtySections] = useState({});
   const isDirty = Object.values(dirtySections).some(Boolean);
 
-  // Stable callbacks — created once, never recreated → prevents infinite loops
+  // Stable callbacks — prevents infinite loops
   const dirtyChangers = useMemo(
     () =>
       Object.fromEntries(
@@ -52,7 +56,7 @@ export const Settings = () => {
             }),
         ])
       ),
-    [] // setDirtySections is always stable
+    []
   );
 
   const handleSectionChange = (id) => {
@@ -76,8 +80,8 @@ export const Settings = () => {
       className="min-h-full"
     >
       {/* ── Page header ─────────────────────────────── */}
-      <div className="border-b border-border bg-background/50 backdrop-blur-sm sticky top-0 z-10">
-        <div className="px-6 py-4">
+      <div className="border-b border-border bg-background/50 backdrop-blur-sm sticky top-0 z-20">
+        <div className="px-4 py-4 sm:px-6">
           <h1 className="font-heading font-bold text-xl text-foreground">Settings</h1>
           {activeSectionData && (
             <p className="text-sm text-muted-foreground mt-0.5">
@@ -87,51 +91,60 @@ export const Settings = () => {
         </div>
       </div>
 
-      <div className="flex min-h-[calc(100vh-57px-61px)]">
+      <div className="flex">
         {/* ── Desktop sidebar ──────────────────────── */}
-        <div className="hidden md:block w-56 shrink-0 border-r border-border p-4 sticky top-[61px] h-fit">
+        <div
+          className="hidden md:block w-56 shrink-0 border-r border-border p-4 sticky h-[calc(100vh-57px-84px)] overflow-y-auto"
+          style={{ top: HEADER_HEIGHT }}
+        >
           <SettingsSidebar
             activeSection={activeSection}
             onSectionChange={handleSectionChange}
           />
         </div>
 
-        {/* ── Mobile section tabs ──────────────────── */}
-        <div className="md:hidden w-full border-b border-border overflow-x-auto sticky top-[61px] z-10 bg-background">
-          <div className="flex gap-1 px-3 py-2 min-w-max">
-            {SETTINGS_SECTIONS.map(({ id, label, icon: Icon }) => (
-              <button
-                key={id}
-                onClick={() => handleSectionChange(id)}
-                className={cn(
-                  "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-colors",
-                  activeSection === id
-                    ? "bg-primary text-primary-foreground"
-                    : "bg-muted text-muted-foreground hover:bg-muted/80 hover:text-foreground"
-                )}
-              >
-                <Icon className="h-3 w-3" />
-                {label}
-              </button>
-            ))}
+        {/* ── Content column (full width on mobile) ── */}
+        <div className="flex-1 min-w-0 flex flex-col">
+          {/* Mobile section tabs — inside content column to prevent flex-row collision */}
+          <div
+            className="md:hidden w-full border-b border-border overflow-x-auto sticky z-10 bg-background"
+            style={{ top: HEADER_HEIGHT }}
+          >
+            <div className="flex gap-1 px-3 py-2 min-w-max">
+              {SETTINGS_SECTIONS.map(({ id, label, icon: Icon }) => (
+                <button
+                  key={id}
+                  onClick={() => handleSectionChange(id)}
+                  className={cn(
+                    "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-colors",
+                    activeSection === id
+                      ? "bg-primary text-primary-foreground"
+                      : "bg-muted text-muted-foreground hover:bg-muted/80 hover:text-foreground"
+                  )}
+                >
+                  <Icon className="h-3 w-3" />
+                  {label}
+                </button>
+              ))}
+            </div>
           </div>
-        </div>
 
-        {/* ── Content area ─────────────────────────── */}
-        <div className="flex-1 min-w-0">
-          <div className="p-6 max-w-2xl">
-            {Object.entries(SECTION_COMPONENTS).map(([id, Component]) => (
-              <div
-                key={id}
-                className={activeSection === id ? "block" : "hidden"}
-              >
-                {id === "security" || id === "subscription" ? (
-                  <Component />
-                ) : (
-                  <Component onDirtyChange={dirtyChangers[id]} />
-                )}
-              </div>
-            ))}
+          {/* Section content */}
+          <div className="px-4 py-5 sm:px-6 sm:py-6">
+            <div className="max-w-2xl">
+              {Object.entries(SECTION_COMPONENTS).map(([id, Component]) => (
+                <div
+                  key={id}
+                  className={activeSection === id ? "block" : "hidden"}
+                >
+                  {id === "security" || id === "subscription" ? (
+                    <Component />
+                  ) : (
+                    <Component onDirtyChange={dirtyChangers[id]} />
+                  )}
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>
@@ -142,20 +155,19 @@ export const Settings = () => {
           <AlertDialogHeader>
             <AlertDialogTitle>You have unsaved changes</AlertDialogTitle>
             <AlertDialogDescription>
-              Your changes are being saved. Please wait a moment before leaving,
-              or leave now and lose any unsaved changes.
+              You have unsaved changes that will be lost if you leave this page.
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter>
+          <AlertDialogFooter className="flex-col-reverse sm:flex-row gap-2 sm:gap-0">
             <Button
               variant="ghost"
-              className="text-destructive hover:text-destructive hover:bg-destructive/10"
+              className="text-destructive hover:text-destructive hover:bg-destructive/10 w-full sm:w-auto"
               onClick={() => blocker.proceed?.()}
             >
-              Leave anyway
+              Discard & leave
             </Button>
-            <Button onClick={() => blocker.reset?.()}>
-              Stay
+            <Button className="w-full sm:w-auto" onClick={() => blocker.reset?.()}>
+              Stay & save
             </Button>
           </AlertDialogFooter>
         </AlertDialogContent>

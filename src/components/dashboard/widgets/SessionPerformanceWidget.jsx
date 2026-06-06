@@ -55,7 +55,7 @@ export const SessionPerformanceWidget = () => {
         : 0,
       totalTrades: s.totalTrades ?? s.trades ?? 0,
     }))
-    .filter((s) => s.totalTrades > 0);
+    .filter((s) => s.session && s.totalTrades > 0);
 
   return (
     <div className="trading-card p-4 h-full flex flex-col">

@@ -1,17 +1,16 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import {
   Select, SelectContent, SelectItem,
   SelectTrigger, SelectValue,
 } from "@/components/ui/select";
-import { Input }    from "@/components/ui/input";
-import { Button }   from "@/components/ui/button";
+import { Input }   from "@/components/ui/input";
+import { Button }  from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { AlertCircle, Plus, X } from "lucide-react";
-import { AutoSaveIndicator } from "@/components/settings/AutoSaveIndicator";
-import { useAutoSave }       from "@/hooks/useAutoSave";
+import { AlertCircle, Plus, Save, Loader2, Info } from "lucide-react";
 import { useUpdateUserProfile } from "@/hooks/useUser";
 import { useAuthStore }      from "@/store/useAuthStore";
 import { useAccounts }       from "@/hooks/useAccounts";
+import { toast }             from "sonner";
 import { cn } from "@/lib/utils";
 
 const EXPERIENCE_OPTIONS = [
@@ -52,7 +51,7 @@ const Chip = ({ label, sub, selected, onClick }) => (
     type="button"
     onClick={onClick}
     className={cn(
-      "px-3 py-1.5 rounded-lg text-xs font-medium border transition-all duration-150",
+      "px-3 py-2 rounded-lg text-xs font-medium border transition-all duration-150 min-h-[44px] sm:min-h-0 sm:py-1.5",
       selected
         ? "bg-primary/10 text-primary border-primary/40"
         : "bg-muted text-muted-foreground border-border hover:border-primary/30 hover:text-foreground"
@@ -71,17 +70,16 @@ const toggle = (arr, val, max = Infinity) => {
 
 export const TradingSection = ({ onDirtyChange }) => {
   const { mongoUser } = useAuthStore();
-  const { mutateAsync: updateProfile } = useUpdateUserProfile();
+  const { mutateAsync, isPending } = useUpdateUserProfile();
   const { data: accountsData } = useAccounts({ limit: 50 });
   const accounts = accountsData?.accounts ?? [];
 
   const init = useCallback(() => ({
-    experienceLevel:   mongoUser?.traderProfile?.experienceLevel ?? mongoUser?.experienceLevel ?? "beginner",
-    tradingModes:      mongoUser?.traderProfile?.tradingModes    ?? mongoUser?.tradingModes    ?? [],
-    tradingStyles:     mongoUser?.traderProfile?.tradingStyles   ?? mongoUser?.tradingStyles   ?? [],
-    primaryPairs:      mongoUser?.traderProfile?.primaryPairs    ?? mongoUser?.primaryPairs    ?? [],
-    preferredSessions: mongoUser?.traderProfile?.preferredSessions ?? mongoUser?.preferredSessions ?? [],
-    defaultAccountId:  mongoUser?.defaultAccountId ?? "",
+    experienceLevel:   mongoUser?.traderProfile?.experienceLevel ?? "beginner",
+    tradingModes:      mongoUser?.traderProfile?.tradingModes    ?? [],
+    tradingStyles:     mongoUser?.traderProfile?.tradingStyles   ?? [],
+    primaryPairs:      mongoUser?.traderProfile?.primaryPairs    ?? [],
+    preferredSessions: mongoUser?.traderProfile?.preferredSessions ?? [],
   }), [mongoUser]);
 
   const [data, setData] = useState(init);
@@ -90,31 +88,21 @@ export const TradingSection = ({ onDirtyChange }) => {
 
   useEffect(() => { setData(init()); }, [mongoUser?._id]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const { save, status, error, isDirty } = useAutoSave({
-    mutationFn: (d) => updateProfile(d),
-  });
+  const saved = useMemo(() => init(), [init]);
 
-  const { save: saveAccount, status: accountStatus, isDirty: accountDirty } = useAutoSave({
-    mutationFn: (d) => updateProfile(d),
-  });
+  const isDirty = useMemo(() => (
+    data.experienceLevel !== saved.experienceLevel ||
+    JSON.stringify(data.tradingModes)      !== JSON.stringify(saved.tradingModes)      ||
+    JSON.stringify(data.tradingStyles)     !== JSON.stringify(saved.tradingStyles)     ||
+    JSON.stringify(data.primaryPairs)      !== JSON.stringify(saved.primaryPairs)      ||
+    JSON.stringify(data.preferredSessions) !== JSON.stringify(saved.preferredSessions)
+  ), [data, saved]);
 
   useEffect(() => {
-    onDirtyChange?.(isDirty || accountDirty);
-  }, [isDirty, accountDirty]); // eslint-disable-line react-hooks/exhaustive-deps
+    onDirtyChange?.(isDirty);
+  }, [isDirty]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const update = (field, value) => {
-    const next = { ...data, [field]: value };
-    setData(next);
-    save({
-      traderProfile: {
-        experienceLevel:   next.experienceLevel,
-        tradingModes:      next.tradingModes,
-        tradingStyles:     next.tradingStyles,
-        primaryPairs:      next.primaryPairs,
-        preferredSessions: next.preferredSessions,
-      },
-    });
-  };
+  const update = (field, value) => setData((d) => ({ ...d, [field]: value }));
 
   const handleAddCustomPair = () => {
     const p = customPair.toUpperCase().trim();
@@ -136,26 +124,31 @@ export const TradingSection = ({ onDirtyChange }) => {
     update("primaryPairs", [...data.primaryPairs, p]);
   };
 
+  const handleSave = async () => {
+    try {
+      await mutateAsync({
+        traderProfile: {
+          experienceLevel:   data.experienceLevel,
+          tradingModes:      data.tradingModes,
+          tradingStyles:     data.tradingStyles,
+          primaryPairs:      data.primaryPairs,
+          preferredSessions: data.preferredSessions,
+        },
+      });
+      toast.success("Trading settings saved");
+    } catch (err) {
+      const msg = err?.response?.data?.message ?? err?.message ?? "Failed to save changes";
+      toast.error(msg);
+    }
+  };
+
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <p className="text-sm font-medium text-foreground">Trading Settings</p>
-        <AutoSaveIndicator status={status} />
-      </div>
-
-      {error && (
-        <p className="text-xs flex items-center gap-1 p-2 rounded-md bg-destructive/10"
-           style={{ color: "var(--loss)" }}>
-          <AlertCircle className="h-3.5 w-3.5" />
-          {error}
-        </p>
-      )}
-
       <Tabs defaultValue="experience">
-        <TabsList className="bg-muted/50">
-          <TabsTrigger value="experience">Experience</TabsTrigger>
-          <TabsTrigger value="pairs">Pairs & Sessions</TabsTrigger>
-          <TabsTrigger value="account">Default Account</TabsTrigger>
+        <TabsList className="bg-muted/50 w-full sm:w-auto">
+          <TabsTrigger value="experience" className="flex-1 sm:flex-none">Experience</TabsTrigger>
+          <TabsTrigger value="pairs"      className="flex-1 sm:flex-none">Pairs & Sessions</TabsTrigger>
+          <TabsTrigger value="account"    className="flex-1 sm:flex-none">Default Account</TabsTrigger>
         </TabsList>
 
         {/* ── Experience ──────────────────────────── */}
@@ -172,7 +165,7 @@ export const TradingSection = ({ onDirtyChange }) => {
                     type="button"
                     onClick={() => update("experienceLevel", opt.value)}
                     className={cn(
-                      "text-left p-3 rounded-xl border-2 transition-all duration-150",
+                      "text-left p-3 rounded-xl border-2 transition-all duration-150 min-h-[60px]",
                       selected
                         ? "bg-primary/5 border-primary"
                         : "bg-card border-border hover:border-primary/30"
@@ -251,17 +244,15 @@ export const TradingSection = ({ onDirtyChange }) => {
                   onClick={() => update("primaryPairs", toggle(data.primaryPairs, pair, 20))}
                 />
               ))}
-              {/* Custom pairs */}
               {data.primaryPairs
                 .filter((p) => !COMMON_PAIRS.includes(p))
                 .map((pair) => (
-                  <div key={pair} className="relative">
-                    <Chip
-                      label={pair}
-                      selected
-                      onClick={() => update("primaryPairs", data.primaryPairs.filter((p) => p !== pair))}
-                    />
-                  </div>
+                  <Chip
+                    key={pair}
+                    label={pair}
+                    selected
+                    onClick={() => update("primaryPairs", data.primaryPairs.filter((p) => p !== pair))}
+                  />
                 ))}
             </div>
             {/* Custom pair input */}
@@ -272,7 +263,7 @@ export const TradingSection = ({ onDirtyChange }) => {
                   onChange={(e) => { setCustomPair(e.target.value.toUpperCase()); setCustomPairError(""); }}
                   onKeyDown={(e) => e.key === "Enter" && handleAddCustomPair()}
                   placeholder="Custom pair e.g. BTCUSD"
-                  className="bg-background border-border h-8 text-xs"
+                  className="bg-background border-border h-10 text-xs"
                   maxLength={10}
                 />
                 {customPairError && (
@@ -282,7 +273,7 @@ export const TradingSection = ({ onDirtyChange }) => {
               <Button
                 size="sm"
                 variant="outline"
-                className="h-8 px-2 text-xs shrink-0"
+                className="h-10 px-3 text-xs shrink-0"
                 onClick={handleAddCustomPair}
               >
                 <Plus className="h-3.5 w-3.5 mr-1" />
@@ -303,7 +294,7 @@ export const TradingSection = ({ onDirtyChange }) => {
                     type="button"
                     onClick={() => update("preferredSessions", toggle(data.preferredSessions, s.value))}
                     className={cn(
-                      "text-left px-4 py-3 rounded-xl border-2 transition-all duration-150",
+                      "text-left px-4 py-3 rounded-xl border-2 transition-all duration-150 min-h-[60px]",
                       selected
                         ? "bg-primary/5 border-primary text-foreground"
                         : "bg-card border-border text-muted-foreground hover:border-primary/30"
@@ -320,21 +311,12 @@ export const TradingSection = ({ onDirtyChange }) => {
 
         {/* ── Default Account ──────────────────────── */}
         <TabsContent value="account" className="mt-4 space-y-4">
-          <div className="flex items-center justify-between mb-2">
-            <p className="text-sm font-medium text-foreground">Default Account</p>
-            <AutoSaveIndicator status={accountStatus} />
-          </div>
           <p className="text-xs text-muted-foreground">
             This account is pre-selected in filters across the app.
           </p>
           <Select
-            value={data.defaultAccountId || "none"}
-            onValueChange={(v) => {
-              const val = v === "none" ? "" : v;
-              const next = { ...data, defaultAccountId: val };
-              setData(next);
-              saveAccount({ defaultAccountId: val });
-            }}
+            value={mongoUser?.defaultAccountId || "none"}
+            disabled
           >
             <SelectTrigger className="bg-background border-border">
               <SelectValue placeholder="Select default account" />
@@ -349,11 +331,33 @@ export const TradingSection = ({ onDirtyChange }) => {
               ))}
             </SelectContent>
           </Select>
-          {accounts.length === 0 && (
-            <p className="text-xs text-muted-foreground">No accounts yet. Create one first.</p>
-          )}
+          <div className="flex items-start gap-2 p-3 rounded-lg bg-muted/40 border border-border">
+            <Info className="h-3.5 w-3.5 text-muted-foreground shrink-0 mt-0.5" />
+            <p className="text-xs text-muted-foreground">
+              Default account selection from settings is coming soon. For now, use the account filter on the Dashboard.
+            </p>
+          </div>
         </TabsContent>
       </Tabs>
+
+      {/* ── Save footer ─────────────────────────── */}
+      <div className="pt-4 border-t border-border flex flex-col-reverse sm:flex-row sm:items-center gap-3">
+        {isDirty && (
+          <p className="text-xs text-muted-foreground text-center sm:text-left">Unsaved changes</p>
+        )}
+        <Button
+          onClick={handleSave}
+          disabled={!isDirty || isPending}
+          size="sm"
+          className="sm:ml-auto w-full sm:w-auto min-h-[44px] sm:min-h-0"
+        >
+          {isPending ? (
+            <><Loader2 className="h-3.5 w-3.5 mr-2 animate-spin" />Saving...</>
+          ) : (
+            <><Save className="h-3.5 w-3.5 mr-2" />Save Changes</>
+          )}
+        </Button>
+      </div>
     </div>
   );
 };

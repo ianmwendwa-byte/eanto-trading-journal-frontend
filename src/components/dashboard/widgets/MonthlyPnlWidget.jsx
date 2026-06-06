@@ -34,13 +34,24 @@ export const MonthlyPnlWidget = () => {
   if (isLoading) return <WidgetSkeleton size="medium" />;
 
   // Normalise — API may return array or { monthly: [] }
+  // Stats endpoint returns { year, month (number), totalPnl }
+  // Dashboard overview returns { month: "YYYY-MM", pnl }
   const raw     = Array.isArray(data) ? data : (data?.monthly ?? data?.months ?? []);
   const monthly = raw
-    .map((m) => ({
-      month:    m.month ?? m.yearMonth,
-      label:    formatMonth(m.month ?? m.yearMonth),
-      pnl:      m.pnl ?? m.netPnl ?? 0,
-    }))
+    .map((m) => {
+      const rawMonth = m.month ?? m.yearMonth;
+      const monthStr =
+        rawMonth && typeof rawMonth === "string" && rawMonth.includes("-")
+          ? rawMonth
+          : m.year && rawMonth
+          ? `${m.year}-${String(rawMonth).padStart(2, "0")}`
+          : null;
+      return {
+        month: monthStr,
+        label: formatMonth(monthStr),
+        pnl:   m.pnl ?? m.netPnl ?? m.totalPnl ?? 0,
+      };
+    })
     .filter((m) => m.month)
     .slice(-12);
 
