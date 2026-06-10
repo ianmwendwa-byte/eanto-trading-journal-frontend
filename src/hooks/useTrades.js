@@ -43,12 +43,12 @@ export const useTrades = (filters = {}) => {
     select: (data) => ({
       trades:     data?.trades     ?? [],
       pagination: {
-        total:       data?.pagination?.total  ?? 0,
-        page:        data?.pagination?.page   ?? 1,
-        limit:       data?.pagination?.limit  ?? 20,
-        totalPages:  data?.pagination?.pages  ?? 0,
-        hasNextPage: (data?.pagination?.page ?? 1) < (data?.pagination?.pages ?? 0),
-        hasPrevPage: (data?.pagination?.page ?? 1) > 1,
+        total:       data?.pagination?.total      ?? 0,
+        page:        data?.pagination?.page       ?? 1,
+        limit:       data?.pagination?.limit      ?? 20,
+        totalPages:  data?.pagination?.totalPages ?? 0,
+        hasNextPage: data?.pagination?.hasNextPage ?? false,
+        hasPrevPage: data?.pagination?.hasPrevPage ?? false,
       },
     }),
     enabled:         isAuthenticated,

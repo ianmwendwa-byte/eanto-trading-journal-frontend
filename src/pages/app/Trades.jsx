@@ -250,6 +250,9 @@ export const Trades = () => {
             <Pagination
               page={filters.page}
               totalPages={totalPages}
+              total={totalTrades}
+              limit={filters.limit}
+              isFetching={tradesFetching}
               onPageChange={(page) => handleFilterChange({ page })}
             />
           )}
