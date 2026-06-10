@@ -92,8 +92,8 @@ export const TradeDetailPanel = ({ trade, onClose, onDelete }) => {
 
   if (!trade) return null;
 
-  const pnl        = trade.pnl    ?? 0;
-  const netPnl     = trade.netPnl ?? pnl;
+  const grossPnl   = trade.grossPnl   ?? trade.pnl ?? 0;
+  const netPnl     = trade.netPnl     ?? grossPnl;
   const commission = trade.commission ?? 0;
   const swap       = trade.swap       ?? 0;
   const duration   = getTradeDuration(trade.openedAt, trade.closedAt);
@@ -122,6 +122,16 @@ export const TradeDetailPanel = ({ trade, onClose, onDelete }) => {
                 {trade.session && <SessionBadge session={trade.session} />}
                 {propCompliance.checked && (
                   <PropComplianceBadge propCompliance={propCompliance} />
+                )}
+                {trade.source && trade.source !== "manual" && (
+                  <span className={cn(
+                    "inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-medium border",
+                    trade.source === "ea"
+                      ? "bg-primary/10 text-primary border-primary/20"
+                      : "bg-muted text-muted-foreground border-border"
+                  )}>
+                    {trade.source === "ea" ? "EA" : "CSV"}
+                  </span>
                 )}
               </div>
             </div>
@@ -158,21 +168,23 @@ export const TradeDetailPanel = ({ trade, onClose, onDelete }) => {
             <div className="trading-card p-3 space-y-2.5">
               <div className="flex items-center justify-between text-sm">
                 <span className="text-muted-foreground">Gross P&amp;L</span>
-                <span className={cn("font-mono font-bold text-lg", getPnLColor(pnl))}>
-                  {formatPnL(pnl)}
+                <span className={cn("font-mono font-bold text-lg", getPnLColor(grossPnl))}>
+                  {formatPnL(grossPnl)}
                 </span>
               </div>
-              {commission > 0 && (
+              {commission !== 0 && (
                 <div className="flex items-center justify-between text-xs">
                   <span className="text-muted-foreground">Commission</span>
-                  <span className="font-mono text-muted-foreground">–{formatCurrency(commission)}</span>
+                  <span className={cn("font-mono", commission < 0 ? "text-[var(--loss)]" : "text-muted-foreground")}>
+                    {formatPnL(commission)}
+                  </span>
                 </div>
               )}
               {swap !== 0 && (
                 <div className="flex items-center justify-between text-xs">
                   <span className="text-muted-foreground">Swap</span>
-                  <span className="font-mono text-muted-foreground">
-                    {swap < 0 ? "–" : "+"}{formatCurrency(Math.abs(swap))}
+                  <span className={cn("font-mono", swap < 0 ? "text-[var(--loss)]" : "text-muted-foreground")}>
+                    {formatPnL(swap)}
                   </span>
                 </div>
               )}

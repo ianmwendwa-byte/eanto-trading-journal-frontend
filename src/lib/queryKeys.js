@@ -58,7 +58,9 @@ export const dashboardKeys = {
 };
 
 export const eaKeys = {
-  status:  (id) => ["ea", "status", id],
-  history: (id) => ["ea", "history", id],
-  config:  (id) => ["ea", "config", id],
+  status:          (id)          => ["ea", "status", id],
+  history:         (id)          => ["ea", "history", id],
+  config:          (id)          => ["ea", "config", id],
+  reconciliation:  (id)          => ["ea", "reconciliation", id],
+  anomalies:       (id, filters) => ["ea", "anomalies", id, filters ?? {}],
 };

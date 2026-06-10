@@ -1,11 +1,9 @@
 import { useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Zap, RefreshCw, Pause, Play } from "lucide-react";
-import { toast } from "sonner";
+import { Zap, Pause, Play, AlertTriangle } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 
 import { AccountTypeBadge } from "@/components/accounts/AccountTypeBadge";
@@ -104,6 +102,19 @@ const EAAccountCard = ({ account, pollingActive }) => {
                 ⚠ Balance mismatch detected
               </p>
             )}
+          </div>
+        )}
+
+        {/* Needs review banner */}
+        {eaSync.verificationStatus === "needs_review" && (
+          <div className="border-t border-[var(--warning)]/30 pt-2">
+            <Link
+              to={`/accounts/${account._id}/reconciliation`}
+              className="flex items-center gap-2 text-[11px] text-[var(--warning)] hover:text-[var(--warning)]/80 transition-colors"
+            >
+              <AlertTriangle className="h-3 w-3 flex-shrink-0" />
+              Anomalies need review — tap to resolve
+            </Link>
           </div>
         )}
 

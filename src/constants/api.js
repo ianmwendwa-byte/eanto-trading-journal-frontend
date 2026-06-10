@@ -20,12 +20,15 @@ export const API = {
   },
   ACCOUNT: {
 
-    BASE:            "/accounts",
-    DETAIL:          (id) => `/accounts/${id}`,
-    EA_STATUS:       (id) => `/accounts/${id}/ea/status`,
-    EA_GENERATE:     (id) => `/accounts/${id}/ea/generate-key`,
-    EA_REVOKE:       (id) => `/accounts/${id}/ea/key`,
-    EA_CONFIG:       (id) => `/accounts/${id}/ea/config`,
+    BASE:              "/accounts",
+    DETAIL:            (id) => `/accounts/${id}`,
+    EA_STATUS:         (id) => `/accounts/${id}/ea/status`,
+    EA_GENERATE:       (id) => `/accounts/${id}/ea/generate-key`,
+    EA_REVOKE:         (id) => `/accounts/${id}/ea/key`,
+    EA_CONFIG:         (id) => `/accounts/${id}/ea/config`,
+    RECONCILIATION:    (id) => `/accounts/${id}/reconciliation`,
+    ANOMALIES:         (id) => `/accounts/${id}/anomalies`,
+    ANOMALY_RESOLVE:   (id, anomalyId) => `/accounts/${id}/anomalies/${anomalyId}`,
   },
   TRADE: {
     BASE:             "/trades",

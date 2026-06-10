@@ -83,8 +83,22 @@ const Step = ({ step, number, isLast }) => {
   );
 };
 
-export const EASetupInstructions = ({ className }) => {
+// ── Embedded mode: plain steps list for use inside Sheet ─────
+const StepsList = () => (
+  <div>
+    {STEPS.map((step, i) => (
+      <Step key={i} step={step} number={i + 1} isLast={i === STEPS.length - 1} />
+    ))}
+  </div>
+);
+
+export const EASetupInstructions = ({ className, embedded = false }) => {
   const [expanded, setExpanded] = useState(false);
+
+  // When embedded inside a Sheet, render steps directly without the collapsible wrapper
+  if (embedded) {
+    return <StepsList />;
+  }
 
   return (
     <div className={cn("trading-card overflow-hidden", className)}>
@@ -115,9 +129,7 @@ export const EASetupInstructions = ({ className }) => {
             style={{ overflow: "hidden" }}
           >
             <div className="px-4 pb-4 border-t border-border pt-4">
-              {STEPS.map((step, i) => (
-                <Step key={i} step={step} number={i + 1} isLast={i === STEPS.length - 1} />
-              ))}
+              <StepsList />
             </div>
           </motion.div>
         )}

@@ -33,6 +33,7 @@ import { AccountTypeBadge }   from "@/components/accounts/AccountTypeBadge";
 import { AccountStatusBadge } from "@/components/accounts/AccountStatusBadge";
 import { EASyncStatus }       from "@/components/accounts/EASyncStatus";
 import { PropChallengeCard }  from "@/components/accounts/PropChallengeCard";
+import { VerificationBadge }  from "@/components/ea/VerificationBadge";
 import { InfoTooltip }        from "@/components/shared/InfoTooltip";
 import { ErrorState }       from "@/components/shared/ErrorState";
 import { BalanceHistoryChart } from "@/components/dashboard/BalanceHistoryChart";
@@ -278,7 +279,7 @@ const EASyncTab = ({ accountId }) => {
   const handleGenerate = () => {
     generateKey(undefined, {
       onSuccess: (data) => {
-        const key = data?.apiKey ?? data?.key ?? data?.data?.apiKey;
+        const key = data?.eaApiKey ?? data?.apiKey ?? data?.key ?? data?.data?.eaApiKey ?? data?.data?.apiKey;
         if (key) {
           setNewKey(key);
           if (!hasShownKeyToast.current) {
@@ -726,8 +727,9 @@ export const AccountDetail = () => {
   const avgRR       = account.performance?.avgRR       ?? null;
   const totalTrades = account.performance?.totalTrades ?? null;
 
-  const eaEnabled = account.eaSync?.enabled  ?? false;
-  const eaOnline  = account.eaSync?.isOnline ?? false;
+  const eaEnabled            = account.eaSync?.enabled              ?? false;
+  const eaOnline             = account.eaSync?.isOnline             ?? false;
+  const eaVerificationStatus = account.eaSync?.verificationStatus   ?? null;
 
   // Prop drawdown from propMetrics (never from account root)
   const currentDrawdown      = account.propMetrics?.currentDrawdownPercent      ?? 0;
@@ -766,6 +768,20 @@ export const AccountDetail = () => {
           <h1 className="text-2xl font-heading font-bold text-foreground">{account.name}</h1>
           <AccountTypeBadge type={account.type} />
           <AccountStatusBadge status={account.status} />
+          {eaVerificationStatus && eaVerificationStatus !== "unverified" && (
+            eaVerificationStatus === "needs_review" ? (
+              <button
+                type="button"
+                onClick={() => navigate(`/accounts/${id}/reconciliation`)}
+                className="focus:outline-none"
+                title="Review anomalies"
+              >
+                <VerificationBadge verificationStatus={eaVerificationStatus} />
+              </button>
+            ) : (
+              <VerificationBadge verificationStatus={eaVerificationStatus} />
+            )
+          )}
         </div>
 
         <div className="flex items-center gap-3 text-sm text-muted-foreground flex-wrap">

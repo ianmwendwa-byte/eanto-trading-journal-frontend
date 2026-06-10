@@ -4,25 +4,99 @@ import api from "@/lib/axios";
 import { eaKeys, accountKeys, tradeKeys } from "@/lib/queryKeys";
 import { API } from "@/constants/api";
 
-// ── EA Status — polling controlled by caller ──────────────────
-// Pass { polling: true } only when the EA tab/page is visible
+// ── EA Status ─────────────────────────────────────────────────
+// refetchInterval adapts to online state: 15s online, 60s offline
 export const useEAStatus = (accountId, { polling = false, enabled: enabledOpt = true } = {}) =>
   useQuery({
     queryKey:        eaKeys.status(accountId),
     queryFn:         () => api.get(API.ACCOUNT.EA_STATUS(accountId)),
-    // Response: { success: true, data: { enabled, isOnline, hasApiKey, ... } }
-    // Axios interceptor unwraps response.data → we receive { success, data:{...} }
     select:          (res) => res?.data ?? res,
     enabled:         !!accountId && enabledOpt,
-    staleTime:       20 * 1000,
-    refetchInterval: polling ? 30 * 1000 : false,
+    staleTime:       15 * 1000,
+    refetchInterval: polling
+      ? (query) => (query.state.data?.isOnline ? 15_000 : 60_000)
+      : false,
   });
 
+// ── Reconciliation status ─────────────────────────────────────
+// Polls aggressively (10s) while upload/reconcile is in progress
+const isReconciliationActive = (data) => {
+  const s = data?.session?.status;
+  return s === "uploading" || s === "reconciling";
+};
+
+export const useReconciliation = (accountId, { enabled: enabledOpt = true } = {}) =>
+  useQuery({
+    queryKey:        eaKeys.reconciliation(accountId),
+    queryFn:         () => api.get(API.ACCOUNT.RECONCILIATION(accountId)),
+    select:          (res) => res?.data ?? res,
+    enabled:         !!accountId && enabledOpt,
+    staleTime:       10 * 1000,
+    refetchInterval: (query) =>
+      isReconciliationActive(query.state.data) ? 10_000 : 30_000,
+  });
+
+// ── Anomalies list ────────────────────────────────────────────
+export const useAnomalies = (accountId, filters = {}) =>
+  useQuery({
+    queryKey: eaKeys.anomalies(accountId, filters),
+    queryFn:  () =>
+      api.get(API.ACCOUNT.ANOMALIES(accountId), { params: filters }),
+    select:   (res) => res?.data ?? res,
+    enabled:  !!accountId,
+    staleTime: 30 * 1000,
+  });
+
+// ── Resolve anomaly ───────────────────────────────────────────
+export const useResolveAnomaly = (accountId) => {
+  const qc = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ anomalyId, resolution, note }) =>
+      api.patch(API.ACCOUNT.ANOMALY_RESOLVE(accountId, anomalyId), { resolution, note }),
+
+    onMutate: async ({ anomalyId }) => {
+      // Cancel in-flight anomaly queries for this account
+      await qc.cancelQueries({ queryKey: ["ea", "anomalies", accountId] });
+
+      // Snapshot for rollback
+      const previousEntries = qc.getQueriesData({ queryKey: ["ea", "anomalies", accountId] });
+
+      // Optimistically mark anomaly resolved across all filter variants
+      qc.setQueriesData(
+        { queryKey: ["ea", "anomalies", accountId] },
+        (old) => {
+          if (!old?.anomalies) return old;
+          return {
+            ...old,
+            anomalies: old.anomalies.map((a) =>
+              a._id === anomalyId ? { ...a, status: "resolved" } : a
+            ),
+          };
+        }
+      );
+
+      return { previousEntries };
+    },
+
+    onError: (_err, _vars, context) => {
+      // Roll back on failure
+      context?.previousEntries?.forEach(([key, data]) => {
+        qc.setQueryData(key, data);
+      });
+      toast.error("Failed to resolve anomaly — please try again");
+    },
+
+    onSettled: () => {
+      qc.invalidateQueries({ queryKey: ["ea", "anomalies", accountId] });
+      qc.invalidateQueries({ queryKey: eaKeys.reconciliation(accountId) });
+      qc.invalidateQueries({ queryKey: eaKeys.status(accountId) });
+    },
+  });
+};
+
 // ── Generate EA Key ───────────────────────────────────────────
-// Key is NEVER stored in cache — caller receives it via onSuccess callback only.
-// We do NOT invalidate eaKeys.status here — that triggers a refetch which can
-// remount EAKeyManager and reset local state before the user confirms the key.
-// The 30s poll will pick up the new status naturally.
+// Key is shown once via onSuccess callback — never stored in cache.
 export const useGenerateEAKey = (accountId) => {
   const qc = useQueryClient();
   return useMutation({
@@ -62,7 +136,6 @@ export const useUpdateEAConfig = (accountId) => {
 };
 
 // ── EA Sync History ───────────────────────────────────────────
-// Uses trades filtered by accountId — shows most recent EA-synced trades
 export const useEASyncHistory = (accountId, { limit = 10 } = {}) =>
   useQuery({
     queryKey:  eaKeys.history(accountId),

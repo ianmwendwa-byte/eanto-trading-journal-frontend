@@ -5,6 +5,9 @@ import {
   DropdownMenu, DropdownMenuContent,
   DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Tooltip, TooltipContent, TooltipProvider, TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { InfoTooltip }        from "@/components/shared/InfoTooltip";
 import { DirectionBadge }     from "./DirectionBadge";
 import { OutcomeBadge }       from "./OutcomeBadge";
@@ -28,8 +31,10 @@ const formatRR     = (v) => {
 };
 
 const SOURCE_BADGE = {
-  ea:         { label: "EA",  cls: "bg-blue-500/10 text-blue-400 border-blue-500/20"   },
-  csv_import: { label: "CSV", cls: "bg-muted text-muted-foreground border-border"       },
+  ea:         { label: "EA",     cls: "bg-primary/10 text-primary border-primary/20"           },
+  csv_import: { label: "CSV",    cls: "bg-muted text-muted-foreground border-border"            },
+  csv:        { label: "CSV",    cls: "bg-muted text-muted-foreground border-border"            },
+  manual:     { label: "Manual", cls: "bg-muted text-muted-foreground border-border"            },
 };
 
 const SORTABLE_COLS = ["closedAt", "pair", "pnl", "netPnl", "realizedRR"];
@@ -164,6 +169,11 @@ export const TradesTable = ({
               const duration  = getTradeDuration(trade.openedAt, trade.closedAt);
               const source    = SOURCE_BADGE[trade.source];
 
+              const grossPnl   = trade.grossPnl  ?? trade.pnl ?? netPnlVal;
+              const commission = trade.commission ?? 0;
+              const swap       = trade.swap       ?? 0;
+              const hasCosts   = commission !== 0 || swap !== 0;
+
               return (
                 <tr
                   key={trade._id}
@@ -216,8 +226,43 @@ export const TradesTable = ({
                     {formatPrice(trade.exitPrice)}
                   </Td>
 
+                  {/* Net P&L — tooltip shows breakdown when costs exist */}
                   <Td mono right className={cn("font-bold", getPnLColor(netPnlVal))}>
-                    {formatPnL(netPnlVal)}
+                    {hasCosts ? (
+                      <TooltipProvider>
+                        <Tooltip delayDuration={200}>
+                          <TooltipTrigger asChild>
+                            <span className="cursor-default underline decoration-dotted underline-offset-2">
+                              {formatPnL(netPnlVal)}
+                            </span>
+                          </TooltipTrigger>
+                          <TooltipContent side="left" className="bg-card border-border p-3 space-y-1.5 min-w-[160px]">
+                            <div className="flex justify-between text-xs gap-4">
+                              <span className="text-muted-foreground">Gross P&amp;L</span>
+                              <span className={cn("font-mono", getPnLColor(grossPnl))}>{formatPnL(grossPnl)}</span>
+                            </div>
+                            {commission !== 0 && (
+                              <div className="flex justify-between text-xs gap-4">
+                                <span className="text-muted-foreground">Commission</span>
+                                <span className="font-mono text-[var(--loss)]">{formatPnL(commission)}</span>
+                              </div>
+                            )}
+                            {swap !== 0 && (
+                              <div className="flex justify-between text-xs gap-4">
+                                <span className="text-muted-foreground">Swap</span>
+                                <span className="font-mono text-[var(--loss)]">{formatPnL(swap)}</span>
+                              </div>
+                            )}
+                            <div className="border-t border-border pt-1.5 flex justify-between text-xs gap-4">
+                              <span className="font-medium text-foreground">Net P&amp;L</span>
+                              <span className={cn("font-mono font-bold", getPnLColor(netPnlVal))}>{formatPnL(netPnlVal)}</span>
+                            </div>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    ) : (
+                      formatPnL(netPnlVal)
+                    )}
                   </Td>
 
                   <Td mono right className="text-muted-foreground text-sm">
