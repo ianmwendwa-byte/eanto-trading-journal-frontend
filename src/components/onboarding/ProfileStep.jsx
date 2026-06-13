@@ -44,7 +44,6 @@ const COUNTRIES = [
   { value: "JP", label: "🇯🇵 Japan" },
   { value: "BR", label: "🇧🇷 Brazil" },
   { value: "MX", label: "🇲🇽 Mexico" },
-  { value: "NG", label: "🇳🇬 Nigeria" },
   { value: "ZM", label: "🇿🇲 Zambia" },
   { value: "TZ", label: "🇹🇿 Tanzania" },
   { value: "UG", label: "🇺🇬 Uganda" },

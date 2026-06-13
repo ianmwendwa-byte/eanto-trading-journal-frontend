@@ -1,5 +1,5 @@
 import { useState, useRef, useCallback } from "react";
-import { X, Trash2, AlertTriangle } from "lucide-react";
+import { X, Trash2, AlertTriangle, HelpCircle, CheckCircle2 } from "lucide-react";
 import { format } from "date-fns";
 import { Button }    from "@/components/ui/button";
 import { Textarea }  from "@/components/ui/textarea";
@@ -8,6 +8,9 @@ import {
   AlertDialog, AlertDialogContent, AlertDialogDescription,
   AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import {
+  Tooltip, TooltipContent, TooltipProvider, TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { DirectionBadge }      from "./DirectionBadge";
 import { OutcomeBadge }        from "./OutcomeBadge";
 import { SessionBadge }        from "./SessionBadge";
@@ -15,9 +18,39 @@ import { GradeStars }          from "./GradeStars";
 import { PropComplianceBadge } from "./PropComplianceBadge";
 import { DisciplineScoreBadge } from "./DisciplineScoreBadge";
 import { useUpdateTrade, useDeleteTrade } from "@/hooks/useTrades";
-import { formatPnL, formatCurrency, getPnLColor } from "@/utils/format";
+import { formatPnL, formatCurrency, getPnLColor, formatPips } from "@/utils/format";
 import { getTradeDuration, isShortDuration } from "@/utils/tradeDuration";
 import { cn } from "@/lib/utils";
+
+const EXIT_REASON_MAP = {
+  tp_hit:        { label: "Take Profit Hit ✓", cls: "text-[var(--profit)]" },
+  sl_hit:        { label: "Stop Loss Hit ✗",   cls: "text-[var(--loss)]"   },
+  manual:        { label: "Manual Close",       cls: "text-foreground"      },
+  trailing_stop: { label: "Trailing Stop",      cls: "text-muted-foreground" },
+};
+
+const FLAG_LABELS = {
+  NO_STOP_LOSS:   "No stop loss set",
+  NO_TAKE_PROFIT: "No take profit set",
+  POOR_RR:        "Risk:Reward below 1:1",
+  HIGH_RISK:      "Risk above 2% per trade",
+};
+
+const SEVERITY_STYLES = {
+  warning:  "bg-[var(--warning)]/10 border-[var(--warning)]/30 text-[var(--warning)]",
+  low:      "bg-primary/10 border-primary/30 text-[color:var(--primary)]",
+  medium:   "bg-[var(--warning)]/10 border-[var(--warning)]/30 text-[var(--warning)]",
+  high:     "bg-[var(--loss)]/10 border-[var(--loss)]/30 text-[var(--loss)]",
+  critical: "bg-[var(--loss)]/15 border-[var(--loss)]/50 text-[var(--loss)]",
+};
+
+const getRiskQualityClass = (score) => {
+  if (score == null) return "text-muted-foreground";
+  if (score >= 80) return "text-[var(--profit)]";
+  if (score >= 60) return "text-[var(--primary)]";
+  if (score >= 40) return "text-[var(--warning)]";
+  return "text-[var(--loss)]";
+};
 
 const SETUP_TAGS = [
   "breakout", "trend_follow", "reversal", "range",
@@ -156,7 +189,15 @@ export const TradeDetailPanel = ({ trade, onClose, onDelete }) => {
               <MetaRow label="Stop Loss"    value={trade.stopLoss   != null ? formatPrice(trade.stopLoss)   : null} mono />
               <MetaRow label="Take Profit"  value={trade.takeProfit != null ? formatPrice(trade.takeProfit) : null} mono />
               <MetaRow label="Lot Size"     value={trade.lotSize?.toFixed(2)} mono />
-              <MetaRow label="Risk %"       value={trade.riskPercent != null ? `${trade.riskPercent.toFixed(2)}%` : null} mono />
+              {trade.magicNumber != null && trade.magicNumber !== 0 && (
+                <MetaRow label="EA Magic" value={String(trade.magicNumber)} mono />
+              )}
+              {trade.eaData?.comment && (
+                <div className="col-span-2 space-y-0.5">
+                  <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Comment</p>
+                  <p className="text-sm text-foreground">{trade.eaData.comment}</p>
+                </div>
+              )}
             </div>
           </div>
 
@@ -211,6 +252,110 @@ export const TradeDetailPanel = ({ trade, onClose, onDelete }) => {
             </div>
           </div>
 
+          {/* Section 2b — Risk */}
+          <Separator />
+          <div className="px-5 py-4 space-y-3">
+            <SectionTitle>Risk</SectionTitle>
+            <div className="grid grid-cols-2 gap-x-4 gap-y-3">
+              <div className="space-y-0.5">
+                <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Risk Amount</p>
+                {trade.riskAmount != null ? (
+                  <TooltipProvider>
+                    <div className="flex items-center gap-1">
+                      <p className="text-sm font-mono text-foreground">
+                        {trade.riskEstimated ? "~" : ""}{formatCurrency(trade.riskAmount)}
+                      </p>
+                      {trade.riskEstimated && (
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <AlertTriangle className="h-3 w-3 text-[var(--warning)] cursor-help" />
+                          </TooltipTrigger>
+                          <TooltipContent className="max-w-[200px] text-xs">
+                            Estimated from actual loss — no stop loss was set
+                          </TooltipContent>
+                        </Tooltip>
+                      )}
+                    </div>
+                  </TooltipProvider>
+                ) : (
+                  <TooltipProvider>
+                    <div className="flex items-center gap-1">
+                      <p className="text-sm text-muted-foreground">N/A</p>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <HelpCircle className="h-3 w-3 text-muted-foreground cursor-help" />
+                        </TooltipTrigger>
+                        <TooltipContent className="max-w-[200px] text-xs">
+                          Risk cannot be calculated without a stop loss on a winning trade
+                        </TooltipContent>
+                      </Tooltip>
+                    </div>
+                  </TooltipProvider>
+                )}
+              </div>
+
+              <div className="space-y-0.5">
+                <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Risk %</p>
+                {trade.riskPercent != null ? (
+                  <div className="flex items-center gap-1">
+                    <p className={cn(
+                      "text-sm font-mono",
+                      trade.riskPercent > 5 ? "text-[var(--loss)]" :
+                      trade.riskPercent > 2 ? "text-[var(--warning)]" :
+                      "text-foreground"
+                    )}>
+                      {trade.riskEstimated ? "~" : ""}{trade.riskPercent.toFixed(2)}%
+                    </p>
+                    {trade.riskPercent > 5 && (
+                      <AlertTriangle className="h-3 w-3 text-[var(--loss)]" />
+                    )}
+                  </div>
+                ) : (
+                  <p className="text-sm text-muted-foreground">—</p>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Section 2c — Pips (forex only — hidden when null) */}
+          {trade.pipsGained != null && (
+            <>
+              <Separator />
+              <div className="px-5 py-4 space-y-3">
+                <SectionTitle>Pips</SectionTitle>
+                <div className="grid grid-cols-2 gap-x-4 gap-y-3">
+                  <MetaRow
+                    label="Pips Gained"
+                    value={formatPips(trade.pipsGained)}
+                    mono
+                    className={trade.pipsGained > 0 ? "text-[var(--profit)]" : trade.pipsGained < 0 ? "text-[var(--loss)]" : undefined}
+                  />
+                  <MetaRow
+                    label="Pips Risked"
+                    value={trade.pipsRisked != null ? `${Number(trade.pipsRisked).toFixed(1)} pips` : null}
+                    mono
+                  />
+                </div>
+              </div>
+            </>
+          )}
+
+          {/* Section 2d — Exit Analysis */}
+          {trade.exitReason && (
+            <>
+              <Separator />
+              <div className="px-5 py-4 space-y-2">
+                <SectionTitle>Exit</SectionTitle>
+                <p className={cn(
+                  "text-sm font-medium",
+                  EXIT_REASON_MAP[trade.exitReason]?.cls ?? "text-foreground"
+                )}>
+                  {EXIT_REASON_MAP[trade.exitReason]?.label ?? trade.exitReason}
+                </p>
+              </div>
+            </>
+          )}
+
           <Separator />
 
           {/* Section 3 — Timing */}
@@ -246,6 +391,82 @@ export const TradeDetailPanel = ({ trade, onClose, onDelete }) => {
               />
             </div>
           </div>
+
+          {/* Section 3b — Risk Quality */}
+          {trade.riskQualityScore != null && (
+            <>
+              <Separator />
+              <div className="px-5 py-4 space-y-3">
+                <SectionTitle>Risk Quality</SectionTitle>
+                <div className="flex items-center justify-between">
+                  <div className="relative h-1.5 rounded-full bg-muted overflow-hidden flex-1 mr-3">
+                    <div
+                      className="absolute left-0 top-0 h-full rounded-full transition-all"
+                      style={{
+                        width: `${trade.riskQualityScore}%`,
+                        backgroundColor: trade.riskQualityScore >= 80 ? "hsl(var(--profit))"
+                          : trade.riskQualityScore >= 60 ? "hsl(var(--primary))"
+                          : trade.riskQualityScore >= 40 ? "hsl(var(--warning))"
+                          : "hsl(var(--loss))",
+                      }}
+                    />
+                  </div>
+                  <span className={cn("text-sm font-mono font-bold shrink-0", getRiskQualityClass(trade.riskQualityScore))}>
+                    {trade.riskQualityScore}/100
+                  </span>
+                </div>
+                {(trade.riskQualityFlags ?? []).length > 0 ? (
+                  <div className="space-y-1.5">
+                    {trade.riskQualityFlags.map((flag) => (
+                      <div key={flag} className="flex items-center gap-1.5 text-xs text-[var(--warning)]">
+                        <AlertTriangle className="h-3 w-3 flex-shrink-0" />
+                        <span>{FLAG_LABELS[flag] ?? flag}</span>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-xs text-[var(--profit)]">✓ No risk concerns</p>
+                )}
+              </div>
+            </>
+          )}
+
+          {/* Section 3c — Trade Compliance (isCompliant + violations) */}
+          {trade.isCompliant != null && (
+            <>
+              <Separator />
+              <div className="px-5 py-4 space-y-3">
+                <SectionTitle>Compliance</SectionTitle>
+                {trade.isCompliant ? (
+                  <div className="flex items-center gap-1.5 text-xs text-[var(--profit)]">
+                    <CheckCircle2 className="h-4 w-4" />
+                    <span className="font-medium">Trade compliant</span>
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    {(trade.complianceViolations ?? []).map((v, i) => (
+                      <div
+                        key={i}
+                        className={cn(
+                          "flex items-start gap-1.5 px-2.5 py-2 rounded-lg border text-xs",
+                          SEVERITY_STYLES[v.severity] ?? SEVERITY_STYLES.warning
+                        )}
+                      >
+                        <span className="shrink-0 mt-0.5">{v.severity === "critical" ? "✗" : "⚠"}</span>
+                        <div className="min-w-0">
+                          <p className="font-semibold">{v.rule}</p>
+                          {v.message && <p className="opacity-80 mt-0.5 leading-snug">{v.message}</p>}
+                        </div>
+                      </div>
+                    ))}
+                    {(trade.complianceViolations ?? []).length === 0 && (
+                      <p className="text-xs text-muted-foreground">Violations not detailed</p>
+                    )}
+                  </div>
+                )}
+              </div>
+            </>
+          )}
 
           {/* Section 4 — Compliance (only if checked) */}
           {propCompliance.checked && (

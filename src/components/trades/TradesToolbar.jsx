@@ -43,6 +43,13 @@ const SESSIONS = [
   { value: "overlap",   label: "Overlap"  },
 ];
 
+const SOURCES = [
+  { value: "",           label: "All"    },
+  { value: "manual",     label: "Manual" },
+  { value: "ea",         label: "EA"     },
+  { value: "csv_import", label: "CSV"    },
+];
+
 const SORT_OPTIONS = [
   { value: "closedAt_desc",   label: "Newest First"  },
   { value: "closedAt_asc",    label: "Oldest First"  },
@@ -109,6 +116,7 @@ export const TradesToolbar = ({
     filters.direction && { key: "direction", label: filters.direction === "buy" ? "▲ Buy" : "▼ Sell" },
     filters.outcome   && { key: "outcome",   label: filters.outcome   },
     filters.session   && { key: "session",   label: SESSIONS.find(s => s.value === filters.session)?.label ?? filters.session },
+    filters.source    && { key: "source",    label: SOURCES.find(s => s.value === filters.source)?.label ?? filters.source },
   ].filter(Boolean);
 
   const hasActiveFilters = activeFilters.length > 0;
@@ -243,6 +251,14 @@ export const TradesToolbar = ({
           onChange={(v) => onFilterChange({ session: v, page: 1 })}
         />
 
+        <div className="w-px h-4 bg-border" />
+
+        <PillGroup
+          options={SOURCES}
+          value={filters.source ?? ""}
+          onChange={(v) => onFilterChange({ source: v, page: 1 })}
+        />
+
         {view === "table" && (
           <>
             <div className="w-px h-4 bg-border" />
@@ -289,7 +305,7 @@ export const TradesToolbar = ({
           {hasActiveFilters && (
             <button
               type="button"
-              onClick={() => onFilterChange({ direction: "", outcome: "", session: "", search: "", page: 1 })}
+              onClick={() => onFilterChange({ direction: "", outcome: "", session: "", source: "", search: "", page: 1 })}
               className="text-xs text-muted-foreground hover:text-foreground transition-colors"
             >
               Clear all

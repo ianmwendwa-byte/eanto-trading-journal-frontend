@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 
-import { LayoutDashboard } from "lucide-react";
+import { LayoutDashboard, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { WidgetSkeleton } from "@/components/dashboard/WidgetSkeleton";
 import { DashboardFilterBar } from "@/components/dashboard/DashboardFilterBar";
@@ -34,7 +34,6 @@ import { WIDGET_REGISTRY } from "@/constants/widgets";
 import { cn } from "@/lib/utils";
 import { AddAccountSheet } from "@/components/accounts/AddAccountSheet";
 import { ContinueSetupBanner } from "@/components/shared/ContinueSetupBanner";
-import { SetupProgressWidget } from "@/components/dashboard/SetupProgressWidget";
 
 // ── Greeting ──────────────────────────────────────────────────────
 const getGreeting = () => {
@@ -102,9 +101,10 @@ const sizeToColSpan = (size) => {
 
 // ── Dashboard page ────────────────────────────────────────────────
 export const Dashboard = () => {
-  const { mongoUser, onboardingComplete } = useAuthStore();
-  const [period,        setPeriod]        = useState("1m");
-  const [customizeOpen, setCustomizeOpen] = useState(false);
+  const { mongoUser } = useAuthStore();
+  const [period,          setPeriod]          = useState("1m");
+  const [customizeOpen,   setCustomizeOpen]   = useState(false);
+  const [addAccountOpen,  setAddAccountOpen]  = useState(false);
 
   // Preferences
   const { data: preferences, isLoading: prefLoading } = useDashboardPreferences();
@@ -194,19 +194,14 @@ export const Dashboard = () => {
               challenges, and grow your trading business.
             </p>
           </div>
-          <Button asChild>
-            <AddAccountSheet/>
+          <Button onClick={() => setAddAccountOpen(true)}>
+            <Plus className="mr-2 h-4 w-4" />
+            Add your first account
           </Button>
         </div>
       ) : (
         /* Widget grid */
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {/* Setup progress — shown when onboarding not yet complete */}
-          {!isLoading && onboardingComplete === false && (
-            <div className="col-span-2">
-              <SetupProgressWidget />
-            </div>
-          )}
           {isLoading
             ? enabledWidgets.map((w) => {
                 const reg = WIDGET_REGISTRY[w.id];
@@ -235,6 +230,12 @@ export const Dashboard = () => {
         isOpen={customizeOpen}
         onClose={() => setCustomizeOpen(false)}
         preferences={preferences}
+      />
+
+      {/* Add account sheet — triggered from the empty state */}
+      <AddAccountSheet
+        open={addAccountOpen}
+        onOpenChange={setAddAccountOpen}
       />
     </div>
     </>

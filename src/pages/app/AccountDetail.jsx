@@ -565,10 +565,21 @@ const AccountTradesTab = ({ accountId, accountName }) => {
   );
 };
 
+// ── Range options for the balance history chart ───────────────
+const RANGE_OPTIONS = [
+  { label: "1W",  days: 7,   interval: "day"   },
+  { label: "1M",  days: 30,  interval: "day"   },
+  { label: "3M",  days: 90,  interval: "week"  },
+  { label: "6M",  days: 180, interval: "week"  },
+  { label: "1Y",  days: 365, interval: "month" },
+  { label: "All", days: null, interval: "month" },
+];
+
 // ── Account Transactions Tab ──────────────────────────────────
 const AccountTransactionsTab = ({ accountId, account }) => {
   const [isAddOpen,       setIsAddOpen]       = useState(false);
   const [selectedTradeId, setSelectedTradeId] = useState(null);
+  const [range,           setRange]           = useState("3M");
 
   const { data, isLoading } = useTransactions({
     accountId,
@@ -576,7 +587,17 @@ const AccountTransactionsTab = ({ accountId, account }) => {
     sortBy: "transactionDate",
     order:  "desc",
   });
-  const { data: balanceHistory, isLoading: historyLoading } = useBalanceHistory({ accountId });
+
+  const rangeConfig = RANGE_OPTIONS.find((r) => r.label === range);
+  const dateFrom = rangeConfig.days
+    ? new Date(Date.now() - rangeConfig.days * 86_400_000).toISOString().split("T")[0]
+    : undefined;
+
+  const { data: balanceHistory, isLoading: historyLoading } = useBalanceHistory({
+    accountId,
+    interval: rangeConfig.interval,
+    ...(dateFrom && { dateFrom }),
+  });
 
   const transactions = data?.transactions ?? [];
   const total        = data?.pagination?.total ?? 0;
@@ -609,12 +630,31 @@ const AccountTransactionsTab = ({ accountId, account }) => {
           </div>
         </div>
 
-        {/* Compact balance chart */}
+        {/* Balance history chart */}
         <div className="trading-card p-4 mb-3">
-          <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium mb-2">
-            Balance History
-          </p>
-          <div className="h-40">
+          <div className="flex items-center justify-between mb-3">
+            <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">
+              Balance History
+            </p>
+            <div className="flex items-center gap-1">
+              {RANGE_OPTIONS.map((opt) => (
+                <button
+                  key={opt.label}
+                  type="button"
+                  onClick={() => setRange(opt.label)}
+                  className={cn(
+                    "px-2 py-0.5 rounded text-[10px] font-mono font-medium transition-colors",
+                    range === opt.label
+                      ? "bg-primary text-primary-foreground"
+                      : "text-muted-foreground hover:text-foreground hover:bg-muted/60"
+                  )}
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div className="h-56">
             <BalanceHistoryChart data={balanceHistory} isLoading={historyLoading} />
           </div>
         </div>

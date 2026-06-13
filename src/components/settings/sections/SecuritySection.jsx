@@ -6,28 +6,77 @@ import {
   AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle,
   AlertDialogDescription, AlertDialogFooter,
 } from "@/components/ui/alert-dialog";
-import { Loader2, Shield } from "lucide-react";
+import { Loader2, Shield, AlertTriangle } from "lucide-react";
+import {
+  reauthenticateWithCredential,
+  reauthenticateWithPopup,
+  EmailAuthProvider,
+  GoogleAuthProvider,
+} from "firebase/auth";
+import { auth } from "@/lib/firebase";
 import { useSendPasswordReset, useDeleteUserAccount } from "@/hooks/useUser";
 import { useAuthStore }  from "@/store/useAuthStore";
 import { formatRelativeTime } from "@/utils/format";
-import { cn }            from "@/lib/utils";
+
+// Two-step delete flow:
+//   "reauth"  → user re-authenticates (required by backend — token must be < 5 min old)
+//   "confirm" → user types their email to confirm permanent deletion
+const DELETE_STEP = { REAUTH: "reauth", CONFIRM: "confirm" };
 
 export const SecuritySection = () => {
   const { mongoUser } = useAuthStore();
   const { mutate: sendReset, isPending: sendingReset } = useSendPasswordReset();
   const { mutate: deleteAccount, isPending: deleting } = useDeleteUserAccount();
 
-  const [deleteDialog, setDeleteDialog] = useState(false);
-  const [confirmEmail, setConfirmEmail] = useState("");
+  const [deleteDialog, setDeleteDialog]   = useState(false);
+  const [deleteStep,   setDeleteStep]     = useState(DELETE_STEP.REAUTH);
+  const [confirmEmail, setConfirmEmail]   = useState("");
+  const [reauthPwd,    setReauthPwd]      = useState("");
+  const [reauthError,  setReauthError]    = useState(null);
+  const [reauthBusy,   setReauthBusy]     = useState(false);
 
-  const email = mongoUser?.email ?? "";
-  const security = mongoUser?.security ?? {};
+  const email     = mongoUser?.email ?? "";
+  const security  = mongoUser?.security ?? {};
   const canDelete = confirmEmail.trim().toLowerCase() === email.toLowerCase();
 
-  // lastLoginAt is top-level; lastLoginIp and failedLoginAttempts are under security
-  const lastLoginAt       = mongoUser?.lastLoginAt ?? null;
-  const lastLoginIp       = security.lastLoginIp ?? null;
-  const failedAttempts    = security.failedLoginAttempts ?? 0;
+  const isGoogleUser = auth.currentUser?.providerData?.[0]?.providerId === "google.com";
+
+  const lastLoginAt    = mongoUser?.lastLoginAt ?? null;
+  const lastLoginIp    = security.lastLoginIp ?? null;
+  const failedAttempts = security.failedLoginAttempts ?? 0;
+
+  const openDeleteDialog = () => {
+    setDeleteStep(DELETE_STEP.REAUTH);
+    setConfirmEmail("");
+    setReauthPwd("");
+    setReauthError(null);
+    setDeleteDialog(true);
+  };
+
+  const handleReauth = async () => {
+    setReauthError(null);
+    setReauthBusy(true);
+    try {
+      if (isGoogleUser) {
+        await reauthenticateWithPopup(auth.currentUser, new GoogleAuthProvider());
+      } else {
+        const credential = EmailAuthProvider.credential(email, reauthPwd);
+        await reauthenticateWithCredential(auth.currentUser, credential);
+      }
+      setDeleteStep(DELETE_STEP.CONFIRM);
+    } catch (err) {
+      const code = err?.code ?? "";
+      if (code === "auth/wrong-password" || code === "auth/invalid-credential") {
+        setReauthError("Incorrect password.");
+      } else if (code === "auth/popup-closed-by-user") {
+        setReauthError(null); // user cancelled — no error
+      } else {
+        setReauthError("Re-authentication failed. Please try again.");
+      }
+    } finally {
+      setReauthBusy(false);
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -108,15 +157,15 @@ export const SecuritySection = () => {
                 Delete Account
               </p>
               <p className="text-xs text-muted-foreground mt-1">
-                Permanently delete your Kraviq account.
-                Your data will be marked for deletion. This action cannot be easily undone.
+                Permanently and immediately deletes your account and all data.
+                This cannot be undone.
               </p>
             </div>
             <Button
               variant="outline"
               size="sm"
               className="border-destructive/40 text-destructive hover:bg-destructive/10"
-              onClick={() => { setConfirmEmail(""); setDeleteDialog(true); }}
+              onClick={openDeleteDialog}
             >
               Delete Account
             </Button>
@@ -124,61 +173,132 @@ export const SecuritySection = () => {
         </TabsContent>
       </Tabs>
 
-      {/* Delete account dialog */}
+      {/* ── Delete account dialog ────────────────── */}
       <AlertDialog open={deleteDialog} onOpenChange={setDeleteDialog}>
         <AlertDialogContent className="bg-card border-border">
-          <AlertDialogHeader>
-            <AlertDialogTitle>Delete your account?</AlertDialogTitle>
-            <AlertDialogDescription asChild>
-              <div className="space-y-2 text-sm text-muted-foreground">
-                <p>
-                  This will soft-delete your account. Your trading data will be preserved
-                  for <strong className="text-foreground">30 days</strong> before permanent
-                  deletion. You can contact support to recover your account within this period.
-                </p>
-                <div className="pt-1">
-                  <p className="text-xs font-medium text-foreground mb-1">
-                    Type your email to confirm:
-                  </p>
-                  <Input
-                    value={confirmEmail}
-                    onChange={(e) => setConfirmEmail(e.target.value)}
-                    placeholder={email}
-                    className="bg-background border-border h-8 text-sm"
-                    autoComplete="off"
-                  />
-                  {confirmEmail && !canDelete && (
-                    <p className="text-[11px] mt-1" style={{ color: "var(--loss)" }}>
-                      Email doesn't match
+
+          {/* Step 1: Re-authenticate */}
+          {deleteStep === DELETE_STEP.REAUTH && (
+            <>
+              <AlertDialogHeader>
+                <AlertDialogTitle className="flex items-center gap-2">
+                  <AlertTriangle className="h-4 w-4" style={{ color: "var(--loss)" }} />
+                  Confirm your identity
+                </AlertDialogTitle>
+                <AlertDialogDescription asChild>
+                  <div className="space-y-3 text-sm text-muted-foreground">
+                    <p>
+                      For security, you must re-authenticate before deleting your account.
                     </p>
+                    {!isGoogleUser && (
+                      <div className="pt-1 space-y-1.5">
+                        <p className="text-xs font-medium text-foreground">Enter your password:</p>
+                        <Input
+                          type="password"
+                          value={reauthPwd}
+                          onChange={(e) => { setReauthPwd(e.target.value); setReauthError(null); }}
+                          placeholder="Your current password"
+                          className="bg-background border-border h-8 text-sm"
+                          autoComplete="current-password"
+                          onKeyDown={(e) => e.key === "Enter" && handleReauth()}
+                        />
+                        {reauthError && (
+                          <p className="text-[11px]" style={{ color: "var(--loss)" }}>
+                            {reauthError}
+                          </p>
+                        )}
+                      </div>
+                    )}
+                    {isGoogleUser && reauthError && (
+                      <p className="text-[11px]" style={{ color: "var(--loss)" }}>
+                        {reauthError}
+                      </p>
+                    )}
+                  </div>
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <Button variant="ghost" onClick={() => setDeleteDialog(false)} disabled={reauthBusy}>
+                  Cancel
+                </Button>
+                <Button
+                  variant="destructive"
+                  onClick={handleReauth}
+                  disabled={reauthBusy || (!isGoogleUser && !reauthPwd)}
+                >
+                  {reauthBusy ? (
+                    <><Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />Verifying...</>
+                  ) : isGoogleUser ? (
+                    "Verify with Google"
+                  ) : (
+                    "Confirm Identity"
                   )}
-                </div>
-              </div>
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <Button
-              variant="ghost"
-              onClick={() => setDeleteDialog(false)}
-              disabled={deleting}
-            >
-              Cancel
-            </Button>
-            <Button
-              variant="destructive"
-              onClick={() => deleteAccount()}
-              disabled={!canDelete || deleting}
-            >
-              {deleting ? (
-                <>
-                  <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />
-                  Deleting...
-                </>
-              ) : (
-                "Delete Account"
-              )}
-            </Button>
-          </AlertDialogFooter>
+                </Button>
+              </AlertDialogFooter>
+            </>
+          )}
+
+          {/* Step 2: Confirm permanent deletion */}
+          {deleteStep === DELETE_STEP.CONFIRM && (
+            <>
+              <AlertDialogHeader>
+                <AlertDialogTitle className="flex items-center gap-2">
+                  <AlertTriangle className="h-4 w-4" style={{ color: "var(--loss)" }} />
+                  Delete your account?
+                </AlertDialogTitle>
+                <AlertDialogDescription asChild>
+                  <div className="space-y-2 text-sm text-muted-foreground">
+                    <p>
+                      This will <strong className="text-foreground">permanently and immediately</strong> delete
+                      your account and all associated data — trades, transactions, accounts, EA syncs,
+                      and score history. <strong className="text-foreground">There is no recovery period.</strong>
+                    </p>
+                    <div className="pt-1">
+                      <p className="text-xs font-medium text-foreground mb-1">
+                        Type your email to confirm:
+                      </p>
+                      <Input
+                        value={confirmEmail}
+                        onChange={(e) => setConfirmEmail(e.target.value)}
+                        placeholder={email}
+                        className="bg-background border-border h-8 text-sm"
+                        autoComplete="off"
+                      />
+                      {confirmEmail && !canDelete && (
+                        <p className="text-[11px] mt-1" style={{ color: "var(--loss)" }}>
+                          Email doesn't match
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <Button
+                  variant="ghost"
+                  onClick={() => setDeleteDialog(false)}
+                  disabled={deleting}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  variant="destructive"
+                  onClick={() => deleteAccount()}
+                  disabled={!canDelete || deleting}
+                >
+                  {deleting ? (
+                    <>
+                      <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />
+                      Deleting...
+                    </>
+                  ) : (
+                    "Permanently Delete Account"
+                  )}
+                </Button>
+              </AlertDialogFooter>
+            </>
+          )}
+
         </AlertDialogContent>
       </AlertDialog>
     </div>

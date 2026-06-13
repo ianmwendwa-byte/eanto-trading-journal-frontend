@@ -38,7 +38,7 @@ export const WelcomeStep = ({ onStart }) => (
         transition={{ duration: 0.4, ease: "easeOut" }}
         className="mb-10"
       >
-        <Logo variant="stacked" size="lg" />
+        <Logo variant="stacked" size="xl" />
       </motion.div>
 
       {/* Tagline */}

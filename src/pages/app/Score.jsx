@@ -26,35 +26,29 @@ export const Score = () => {
   const [scope, setScope] = useState("user");
   const isUserScope = scope === "user";
 
-  // Load all accounts for the scope selector
   const { data: accountsData } = useAccounts({ limit: 50 });
   const accounts = accountsData?.accounts ?? [];
 
-  // ── Always call all hooks (React rules); enabled flag controls execution ──
-
+  // Always call all hooks (React rules of hooks)
   const userScoreQuery    = useUserScore();
   const userHistoryQuery  = useUserScoreHistory(12);
   const recalcUser        = useRecalculateScore();
 
-  // Passes null when scope is "user" → these queries won't run (enabled: !!accountId)
   const accountScoreQuery   = useAccountScore(isUserScope ? null : scope);
   const accountHistoryQuery = useAccountScoreHistory(isUserScope ? null : scope);
   const recalcAccount       = useRecalculateAccountScore(isUserScope ? null : scope);
 
-  // ── Beta gate ──────────────────────────────────────────────────
   if (!betaEnabled) return <ScoreTeaser />;
 
-  // ── Active data based on selected scope ───────────────────────
   const { data: score, isLoading, isError, error, refetch } =
     isUserScope ? userScoreQuery : accountScoreQuery;
 
   const { data: history } =
     isUserScope ? userHistoryQuery : accountHistoryQuery;
 
-  const onRecalculate  = isUserScope ? () => recalcUser.mutate()    : () => recalcAccount.mutate();
+  const onRecalculate   = isUserScope ? () => recalcUser.mutate()   : () => recalcAccount.mutate();
   const isRecalculating = isUserScope ? recalcUser.isPending         : recalcAccount.isPending;
 
-  // ── States ────────────────────────────────────────────────────
   if (isLoading) return <ScoreSkeleton />;
 
   if (isError) return (
@@ -77,37 +71,38 @@ export const Score = () => {
       initial="initial"
       animate="animate"
       variants={pageVariants}
-      className="p-4 md:p-6"
+      className="p-4 md:p-6 space-y-6"
     >
-      {/* Header */}
-      <div className="mb-4">
-        <h1 className="font-heading font-bold text-2xl text-foreground">Business Score</h1>
-        <p className="text-sm text-muted-foreground mt-1">
-          Your trading business health — 0 to 100
-        </p>
+      {/* ── Header ── */}
+      <div className="flex items-start justify-between gap-4 flex-wrap">
+        <div>
+          <h1 className="font-heading font-bold text-2xl text-foreground">Business Score</h1>
+          <p className="text-sm text-muted-foreground mt-1">
+            Your trading business health — 0 to 100
+          </p>
+        </div>
+
+        {accounts.length > 0 && (
+          <div className="flex flex-col items-end gap-1">
+            <ScoreScopeSelector
+              accounts={accounts}
+              scope={scope}
+              onScopeChange={setScope}
+            />
+            {isUserScope && accounts.some((a) => a.type === "war") && (
+              <p className="text-[10px] text-muted-foreground">
+                War accounts excluded from Overall
+              </p>
+            )}
+          </div>
+        )}
       </div>
 
-      {/* Scope selector — only shown when accounts are loaded */}
-      {accounts.length > 0 && (
-        <div className="mb-6">
-          <ScoreScopeSelector
-            accounts={accounts}
-            scope={scope}
-            onScopeChange={(s) => { setScope(s); }}
-          />
-          {isUserScope && accounts.some((a) => a.type === "war") && (
-            <p className="text-xs text-muted-foreground mt-2">
-              War accounts are excluded from the Overall score.
-            </p>
-          )}
-        </div>
-      )}
-
-      {/* Empty / not enough data */}
+      {/* ── Content ── */}
       {(!hasScore || !hasMinimumData) ? (
         <ScoreEmptyState metadata={score?.metadata} />
       ) : (
-        <div className="flex flex-col md:flex-row gap-6 items-start">
+        <>
           <ScorePanel
             score={score}
             previousScore={previousScore}
@@ -115,7 +110,7 @@ export const Score = () => {
             isRecalculating={isRecalculating}
           />
           <ScoreDetail score={score} history={history} />
-        </div>
+        </>
       )}
     </motion.div>
   );

@@ -65,6 +65,7 @@ export const Trades = () => {
     direction: searchParams.get("direction") ?? "",
     outcome:   searchParams.get("outcome")   ?? "",
     session:   searchParams.get("session")   ?? "",
+    source:    searchParams.get("source")    ?? "",
     period:    searchParams.get("period")    ?? "all",
     sort:      searchParams.get("sort")      ?? "closedAt_desc",
     page:      Number(searchParams.get("page") ?? 1),
@@ -77,7 +78,7 @@ export const Trades = () => {
       const next = { ...prev, ...updates };
       if (!("page" in updates)) next.page = 1;
       const params = new URLSearchParams();
-      const syncKeys = ["search", "pair", "direction", "outcome", "session", "period", "sort", "accountId"];
+      const syncKeys = ["search", "pair", "direction", "outcome", "session", "source", "period", "sort", "accountId"];
       syncKeys.forEach((k) => { if (next[k]) params.set(k, next[k]); });
       if (next.page > 1) params.set("page", String(next.page));
       if (view !== "table") params.set("view", view);

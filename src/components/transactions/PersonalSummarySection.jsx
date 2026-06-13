@@ -175,13 +175,13 @@ const SinglePersonalSummary = ({ account, isLoading }) => {
           <Stat
             label="Deposits"
             value={metrics.totalDeposits != null ? formatCurrency(metrics.totalDeposits) : null}
-            valueClass="text-[var(--profit)]"
+            valueClass="text-[var(--loss)]"
             tooltip="Total deposited into this account"
           />
           <Stat
             label="Withdrawals"
             value={metrics.totalWithdrawals != null ? formatCurrency(metrics.totalWithdrawals) : null}
-            valueClass="text-[var(--loss)]"
+            valueClass="text-[var(--profit)]"
             tooltip="Total withdrawn from this account"
           />
           <Stat

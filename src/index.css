@@ -353,6 +353,8 @@
   .trading-card {
     @apply bg-card border border-border rounded-xl;
 
+    position: relative;
+    overflow: hidden;
     box-shadow: var(--shadow-sm);
   }
 

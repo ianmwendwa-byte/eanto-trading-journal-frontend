@@ -9,7 +9,6 @@ import {
 } from "@/components/ui/select";
 import { accountFormSchema, transformAccountForm } from "@/app/schema/account";
 import { useCreateAccount } from "@/hooks/useAccounts";
-import { cn } from "@/lib/utils";
 
 const SUBTITLES = {
   manual:     "Add a Normal account to start tracking your trades",
@@ -74,7 +73,7 @@ export const AccountCreationStep = ({ wizardData, onAccountCreated, onSkip }) =>
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-        {/* Account type (editable but pre-selected) */}
+        {/* Account type */}
         <FF label="Account Type" required error={errors.type}>
           <Controller
             name="type"
@@ -147,7 +146,12 @@ export const AccountCreationStep = ({ wizardData, onAccountCreated, onSkip }) =>
           </FF>
         </div>
 
-        <FF label="Starting Balance" required error={errors.startingBalance}>
+        {/* Starting Balance — labelled "Account Size" for prop */}
+        <FF
+          label={accountType === "prop" ? "Account Size ($)" : "Starting Balance"}
+          required
+          error={errors.startingBalance}
+        >
           <Input
             type="number" step="0.01" min="0"
             placeholder="10000"
@@ -155,6 +159,27 @@ export const AccountCreationStep = ({ wizardData, onAccountCreated, onSkip }) =>
             {...register("startingBalance")}
           />
         </FF>
+
+        {/* Trading Mode — normal/war only */}
+        {accountType !== "prop" && (
+          <FF label="Trading Mode" required error={errors.tradingMode}>
+            <Controller
+              name="tradingMode"
+              control={control}
+              render={({ field }) => (
+                <Select value={field.value} onValueChange={field.onChange}>
+                  <SelectTrigger className="bg-background border-border">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="bg-card border-border">
+                    <SelectItem value="live">Live</SelectItem>
+                    <SelectItem value="demo">Demo</SelectItem>
+                  </SelectContent>
+                </Select>
+              )}
+            />
+          </FF>
+        )}
 
         {/* Broker — normal/war only */}
         {accountType !== "prop" && (
@@ -167,7 +192,7 @@ export const AccountCreationStep = ({ wizardData, onAccountCreated, onSkip }) =>
           </FF>
         )}
 
-        {/* Prop-specific */}
+        {/* Prop-specific fields */}
         {accountType === "prop" && (
           <div className="space-y-3">
             <div className="grid grid-cols-2 gap-3">
@@ -178,11 +203,23 @@ export const AccountCreationStep = ({ wizardData, onAccountCreated, onSkip }) =>
                   {...register("propFirm")}
                 />
               </FF>
-              <FF label="Account Size" error={errors.accountSize}>
-                <Input
-                  type="number" placeholder="10000"
-                  className="bg-background border-border font-mono"
-                  {...register("accountSize")}
+              <FF label="Program Type" error={errors.programType}>
+                <Controller
+                  name="programType"
+                  control={control}
+                  render={({ field }) => (
+                    <Select value={field.value ?? ""} onValueChange={field.onChange}>
+                      <SelectTrigger className="bg-background border-border">
+                        <SelectValue placeholder="Select" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-card border-border">
+                        <SelectItem value="1_step">1-Step</SelectItem>
+                        <SelectItem value="2_step">2-Step</SelectItem>
+                        <SelectItem value="3_step">3-Step</SelectItem>
+                        <SelectItem value="instant">Instant Funding</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  )}
                 />
               </FF>
             </div>
@@ -202,6 +239,22 @@ export const AccountCreationStep = ({ wizardData, onAccountCreated, onSkip }) =>
                 />
               </FF>
             </div>
+            <div className="grid grid-cols-2 gap-3">
+              <FF label="Daily Drawdown %" error={errors.dailyDrawdownPercent}>
+                <Input
+                  type="number" step="0.1" placeholder="5"
+                  className="bg-background border-border font-mono"
+                  {...register("dailyDrawdownPercent")}
+                />
+              </FF>
+              <FF label="Min Trading Days" error={errors.minTradingDays}>
+                <Input
+                  type="number" placeholder="5"
+                  className="bg-background border-border font-mono"
+                  {...register("minTradingDays")}
+                />
+              </FF>
+            </div>
             <FF label="Challenge Fee ($)" error={errors.challengeFee}>
               <Input
                 type="number" step="0.01" placeholder="155"
@@ -217,19 +270,18 @@ export const AccountCreationStep = ({ wizardData, onAccountCreated, onSkip }) =>
           <div className="flex items-start gap-3 p-3 rounded-xl bg-primary/5 border border-primary/20">
             <Zap className="h-4 w-4 text-primary flex-shrink-0 mt-0.5" />
             <p className="text-xs text-muted-foreground">
-              After creating your account, you'll be able to connect your MT4/MT5 EA from <strong className="text-foreground">Account Settings → EA Sync</strong>.
+              After creating your account, you'll be able to connect your MT4/MT5 EA from{" "}
+              <strong className="text-foreground">Account Settings → EA Sync</strong>.
             </p>
           </div>
         )}
 
-        {/* Submit button */}
         <Button type="submit" className="w-full" disabled={isPending}>
           {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
           {isPending ? "Creating account..." : "Create Account & Finish"}
         </Button>
       </form>
 
-      {/* Skip link */}
       <button
         type="button"
         onClick={onSkip}

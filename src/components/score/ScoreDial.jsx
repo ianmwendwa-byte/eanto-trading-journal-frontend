@@ -2,11 +2,11 @@ import { motion } from "framer-motion";
 import { AnimatedScore } from "./AnimatedScore";
 
 export const BAND_CONFIG = {
-  needs_work:  { label: "Needs Work",  range: "0–20",   color: "hsl(var(--loss))",    textClass: "text-[var(--loss)]"    },
-  developing:  { label: "Developing",  range: "21–40",  color: "hsl(var(--warning))", textClass: "text-[var(--warning)]" },
-  progressing: { label: "Progressing", range: "41–60",  color: "hsl(var(--primary))", textClass: "text-[var(--primary)]" },
-  solid:       { label: "Solid",       range: "61–80",  color: "hsl(var(--profit))",  textClass: "text-[var(--profit)]"  },
-  elite:       { label: "Elite",       range: "81–100", color: "hsl(var(--info))",    textClass: "text-[var(--info)]"    },
+  needs_work:  { label: "Needs Work",  range: "0–20",   color: "var(--loss)",     textClass: "text-[var(--loss)]"    },
+  developing:  { label: "Developing",  range: "21–40",  color: "var(--warning)",  textClass: "text-[var(--warning)]" },
+  progressing: { label: "Progressing", range: "41–60",  color: "var(--primary)",  textClass: "text-[color:var(--primary)]" },
+  solid:       { label: "Solid",       range: "61–80",  color: "var(--profit)",   textClass: "text-[var(--profit)]"  },
+  elite:       { label: "Elite",       range: "81–100", color: "var(--info)",     textClass: "text-[var(--info)]"    },
 };
 
 export const getBandFromScore = (score) => {
@@ -19,20 +19,18 @@ export const getBandFromScore = (score) => {
 };
 
 export const ScoreDial = ({ score, band: bandProp, size = 200, animate = true }) => {
-  const strokeWidth  = size * 0.06;
-  const radius       = (size - strokeWidth) / 2;
+  const strokeWidth   = size * 0.06;
+  const radius        = (size - strokeWidth) / 2;
   const circumference = 2 * Math.PI * radius;
   const center        = size / 2;
   const arcLength     = circumference * (270 / 360);
 
-  // offset: full arcLength = no arc shown, 0 = full arc shown
   const scoreOffset = score == null
     ? arcLength
     : arcLength * (1 - score / 100);
 
   const band     = bandProp ?? getBandFromScore(score);
-  const arcColor = band ? BAND_CONFIG[band].color : "hsl(var(--muted-foreground))";
-  const bandLabel = band ? BAND_CONFIG[band].label : null;
+  const arcColor = band ? BAND_CONFIG[band].color : "var(--muted-foreground)";
 
   return (
     <div style={{ position: "relative", width: size, height: size }}>
@@ -46,7 +44,7 @@ export const ScoreDial = ({ score, band: bandProp, size = 200, animate = true })
         <circle
           cx={center} cy={center} r={radius}
           fill="none"
-          stroke="hsl(var(--muted))"
+          stroke="var(--muted)"
           strokeWidth={strokeWidth}
           strokeLinecap="round"
           strokeDasharray={`${arcLength} ${circumference}`}
@@ -65,7 +63,7 @@ export const ScoreDial = ({ score, band: bandProp, size = 200, animate = true })
         />
       </svg>
 
-      {/* Center content — positioned in original (unrotated) coordinate space */}
+      {/* Center content */}
       <div
         style={{
           position: "absolute",
@@ -82,18 +80,16 @@ export const ScoreDial = ({ score, band: bandProp, size = 200, animate = true })
           className="font-mono font-bold"
           style={{ fontSize: size * 0.26, color: arcColor, lineHeight: 1 }}
         />
-        {bandLabel && (
-          <span
-            style={{
-              fontSize: size * 0.09,
-              color: arcColor,
-              fontWeight: 500,
-              marginTop: 4,
-            }}
-          >
-            {bandLabel}
-          </span>
-        )}
+        <span
+          style={{
+            fontSize: size * 0.085,
+            color: "var(--muted-foreground)",
+            fontWeight: 500,
+            marginTop: 4,
+          }}
+        >
+          out of 100
+        </span>
       </div>
     </div>
   );

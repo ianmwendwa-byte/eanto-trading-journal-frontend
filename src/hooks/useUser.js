@@ -147,7 +147,9 @@ export const useSilentUpdateNotificationPreferences = () => {
   });
 };
 
-// ── Soft delete user account ──────────────────────────────────
+// ── Delete user account ───────────────────────────────────────
+// Backend requires: { confirmation: "DELETE" } and a Firebase token
+// issued within the last 5 minutes (re-auth enforced by caller).
 export const useDeleteUserAccount = () => {
   const { logout } = useAuthStore();
   const qc = useQueryClient();
@@ -156,12 +158,12 @@ export const useDeleteUserAccount = () => {
   return useMutation({
     mutationFn: () => api.delete(API.AUTH.DELETE_ACCOUNT, { data: { confirmation: "DELETE" } }),
     onSuccess: async () => {
-      toast.success("Account deleted. You have 30 days to recover it by contacting support.");
-      try { await signOut(auth); } catch {}
+      toast.success("Your account has been permanently deleted.");
+      signOut(auth).catch(() => {}); // fire-and-forget — user is already being deleted
       logout();
       qc.clear();
       navigate("/login");
     },
-    onError: (err) => toast.error(err?.message ?? "Failed to delete account"),
+    onError: (err) => toast.error(err?.response?.data?.message ?? err?.message ?? "Failed to delete account"),
   });
 };

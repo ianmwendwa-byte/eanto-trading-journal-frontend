@@ -15,7 +15,7 @@ const formatChartData = (history) => {
   return history
     .map((item) => {
       const time  = toDateStr(item.date ?? item.time);
-      const value = item.balance ?? item.value ?? 0;
+      const value = item.balanceAfter ?? item.balance ?? item.value ?? 0;
       return time ? { time, value } : null;
     })
     .filter(Boolean)

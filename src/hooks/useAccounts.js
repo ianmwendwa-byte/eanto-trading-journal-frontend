@@ -81,6 +81,7 @@ export const useCreateAccount = () => {
     mutationFn: (data) => api.post(API.ACCOUNT.BASE, data),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: accountKeys.all() });
+      qc.invalidateQueries({ queryKey: ["dashboard"] });
       toast.success("Account created successfully");
     },
     onError: (error) => toast.error(error.message ?? "Failed to create account"),

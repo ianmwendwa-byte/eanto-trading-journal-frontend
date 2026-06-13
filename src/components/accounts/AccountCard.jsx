@@ -1,7 +1,8 @@
-﻿import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
-  MoreHorizontal, Eye, Key, Pencil, Trash2, AlertTriangle,
+  MoreHorizontal, Eye, Key, Pencil, Trash2,
+  Wallet, Trophy, Zap,
 } from "lucide-react";
 import { Skeleton }  from "@/components/ui/skeleton";
 import { Button }    from "@/components/ui/button";
@@ -14,32 +15,60 @@ import { AccountTypeBadge }   from "./AccountTypeBadge";
 import { AccountStatusBadge } from "./AccountStatusBadge";
 import { EASyncStatus }       from "./EASyncStatus";
 import { InfoTooltip }        from "@/components/shared/InfoTooltip";
-import { formatCurrency, formatPnL, getPnLColor } from "@/utils/format";
+import { formatCurrency, getPnLColor } from "@/utils/format";
 import { cn }                 from "@/lib/utils";
 import { staggerItemVariants } from "@/lib/animations";
 import { useEAStatus }        from "@/hooks/useEA";
 
-// ── Accent bar color by type ──────────────────────────────────
-const TYPE_BAR = {
-  normal: "bg-[var(--profit)]",
-  prop:   "bg-primary",
-  war:    "bg-[var(--loss)]",
+// ── Per-type config — colors unchanged ───────────────────
+const TYPE_CONFIG = {
+  normal: {
+    strip:    "bg-[var(--profit)]",
+    iconBg:   "bg-[var(--profit)]/10",
+    iconText: "text-[var(--profit)]",
+    hex:      "#22C55E",
+    Icon:     Wallet,
+  },
+  prop: {
+    strip:    "bg-primary",
+    iconBg:   "bg-primary/10",
+    iconText: "text-primary",
+    hex:      "#4F6EF7",
+    Icon:     Trophy,
+  },
+  war: {
+    strip:    "bg-[var(--loss)]",
+    iconBg:   "bg-[var(--loss)]/10",
+    iconText: "text-[var(--loss)]",
+    hex:      "#EF4444",
+    Icon:     Zap,
+  },
 };
 
-// ── Small stat cell ───────────────────────────────────────────
-const StatCell = ({ label, value, valueClass, tooltip }) => (
-  <div className="space-y-0.5">
-    <div className="flex items-center gap-0.5">
-      <p className="text-[10px] text-muted-foreground uppercase tracking-wider">{label}</p>
-      {tooltip && <InfoTooltip content={tooltip} side="top" />}
-    </div>
-    <p className={cn("text-sm font-mono font-medium", valueClass ?? "text-foreground")}>
-      {value ?? "—"}
-    </p>
+// ── Win rate / avg RR color helpers ──────────────────────
+const winRateColor = (wr) => {
+  if (wr === null) return "text-muted-foreground";
+  if (wr >= 60) return "text-[var(--profit)]";
+  if (wr >= 50) return "text-[var(--warning)]";
+  return "text-[var(--loss)]";
+};
+
+const avgRRColor = (rr) => {
+  if (rr === null) return "text-muted-foreground";
+  if (rr >= 2.0) return "text-[var(--profit)]";
+  if (rr >= 1.0) return "text-[var(--warning)]";
+  return "text-[var(--loss)]";
+};
+
+// ── Stat cell (list view) ─────────────────────────────────
+const StatCell = ({ label, value, valueClass }) => (
+  <div className="flex flex-col items-center gap-0.5">
+    <p className="text-[9px] text-muted-foreground uppercase tracking-wider">{label}</p>
+    <p className={cn("text-xs font-mono font-semibold", valueClass ?? "text-foreground")}>{value ?? "—"}</p>
   </div>
 );
 
-// ── Progress bar (prop challenges) ────────────────────────────
+// ── Prop progress bar ─────────────────────────────────────
 const PropBar = ({ label, current = 0, target = 0, tooltip, colorMode = "drawdown" }) => {
   const pct = target > 0 ? Math.min(100, (current / target) * 100) : 0;
 
@@ -57,16 +86,16 @@ const PropBar = ({ label, current = 0, target = 0, tooltip, colorMode = "drawdow
 
   return (
     <div className="space-y-1">
-      <div className="flex items-center justify-between text-xs">
+      <div className="flex items-center justify-between">
         <div className="flex items-center gap-1">
-          <span className="text-muted-foreground">{label}</span>
+          <span className="text-[10px] text-muted-foreground">{label}</span>
           {tooltip && <InfoTooltip content={tooltip} side="top" />}
         </div>
-        <span className={cn("font-mono", textColor)}>
+        <span className={cn("text-[10px] font-mono tabular-nums", textColor)}>
           {current.toFixed(2)}% / {target}%
         </span>
       </div>
-      <div className="h-1.5 rounded-full bg-muted overflow-hidden">
+      <div className="h-[3px] rounded-full bg-muted/50 overflow-hidden">
         <div
           className={cn("h-full rounded-full transition-all duration-500", barColor)}
           style={{ width: `${pct}%` }}
@@ -76,41 +105,16 @@ const PropBar = ({ label, current = 0, target = 0, tooltip, colorMode = "drawdow
   );
 };
 
-// ── Win rate color ────────────────────────────────────────────
-const winRateColor = (wr) => {
-  if (wr === null) return "text-muted-foreground";
-  if (wr >= 60) return "text-[var(--profit)]";
-  if (wr >= 50) return "text-[var(--warning)]";
-  return "text-[var(--loss)]";
-};
-
-// ── Avg RR color ──────────────────────────────────────────────
-const avgRRColor = (rr) => {
-  if (rr === null) return "text-muted-foreground";
-  if (rr >= 2.0) return "text-[var(--profit)]";
-  if (rr >= 1.0) return "text-[var(--warning)]";
-  return "text-[var(--loss)]";
-};
-
-// ── EA status from /ea/status — enabled + isOnline ────────────
-// Response: { success, data: { enabled, isOnline, hasApiKey, ... } }
-// Only fetches when account.eaSync?.enabled is true to avoid N calls for non-EA accounts.
-// Falls back to account.eaSync for the brief window before the first fetch completes.
+// ── EA status chip ────────────────────────────────────────
 const EAStatusChip = ({ account }) => {
   const configEnabled = account.eaSync?.enabled ?? false;
-
-  const { data: status } = useEAStatus(account._id, {
-    polling: false,
-    enabled: configEnabled,
-  });
-
+  const { data: status } = useEAStatus(account._id, { polling: false, enabled: configEnabled });
   const enabled  = status?.enabled  ?? configEnabled;
   const isOnline = status?.isOnline ?? false;
-
   return <EASyncStatus isOnline={isOnline} enabled={enabled} />;
 };
 
-// ── Dropdown actions ──────────────────────────────────────────
+// ── Dropdown actions ──────────────────────────────────────
 const Actions = ({ account, onEdit, onDelete, navigate }) => (
   <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
     <Button
@@ -153,30 +157,24 @@ const Actions = ({ account, onEdit, onDelete, navigate }) => (
   </div>
 );
 
-// ── Main card ─────────────────────────────────────────────────
+// ── Main card ─────────────────────────────────────────────
 export const AccountCard = ({ account, viewMode = "grid", onEdit, onDelete }) => {
   const navigate = useNavigate();
 
-  // ── Correct field mapping per API spec ────────────────────
-  const isProp = account.type === "prop";
+  const isProp   = account.type === "prop";
+  const cfg      = TYPE_CONFIG[account.type] ?? TYPE_CONFIG.normal;
+  const TypeIcon = cfg.Icon;
 
-  // Balance: prop shows firm capital (accountSize); normal/war shows live balance
-  const accountSize = isProp ? (account.accountSize ?? 0): (account.startingBalance ?? 0);
+  const accountSize = isProp ? (account.accountSize ?? 0) : (account.startingBalance ?? 0);
+  const pnl         = account.performance?.totalPnl ?? 0;
 
-  
-  // P&L: always from performance, never calculated
-  const pnl = account.performance?.totalPnl ?? 0;
-
-  // Performance stats — all from account.performance (0-100 for winRate)
   const winRate     = account.performance?.winRate     ?? null;
   const avgRR       = account.performance?.avgRR       ?? null;
   const totalTrades = account.performance?.totalTrades ?? null;
 
-  // Prop metrics (null on normal/war)
   const propMetrics = account.propMetrics ?? null;
   const propRules   = account.propRules   ?? null;
 
-  // Current drawdown from propMetrics (not account root)
   const currentDrawdown      = propMetrics?.currentDrawdownPercent      ?? 0;
   const currentDailyDrawdown = propMetrics?.currentDailyDrawdownPercent ?? 0;
   const currentProfit        = propMetrics?.currentProfitPercent        ?? 0;
@@ -184,34 +182,20 @@ export const AccountCard = ({ account, viewMode = "grid", onEdit, onDelete }) =>
   const dailyDrawdown        = propRules?.dailyDrawdownPercent ?? 0;
   const profitTarget         = propRules?.profitTarget         ?? 0;
 
-  // Trading days
   const tradingDaysDone = propMetrics?.tradingDaysCompleted ?? 0;
   const tradingDaysMin  = propRules?.minTradingDays         ?? 0;
 
-  // Violations
-  const violations     = propRules?.violations?.violationLog ?? [];
-  const lastViolation  = violations[violations.length - 1];
-
-  // Payout
   const payoutEligible       = account.payout?.eligible ?? false;
   const totalPayoutsReceived = propMetrics?.totalPayoutsReceived ?? 0;
 
-  // EA status is fetched live from /ea/status by EAStatusChip below.
-
- 
-
-  // Prop firm name
   const propFirmDisplay = propRules?.propFirmName ?? account.propFirm ?? "Prop Firm";
+  const challengeType   = propRules?.programType  ?? null;
+  const challengePhase  = account.challenge?.phase ?? null;
 
-  // Challenge
-  const challengeType   = propRules?.programType ?? null;
-  const challengePhase  = account.challenge?.phase  ?? null;
-
-  // Behavioural flags
   const hasFlags = account.behaviouralFlags &&
     Object.values(account.behaviouralFlags).some(Boolean);
 
-  // ── List view ──────────────────────────────────────────────
+  // ── List view ──────────────────────────────────────────
   if (viewMode === "list") {
     return (
       <motion.div
@@ -220,8 +204,11 @@ export const AccountCard = ({ account, viewMode = "grid", onEdit, onDelete }) =>
         className="trading-card relative overflow-hidden flex items-center gap-4 cursor-pointer group"
         onClick={() => navigate(`/accounts/${account._id}`)}
       >
-        <div className={cn("absolute left-0 top-0 h-full w-[3px]", TYPE_BAR[account.type])} />
-        <div className="pl-3 pr-4 py-3 flex items-center gap-4 w-full">
+        <div className={cn("absolute left-0 top-0 h-full w-[3px]", cfg.strip)} />
+        <div className="pl-4 pr-4 py-3 flex items-center gap-4 w-full">
+          <div className={cn("h-8 w-8 rounded-lg flex items-center justify-center flex-shrink-0", cfg.iconBg)}>
+            <TypeIcon className={cn("h-4 w-4", cfg.iconText)} />
+          </div>
           <div className="flex-1 min-w-0">
             <p className="text-sm font-semibold text-foreground truncate group-hover:text-primary transition-colors">
               {account.name}
@@ -230,40 +217,21 @@ export const AccountCard = ({ account, viewMode = "grid", onEdit, onDelete }) =>
               {isProp ? propFirmDisplay : (account.broker ?? account.platform ?? "—")}
             </p>
           </div>
-
           <AccountTypeBadge type={account.type} />
           <AccountStatusBadge status={account.status} />
-
           <div className="text-right hidden sm:block w-32">
-            <p className="text-sm font-bold font-mono text-foreground">
-              {formatCurrency(accountSize)}
-            </p>
+            <p className="text-sm font-bold font-mono text-foreground">{formatCurrency(accountSize)}</p>
             {!isProp && (
               <p className={cn("text-xs font-mono", getPnLColor(pnl))}>
                 {pnl >= 0 ? "+" : ""}{formatCurrency(Math.abs(pnl))}
               </p>
             )}
           </div>
-
           <div className="hidden md:flex items-center gap-6">
-            <StatCell
-              label="Win Rate"
-              value={winRate !== null ? `${winRate.toFixed(1)}%` : "—"}
-              valueClass={winRateColor(winRate)}
-            />
-            <StatCell
-              label="Avg R:R"
-              value={avgRR !== null ? `${avgRR.toFixed(2)}:1` : "—"}
-              valueClass={avgRRColor(avgRR)}
-            />
-            <StatCell
-              label={isProp ? "Days" : "Trades"}
-              value={isProp
-                ? `${tradingDaysDone}/${tradingDaysMin}`
-                : (totalTrades ?? "—")}
-            />
+            <StatCell label="Win Rate" value={winRate !== null ? `${winRate.toFixed(1)}%` : "—"} valueClass={winRateColor(winRate)} />
+            <StatCell label="Avg R:R"  value={avgRR   !== null ? `${avgRR.toFixed(2)}:1`  : "—"} valueClass={avgRRColor(avgRR)} />
+            <StatCell label={isProp ? "Days" : "Trades"} value={isProp ? `${tradingDaysDone}/${tradingDaysMin}` : (totalTrades ?? "—")} />
           </div>
-
           <div className="flex items-center gap-2 ml-auto" onClick={(e) => e.stopPropagation()}>
             <EAStatusChip account={account} />
             <Actions account={account} onEdit={onEdit} onDelete={onDelete} navigate={navigate} />
@@ -273,43 +241,54 @@ export const AccountCard = ({ account, viewMode = "grid", onEdit, onDelete }) =>
     );
   }
 
-  // ── Grid view ──────────────────────────────────────────────
+  // ── Grid view ──────────────────────────────────────────
   return (
     <motion.div
       variants={staggerItemVariants}
-      whileHover={{ y: -2, transition: { duration: 0.15 } }}
+      whileHover={{ y: -3, transition: { duration: 0.15 } }}
       whileTap={{ scale: 0.99 }}
-      className="trading-card relative overflow-hidden flex flex-col cursor-pointer group"
+      className="trading-card flex flex-col cursor-pointer group"
+      style={{
+        backgroundImage: `radial-gradient(ellipse at 110% -10%, ${cfg.hex}35 0%, transparent 55%), radial-gradient(circle, ${cfg.hex}18 1.5px, transparent 1.5px)`,
+        backgroundSize: "auto, 22px 22px",
+      }}
       onClick={() => navigate(`/accounts/${account._id}`)}
     >
-      <div className={cn("absolute left-0 top-0 h-full w-[3px]", TYPE_BAR[account.type])} />
+      {/* Top accent strip */}
+      <div className={cn("h-[4px] w-full shrink-0", cfg.strip)} />
 
-      <div className="p-4 pl-5 flex flex-col gap-3">
-        {/* ── Header ─────────────────────────────── */}
-        <div className="flex items-start justify-between gap-2">
-          <div className="min-w-0 flex-1">
-            <p className="text-sm font-semibold text-foreground truncate group-hover:text-primary transition-colors">
-              {account.name}
-            </p>
-            <p className="text-xs text-muted-foreground truncate mt-0.5">
-              {isProp
-                ? `${propFirmDisplay} · ${account.platform ?? "—"}`
-                : account.broker
-                ? `${account.broker} · ${account.platform ?? "—"}`
-                : (account.platform ?? "—")}
-            </p>
+      <div className="relative flex flex-col flex-1 p-5 gap-4">
+
+        {/* ── Header ─────────────────────────────────── */}
+        <div className="flex items-start justify-between gap-3">
+          <div className="flex items-center gap-2.5 min-w-0 flex-1">
+            <div className={cn("h-8 w-8 rounded-lg flex items-center justify-center flex-shrink-0", cfg.iconBg)}>
+              <TypeIcon className={cn("h-3.5 w-3.5", cfg.iconText)} />
+            </div>
+            <div className="min-w-0">
+              <p className="text-[13px] font-semibold text-foreground truncate group-hover:text-primary transition-colors leading-snug">
+                {account.name}
+              </p>
+              <p className="text-[11px] text-muted-foreground truncate">
+                {isProp
+                  ? `${propFirmDisplay} · ${account.platform ?? "—"}`
+                  : account.broker
+                  ? `${account.broker} · ${account.platform ?? "—"}`
+                  : (account.platform ?? "—")}
+              </p>
+            </div>
           </div>
-          <div className="flex items-center gap-1 flex-shrink-0">
+          <div className="flex flex-col items-end gap-1 flex-shrink-0">
             <AccountTypeBadge type={account.type} />
             <AccountStatusBadge status={account.status} />
           </div>
         </div>
 
-        {/* ── Balance / Account Size ─────────────── */}
+        {/* ── Balance — raw typography, no box ────────── */}
         <div>
-          <div className="flex items-center gap-1 mb-0.5">
-            <p className="text-[10px] text-muted-foreground uppercase tracking-wider">
-              {isProp ? "Account Size" : "Starting Balance"}
+          <div className="flex items-center gap-1 mb-1.5">
+            <p className="text-[9px] font-medium text-muted-foreground uppercase tracking-widest">
+              {isProp ? "Account Size" : "Balance"}
             </p>
             <InfoTooltip
               content={isProp
@@ -318,79 +297,72 @@ export const AccountCard = ({ account, viewMode = "grid", onEdit, onDelete }) =>
               side="top"
             />
           </div>
-          <p className="text-xl font-bold font-mono text-foreground leading-none">
-            {formatCurrency(accountSize)}
-          </p>
-          {isProp ? (
-            <p className={cn(
-              "text-xs font-mono mt-0.5",
-              currentProfit >= 0
-                ? "text-[var(--profit)]"
-                : "text-[var(--loss)]"
-            )}>
-              {currentProfit >= 0 ? "+" : ""}{currentProfit.toFixed(2)}% profit
+          <div className="flex items-baseline gap-2.5">
+            <p className="text-[26px] font-bold font-mono text-foreground leading-none tracking-tight">
+              {formatCurrency(accountSize)}
             </p>
-          ) : (
-            <p className={cn("text-xs font-mono mt-0.5", getPnLColor(pnl))}>
-              {pnl >= 0 ? "+" : ""}{formatCurrency(Math.abs(pnl))}
-            </p>
-          )}
+            {isProp ? (
+              <span className={cn(
+                "text-[11px] font-mono font-medium",
+                currentProfit >= 0 ? "text-[var(--profit)]" : "text-[var(--loss)]"
+              )}>
+                {currentProfit >= 0 ? "+" : ""}{currentProfit.toFixed(2)}%
+              </span>
+            ) : (
+              <span className={cn("text-[11px] font-mono font-medium", getPnLColor(pnl))}>
+                {pnl >= 0 ? "+" : ""}{formatCurrency(Math.abs(pnl))}
+              </span>
+            )}
+          </div>
         </div>
 
-        {/* ── Stats row ──────────────────────────── */}
-        <div className="grid grid-cols-3 gap-2 pt-2 border-t border-border">
-          <StatCell
-            label="Win Rate"
-            value={winRate !== null ? `${winRate.toFixed(1)}%` : "—"}
-            valueClass={winRateColor(winRate)}
-            tooltip="Win rate from all closed trades"
-          />
-          <StatCell
-            label="Avg R:R"
-            value={avgRR !== null ? `${avgRR.toFixed(2)}:1` : "—"}
-            valueClass={avgRRColor(avgRR)}
-            tooltip="Average reward to risk ratio"
-          />
-          <StatCell
-            label={isProp ? "Trade Days" : "Trades"}
-            value={isProp
-              ? `${tradingDaysDone}/${tradingDaysMin}`
-              : (totalTrades ?? "—")}
-            tooltip={isProp
-              ? "Trading days completed vs minimum required"
-              : "Total closed trades"}
-          />
+        {/* ── Stats — floating inline with dividers, no box ── */}
+        <div className="flex items-stretch divide-x divide-border/50">
+          <div className="flex-1 flex flex-col items-center gap-0.5 pr-3">
+            <p className="text-[9px] text-muted-foreground uppercase tracking-wider">Win Rate</p>
+            <p className={cn("text-[13px] font-mono font-semibold tabular-nums", winRateColor(winRate))}>
+              {winRate !== null ? `${winRate.toFixed(1)}%` : "—"}
+            </p>
+          </div>
+          <div className="flex-1 flex flex-col items-center gap-0.5 px-3">
+            <p className="text-[9px] text-muted-foreground uppercase tracking-wider">Avg R:R</p>
+            <p className={cn("text-[13px] font-mono font-semibold tabular-nums", avgRRColor(avgRR))}>
+              {avgRR !== null ? `${avgRR.toFixed(2)}:1` : "—"}
+            </p>
+          </div>
+          <div className="flex-1 flex flex-col items-center gap-0.5 pl-3">
+            <p className="text-[9px] text-muted-foreground uppercase tracking-wider">
+              {isProp ? "Trade Days" : "Trades"}
+            </p>
+            <p className="text-[13px] font-mono font-semibold text-foreground tabular-nums">
+              {isProp ? `${tradingDaysDone}/${tradingDaysMin}` : (totalTrades ?? "—")}
+            </p>
+          </div>
         </div>
 
-        {/* ── Prop challenge section ─────────────── */}
+        {/* ── Prop challenge section ───────────────────── */}
         {isProp && propRules && propMetrics && (
-          <div className="space-y-2 pt-1 border-t border-border">
-            {/* Challenge label */}
+          <div className="space-y-2.5">
             {challengeType && challengePhase && (
-              <p className="text-[10px] text-muted-foreground uppercase tracking-wider">
+              <p className="text-[9px] font-medium text-muted-foreground uppercase tracking-widest">
                 {challengeType.replace("_", "-")} · Phase {challengePhase}
               </p>
             )}
 
-            {/* Profit Target */}
             <PropBar
               label="Profit Target"
               current={currentProfit}
               target={profitTarget}
               colorMode="profit"
-              tooltip={`Current profit vs target needed to pass. Need ${profitTarget}% to pass this phase.`}
+              tooltip={`Need ${profitTarget}% to pass this phase.`}
             />
-
-            {/* Max Drawdown */}
             <PropBar
               label="Max Drawdown"
               current={currentDrawdown}
               target={maxDrawdown}
               colorMode="drawdown"
-              tooltip={`Current drawdown vs maximum allowed. Account blown at ${maxDrawdown}%.`}
+              tooltip={`Account blown at ${maxDrawdown}%.`}
             />
-
-            {/* Daily Drawdown */}
             {dailyDrawdown > 0 && (
               <PropBar
                 label="Daily Drawdown"
@@ -401,54 +373,56 @@ export const AccountCard = ({ account, viewMode = "grid", onEdit, onDelete }) =>
               />
             )}
 
-            {/* Payout */}
-            <div className="flex items-center justify-between pt-1">
+            <div className="flex items-center justify-between pt-0.5">
               {payoutEligible ? (
                 <Badge
                   variant="outline"
-                  className="text-[10px] bg-[var(--profit)]/10 text-[var(--profit)] border-[var(--profit)]/20"
+                  className="text-[9px] h-4 bg-[var(--profit)]/10 text-[var(--profit)] border-[var(--profit)]/20"
                 >
                   Payout Eligible ✓
                 </Badge>
               ) : (
-                <p className="text-[10px] text-muted-foreground">Not eligible yet</p>
+                <span className="text-[10px] text-muted-foreground">Not payout eligible</span>
               )}
               {totalPayoutsReceived > 0 && (
-                <p className="text-[10px] text-muted-foreground font-mono">
+                <span className="text-[10px] text-muted-foreground font-mono">
                   Earned: {formatCurrency(totalPayoutsReceived)}
-                </p>
+                </span>
               )}
             </div>
           </div>
         )}
 
-        {/* ── Footer: EA + actions ───────────────── */}
+        {/* ── Behavioural warning ──────────────────────── */}
+        {hasFlags && (
+          <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-md bg-[var(--warning)]/10 border border-[var(--warning)]/20">
+            <span className="text-xs">⚠</span>
+            <p className="text-[11px] text-[var(--warning)] font-medium">Behavioural alert detected</p>
+          </div>
+        )}
+
+        {/* ── Spacer — pushes footer to bottom always ─── */}
+        <div className="flex-1" />
+
+        {/* ── Footer ──────────────────────────────────── */}
         <div
-          className="flex items-center justify-between pt-1 border-t border-border"
+          className="flex items-center justify-between pt-3 border-t border-border/60"
           onClick={(e) => e.stopPropagation()}
         >
           <EAStatusChip account={account} />
           <Actions account={account} onEdit={onEdit} onDelete={onDelete} navigate={navigate} />
         </div>
-
-        {/* ── Behavioural warning ────────────────── */}
-        {hasFlags && (
-          <div className="flex items-center gap-1.5 px-2 py-1.5 rounded-md bg-[var(--warning)]/10 border border-[var(--warning)]/20 -mx-1">
-            <span className="text-xs">⚠</span>
-            <p className="text-[11px] text-[var(--warning)] font-medium">
-              Behavioural alert detected
-            </p>
-          </div>
-        )}
       </div>
     </motion.div>
   );
 };
 
+// ── Skeleton — prop-firm height, no inner boxes ───────────
 export const AccountCardSkeleton = ({ viewMode = "grid" }) => {
   if (viewMode === "list") {
     return (
       <div className="trading-card p-3 flex items-center gap-4">
+        <Skeleton className="h-8 w-8 rounded-lg flex-shrink-0" />
         <div className="flex-1 space-y-1.5">
           <Skeleton className="h-4 w-32" />
           <Skeleton className="h-3 w-20" />
@@ -460,7 +434,7 @@ export const AccountCardSkeleton = ({ viewMode = "grid" }) => {
         </div>
         <div className="hidden md:flex gap-6">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="space-y-1">
+            <div key={i} className="space-y-1 flex flex-col items-center">
               <Skeleton className="h-2.5 w-12" />
               <Skeleton className="h-4 w-14" />
             </div>
@@ -475,32 +449,92 @@ export const AccountCardSkeleton = ({ viewMode = "grid" }) => {
   }
 
   return (
-    <div className="trading-card p-4 flex flex-col gap-3">
-      <div className="flex items-start justify-between">
-        <div className="space-y-1.5 flex-1">
-          <Skeleton className="h-4 w-32" />
-          <Skeleton className="h-3 w-20" />
-        </div>
-        <Skeleton className="h-5 w-16 rounded-full" />
-      </div>
-      <div className="space-y-1">
-        <Skeleton className="h-3 w-14" />
-        <Skeleton className="h-6 w-28" />
-        <Skeleton className="h-3 w-20" />
-      </div>
-      <div className="grid grid-cols-3 gap-2 pt-1 border-t border-border">
-        {[1, 2, 3].map((i) => (
-          <div key={i} className="space-y-1">
-            <Skeleton className="h-2.5 w-12" />
-            <Skeleton className="h-4 w-16" />
+    <div className="trading-card flex flex-col">
+      {/* Top strip */}
+      <Skeleton className="h-[4px] w-full rounded-none shrink-0" />
+
+      {/* Matching dot-grid so skeleton has the same texture as the real card */}
+      <div
+        className="absolute inset-0 pointer-events-none opacity-40"
+        style={{
+          backgroundImage: "radial-gradient(circle, hsl(var(--muted-foreground)/0.15) 1.5px, transparent 1.5px)",
+          backgroundSize: "22px 22px",
+        }}
+      />
+
+      <div className="flex flex-col flex-1 p-5 gap-4">
+
+        {/* Header */}
+        <div className="flex items-start justify-between gap-3">
+          <div className="flex items-center gap-2.5 flex-1 min-w-0">
+            <Skeleton className="h-8 w-8 rounded-lg flex-shrink-0" />
+            <div className="space-y-1.5 flex-1">
+              <Skeleton className="h-[13px] w-28" />
+              <Skeleton className="h-[11px] w-20" />
+            </div>
           </div>
-        ))}
-      </div>
-      <div className="flex items-center justify-between pt-1 border-t border-border">
-        <Skeleton className="h-3 w-16" />
-        <div className="flex gap-1">
-          <Skeleton className="h-7 w-14" />
-          <Skeleton className="h-7 w-7" />
+          <div className="flex flex-col gap-1 items-end">
+            <Skeleton className="h-5 w-12 rounded-full" />
+            <Skeleton className="h-5 w-16 rounded-full" />
+          </div>
+        </div>
+
+        {/* Balance — two lines, no container */}
+        <div className="space-y-1.5">
+          <Skeleton className="h-[9px] w-14" />
+          <div className="flex items-baseline gap-2.5">
+            <Skeleton className="h-[26px] w-36" />
+            <Skeleton className="h-[11px] w-12" />
+          </div>
+        </div>
+
+        {/* Stats — three floating columns */}
+        <div className="flex items-center divide-x divide-border/50">
+          {[1, 2, 3].map((i) => (
+            <div
+              key={i}
+              className={cn(
+                "flex-1 flex flex-col items-center gap-1",
+                i === 1 ? "pr-3" : i === 2 ? "px-3" : "pl-3"
+              )}
+            >
+              <Skeleton className="h-[9px] w-10" />
+              <Skeleton className="h-[13px] w-12" />
+            </div>
+          ))}
+        </div>
+
+        {/* Prop challenge section (always shown — sets prop firm height) */}
+        <div className="space-y-2.5">
+          <Skeleton className="h-[9px] w-24" />
+
+          {/* Progress bar × 2 */}
+          {[1, 2].map((i) => (
+            <div key={i} className="space-y-1.5">
+              <div className="flex items-center justify-between">
+                <Skeleton className="h-[10px] w-20" />
+                <Skeleton className="h-[10px] w-16" />
+              </div>
+              <Skeleton className="h-[3px] w-full rounded-full" />
+            </div>
+          ))}
+
+          {/* Payout row */}
+          <div className="flex items-center justify-between pt-0.5">
+            <Skeleton className="h-4 w-28 rounded-full" />
+          </div>
+        </div>
+
+        {/* Spacer */}
+        <div className="flex-1" />
+
+        {/* Footer */}
+        <div className="flex items-center justify-between pt-3 border-t border-border/60">
+          <Skeleton className="h-3 w-16" />
+          <div className="flex gap-1">
+            <Skeleton className="h-7 w-14" />
+            <Skeleton className="h-7 w-7 rounded-md" />
+          </div>
         </div>
       </div>
     </div>

@@ -70,3 +70,45 @@ export const getPnLBg = (value) => {
   if (value < 0) return "bg-[var(--loss)]/10 text-[var(--loss)]";
   return "bg-muted text-muted-foreground";
 };
+
+// formatRR: "1:2.64" for positive, "−1:1.00" for negative, "—" for null
+export const formatRR = (value) => {
+  if (value === null || value === undefined) return "—";
+  const n = Number(value);
+  if (n >= 0) return `1:${n.toFixed(2)}`;
+  return `−1:${Math.abs(n).toFixed(2)}`;
+};
+
+// formatPips: "+50.0 pips" — returns "—" for null (non-pip instruments)
+export const formatPips = (value) => {
+  if (value === null || value === undefined) return "—";
+  const n = Number(value);
+  const prefix = n > 0 ? "+" : "";
+  return `${prefix}${n.toFixed(1)} pips`;
+};
+
+// formatPrice: correct decimal places per instrument
+export const formatPrice = (value, pair) => {
+  if (value === null || value === undefined) return "—";
+  const n = Number(value);
+  if (!pair) return n.toFixed(5);
+  const p = pair.toUpperCase();
+  if (p.includes("JPY")) return n.toFixed(3);
+  if (p.startsWith("XAU") || p.startsWith("XAG") || p.startsWith("XPT") || p.startsWith("XPD")) return n.toFixed(2);
+  if (p.startsWith("BTC") || p.startsWith("ETH") || p.startsWith("LTC") || p.startsWith("XRP")) return n.toFixed(2);
+  if (["US30", "US500", "SPX", "NAS", "GER", "UK100", "JPN"].some((i) => p.includes(i))) return n.toFixed(2);
+  return n.toFixed(5);
+};
+
+// formatDuration: from two dates — "1d 4h", "2h 15m", "30m", "—"
+export const formatDuration = (start, end) => {
+  if (!start || !end) return "—";
+  const diffMs = new Date(end).getTime() - new Date(start).getTime();
+  if (diffMs < 0) return "—";
+  const mins = Math.floor(diffMs / 60000);
+  const hours = Math.floor(mins / 60);
+  const days = Math.floor(hours / 24);
+  if (days > 0) return `${days}d ${hours % 24}h`;
+  if (hours > 0) return `${hours}h ${mins % 60}m`;
+  return `${mins}m`;
+};

@@ -1,20 +1,30 @@
 import { useMemo, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Zap, Pause, Play, AlertTriangle } from "lucide-react";
+import { Zap, Pause, Play, AlertTriangle, ExternalLink } from "lucide-react";
+import { format } from "date-fns";
 
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 import { AccountTypeBadge } from "@/components/accounts/AccountTypeBadge";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { EAStatusDot } from "@/components/ea/EAStatusIndicator";
 import { VerificationBadge } from "@/components/ea/VerificationBadge";
-import { SyncHistory } from "@/components/ea/SyncHistory";
+import { DirectionBadge } from "@/components/trades/DirectionBadge";
+import { Pagination } from "@/components/shared/Pagination";
 
 import { useAccounts } from "@/hooks/useAccounts";
 import { useEAStatus } from "@/hooks/useEA";
-import { formatRelativeTime, formatCompact } from "@/utils/format";
+import { useTrades } from "@/hooks/useTrades";
+import { formatRelativeTime, formatCompact, formatPnL, getPnLColor } from "@/utils/format";
 import { pageVariants, staggerContainerVariants, staggerItemVariants } from "@/lib/animations";
 import { cn } from "@/lib/utils";
 
@@ -142,6 +152,118 @@ const EAAccountCard = ({ account, pollingActive }) => {
   );
 };
 
+// ── EA Trade History ──────────────────────────────────────────
+const EATradeHistory = ({ eaAccounts }) => {
+  const [page, setPage]           = useState(1);
+  const [accountId, setAccountId] = useState("all");
+
+  const filters = useMemo(() => ({
+    source:    "ea",
+    page,
+    limit:     10,
+    sort:      "closedAt_desc",
+    ...(accountId !== "all" ? { accountId } : {}),
+  }), [page, accountId]);
+
+  const { data, isLoading } = useTrades(filters);
+  const trades     = data?.trades     ?? [];
+  const pagination = data?.pagination ?? {};
+
+  const showAccountFilter = eaAccounts.length > 1;
+
+  return (
+    <div className="trading-card overflow-hidden">
+      {/* Header */}
+      <div className="flex items-center justify-between px-4 py-3 border-b border-border gap-3 flex-wrap">
+        <p className="text-sm font-semibold text-foreground">EA Trade History</p>
+        <div className="flex items-center gap-2">
+          {showAccountFilter && (
+            <Select
+              value={accountId}
+              onValueChange={(v) => { setAccountId(v); setPage(1); }}
+            >
+              <SelectTrigger className="h-7 text-xs w-40">
+                <SelectValue placeholder="All accounts" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All accounts</SelectItem>
+                {eaAccounts.map((a) => (
+                  <SelectItem key={a._id} value={a._id}>{a.name}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
+          <Link
+            to={`/trades?source=ea${accountId !== "all" ? `&accountId=${accountId}` : ""}`}
+            className="flex items-center gap-1 text-[11px] text-muted-foreground hover:text-foreground transition-colors"
+          >
+            View all <ExternalLink className="h-3 w-3" />
+          </Link>
+        </div>
+      </div>
+
+      {/* Table */}
+      {isLoading ? (
+        <div className="divide-y divide-border">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <div key={i} className="flex items-center gap-3 px-4 py-3">
+              <Skeleton className="h-3 w-16" />
+              <Skeleton className="h-3 w-10" />
+              <Skeleton className="h-3 w-10 ml-auto" />
+              <Skeleton className="h-3 w-16" />
+            </div>
+          ))}
+        </div>
+      ) : trades.length === 0 ? (
+        <div className="py-10 text-center">
+          <p className="text-sm font-medium text-foreground">No EA trades yet</p>
+          <p className="text-xs text-muted-foreground mt-1">Trades synced by your Expert Advisor will appear here</p>
+        </div>
+      ) : (
+        <>
+          {/* Column headers */}
+          <div className="grid grid-cols-[1fr_auto_auto_auto_auto] gap-x-4 px-4 py-2 border-b border-border bg-muted/20">
+            {["Pair", "Dir", "Lots", "Closed", "Net P&L"].map((h) => (
+              <p key={h} className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider text-right first:text-left">{h}</p>
+            ))}
+          </div>
+
+          <div className="divide-y divide-border">
+            {trades.map((trade) => (
+              <div
+                key={trade._id}
+                className="grid grid-cols-[1fr_auto_auto_auto_auto] gap-x-4 items-center px-4 py-2.5 hover:bg-muted/30 transition-colors"
+              >
+                <p className="text-xs font-mono font-semibold text-foreground">{trade.pair ?? "—"}</p>
+                <DirectionBadge direction={trade.direction} size="xs" />
+                <p className="text-[11px] font-mono text-muted-foreground text-right">{trade.lotSize != null ? Number(trade.lotSize).toFixed(2) : "—"}</p>
+                <p className="text-[11px] font-mono text-muted-foreground text-right">
+                  {trade.closedAt ? format(new Date(trade.closedAt), "MMM d") : "—"}
+                </p>
+                <p className={cn("text-xs font-mono font-bold text-right", getPnLColor(trade.netPnl ?? trade.pnl))}>
+                  {formatPnL(trade.netPnl ?? trade.pnl)}
+                </p>
+              </div>
+            ))}
+          </div>
+
+          {pagination.totalPages > 1 && (
+            <div className="px-4 py-3 border-t border-border">
+              <Pagination
+                page={pagination.page}
+                totalPages={pagination.totalPages}
+                total={pagination.total}
+                limit={pagination.limit}
+                onPageChange={setPage}
+              />
+            </div>
+          )}
+        </>
+      )}
+    </div>
+  );
+};
+
 // ── Stats summary bar ─────────────────────────────────────────
 const EAStatsBar = ({ accounts }) => {
   const stats = useMemo(() => {
@@ -258,12 +380,9 @@ export const EASync = () => {
         </motion.div>
       )}
 
-      {/* ── Sync history ── */}
-      {!isLoading && eaAccounts.length > 0 && eaAccounts[0] && (
-        <div>
-          <h2 className="text-sm font-semibold text-foreground mb-3">Recent Sync Activity</h2>
-          <SyncHistory accountId={eaAccounts[0]._id} compact={false} />
-        </div>
+      {/* ── EA trade history ── */}
+      {!isLoading && eaAccounts.length > 0 && (
+        <EATradeHistory eaAccounts={eaAccounts} />
       )}
     </motion.div>
   );

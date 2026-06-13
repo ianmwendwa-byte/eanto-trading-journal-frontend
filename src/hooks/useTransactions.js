@@ -34,14 +34,20 @@ export const useTransactionSummary = (filters = {}, options = {}) => {
 };
 
 // ── Balance history (equity curve) ───────────────────────────
-export const useBalanceHistory = (filters = {}, options = {}) =>
-  useQuery({
-    queryKey:  transactionKeys.history(filters),
-    queryFn:   () => api.get(API.TRANSACTION.BALANCE_HISTORY, { params: filters }),
-    select:    (data) => data?.data ?? [],
-    enabled:   options.enabled !== false,
+export const useBalanceHistory = ({ accountId, ...filters } = {}, options = {}) => {
+  const { isAuthenticated } = useAuthStore();
+  const url = accountId
+    ? API.TRANSACTION.ACCOUNT_BALANCE_HISTORY(accountId)
+    : API.TRANSACTION.BALANCE_HISTORY;
+
+  return useQuery({
+    queryKey:  transactionKeys.history({ accountId, ...filters }),
+    queryFn:   () => api.get(url, { params: filters }),
+    select:    (data) => (Array.isArray(data) ? data : (data?.data ?? [])),
+    enabled:   isAuthenticated && options.enabled !== false,
     staleTime: 2 * 60 * 1000,
   });
+};
 
 // ── Transaction type distribution ────────────────────────────
 export const useTransactionDistribution = (filters = {}) => {

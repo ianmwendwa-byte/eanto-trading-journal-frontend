@@ -20,7 +20,7 @@ export const useTrades = (filters = {}) => {
   const { isAuthenticated } = useAuthStore();
   const {
     page = 1, limit = 20, accountId, pair, direction, outcome,
-    session, weekday, dateFrom, dateTo, sort = "closedAt_desc", search,
+    session, weekday, dateFrom, dateTo, sort = "closedAt_desc", search, source,
   } = filters;
   const { sortBy, sortOrder } = SORT_MAP[sort] ?? SORT_MAP.closedAt_desc;
 
@@ -35,6 +35,7 @@ export const useTrades = (filters = {}) => {
     ...(dateFrom  ? { dateFrom }  : {}),
     ...(dateTo    ? { dateTo }    : {}),
     ...(search    ? { search }    : {}),
+    ...(source    ? { source }    : {}),
   };
 
   return useQuery({

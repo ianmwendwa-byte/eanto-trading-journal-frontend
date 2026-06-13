@@ -118,7 +118,7 @@ export const Accounts = () => {
             ? "grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4"
             : "flex flex-col gap-3"
         }>
-          {Array.from({ length: 6 }).map((_, i) => (
+          {Array.from({ length: PAGE_SIZE }).map((_, i) => (
             <AccountCardSkeleton key={i} viewMode={viewMode} />
           ))}
         </div>

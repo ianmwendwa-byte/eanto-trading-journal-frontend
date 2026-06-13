@@ -1,7 +1,7 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, ArrowRight } from "lucide-react";
+import { ArrowLeft, ArrowRight, TrendingUp } from "lucide-react";
 import Logo from "@/components/shared/Logo";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -24,9 +24,9 @@ import {
   buildOnboardingPayload,
 } from "@/hooks/useOnboarding";
 import { useUpdateDashboardPreferences } from "@/hooks/useDashboard";
+import { useAccounts } from "@/hooks/useAccounts";
 import { useAuthStore } from "@/store/useAuthStore";
 import { DEFAULT_WIDGETS } from "@/constants/widgets";
-import { cn } from "@/lib/utils";
 
 // ── Widget presets per trader type ────────────────────────────
 const widgetPresets = {
@@ -110,11 +110,11 @@ const loadDraft = (key) => {
 const saveDraft = (key, step, wizardData) => {
   try {
     localStorage.setItem(key, JSON.stringify({ step, wizardData }));
-  } catch {}
+  } catch { /* storage unavailable — ignore */ }
 };
 
 const clearDraft = (key) => {
-  try { localStorage.removeItem(key); } catch {}
+  try { localStorage.removeItem(key); } catch { /* storage unavailable — ignore */ }
 };
 
 // ── Profile validity heuristic from saved data ────────────────
@@ -125,8 +125,16 @@ const profileValidFromDraft = (d) =>
 // ── Main component ────────────────────────────────────────────
 export const Onboarding = () => {
   const navigate   = useNavigate();
-  const direction  = useRef(1);
+  const [direction, setDirection] = useState(1);
   const { mongoUser } = useAuthStore();
+
+  // Live check — completedSteps flag is only set after the full wizard completes,
+  // so also check the accounts API directly so a pre-existing account hides step 5.
+  const { data: accountsData } = useAccounts({ limit: 1 });
+  const hasAccount =
+    (mongoUser?.onboarding?.completedSteps?.includes("first_account_created") ?? false) ||
+    (accountsData?.accounts?.length ?? 0) > 0;
+  const totalSteps = hasAccount ? 4 : 5;
 
   // Draft key is user-specific so different accounts don't share state
   const draftKey = makeDraftKey(mongoUser?._id);
@@ -138,10 +146,13 @@ export const Onboarding = () => {
     try { return loadDraft(draftKey); } catch { return null; }
   })();
 
-  // Restore step: jump past welcome if returning to a draft
-  const [step, setStep] = useState(
-    () => (draft?.step >= 1 ? draft.step : 0)
-  );
+  // Restore step: jump past welcome if returning to a draft.
+  // Cap at totalSteps so a draft at step 5 doesn't render step 5
+  // when the user has since created an account.
+  const [step, setStep] = useState(() => {
+    const draftStep = draft?.step >= 1 ? draft.step : 0;
+    return Math.min(draftStep, totalSteps);
+  });
 
   // Restore wizard data, merging with defaults so added fields always exist
   const [wizardData, setWizardData] = useState(
@@ -181,12 +192,12 @@ export const Onboarding = () => {
     setWizardData((prev) => ({ ...prev, ...updates }));
 
   const goNext = () => {
-    direction.current = 1;
+    setDirection(1);
     setStep((s) => s + 1);
   };
 
   const goBack = () => {
-    direction.current = -1;
+    setDirection(-1);
     setStep((s) => s - 1);
   };
 
@@ -199,7 +210,9 @@ export const Onboarding = () => {
   };
 
   // ── Final submit ────────────────────────────────────────────
-  const handleAccountCreated = async () => {
+  // accountWasCreated: true when account just created in step 5,
+  // false when the user skipped step 5 (no account made this session).
+  const handleAccountCreated = async (accountWasCreated = false) => {
     setIsSubmitting(true);
     try {
       const payload = buildOnboardingPayload(wizardData);
@@ -220,7 +233,15 @@ export const Onboarding = () => {
       clearDraft(draftKey);
 
       toast.success("Welcome to Kraviq. Let's get to work.");
-      navigate("/dashboard");
+
+      // Only go to the dashboard when there's at least one account.
+      // accountWasCreated covers the case where the account was just made
+      // in this step; hasAccount covers accounts created before onboarding.
+      if (accountWasCreated || hasAccount) {
+        navigate("/dashboard");
+      } else {
+        navigate("/accounts");
+      }
     } catch {
       setIsSubmitting(false);
     }
@@ -239,7 +260,7 @@ export const Onboarding = () => {
       <div className="hidden lg:flex w-[38%] bg-card/60 border-r border-border flex-col p-8 justify-between">
         {/* Logo */}
         <div>
-          <Logo variant="horizontal" size="sm" />
+          <Logo variant="horizontal" size="lg" />
         </div>
 
         {/* Context content */}
@@ -299,14 +320,14 @@ export const Onboarding = () => {
         <div className="flex-1 flex flex-col items-center justify-center px-6 py-8">
           <div className="w-full max-w-lg space-y-6">
             {/* Step indicator */}
-            <StepIndicator currentStep={step} />
+            <StepIndicator currentStep={step} totalSteps={totalSteps} />
 
             {/* Step content — direction-aware slide */}
-            <div className="min-h-[420px]">
-              <AnimatePresence mode="wait" custom={direction.current}>
+            <div className="min-h-105">
+              <AnimatePresence mode="wait" custom={direction}>
                 <motion.div
                   key={step}
-                  custom={direction.current}
+                  custom={direction}
                   variants={variants}
                   initial="initial"
                   animate="animate"
@@ -328,18 +349,19 @@ export const Onboarding = () => {
                   {step === 4 && (
                     <PreferencesStep wizardData={wizardData} onChange={updateWizard} />
                   )}
-                  {step === 5 && (
+                  {step === 5 && !hasAccount && (
                     <AccountCreationStep
                       wizardData={wizardData}
-                      onAccountCreated={handleAccountCreated}
-                      onSkip={() => skip()}
+                      onAccountCreated={() => handleAccountCreated(true)}
+                      onSkip={() => handleAccountCreated(false)}
                     />
                   )}
                 </motion.div>
               </AnimatePresence>
             </div>
 
-            {/* Navigation buttons (steps 1–4 only; step 5 has its own) */}
+            {/* Navigation buttons — steps 1–4 always; step 5 (AccountCreationStep)
+                has its own internal buttons and is only rendered when !hasAccount. */}
             {step < 5 && (
               <div className="space-y-3">
                 <div className="flex gap-3">
@@ -351,11 +373,16 @@ export const Onboarding = () => {
                   )}
                   <Button
                     className="flex-1"
-                    onClick={goNext}
-                    disabled={!canContinue()}
+                    // Step 4 + account already exists → skip step 5, submit directly
+                    onClick={step === 4 && hasAccount ? handleAccountCreated : goNext}
+                    disabled={!canContinue() || isSubmitting}
                   >
-                    {step === 4 ? "Almost done →" : "Continue"}
-                    {step < 4 && <ArrowRight className="ml-2 h-4 w-4" />}
+                    {step === 4 && hasAccount
+                      ? isSubmitting ? "Completing…" : "Complete Setup"
+                      : step === 4
+                      ? "Almost done →"
+                      : <>Continue <ArrowRight className="ml-2 h-4 w-4" /></>
+                    }
                   </Button>
                 </div>
 
