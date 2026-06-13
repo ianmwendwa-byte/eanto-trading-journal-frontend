@@ -306,7 +306,8 @@ export const AddTradeSheet = ({ isOpen, onClose, defaultAccountId }) => {
     <Sheet open={isOpen} onOpenChange={(open) => !open && handleClose()}>
       <SheetContent
         side="right"
-        className="w-full sm:w-[580px] bg-card border-l border-border p-0 flex flex-col [&>button:first-of-type]:hidden"
+        showCloseButton={false}
+        className="w-full sm:w-[580px] bg-card border-l border-border p-0 flex flex-col"
       >
         {/* ── Header ──────────────────────────────────── */}
         <SheetHeader className="px-5 pt-5 pb-4 border-b border-border flex-shrink-0">

@@ -1,6 +1,5 @@
-import { X, ExternalLink } from "lucide-react";
+import { ExternalLink } from "lucide-react";
 import { Link } from "react-router-dom";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { AccountTypeBadge } from "@/components/accounts/AccountTypeBadge";
@@ -81,11 +80,8 @@ export const TransactionDetailSheet = ({ transaction, onClose, onTradeClick }) =
   return (
     <div className="flex flex-col h-full">
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-border flex-shrink-0">
+      <div className="px-4 py-3 border-b border-border flex-shrink-0">
         <p className="text-sm font-semibold text-foreground">Transaction Details</p>
-        <Button variant="ghost" size="icon" className="h-7 w-7" onClick={onClose}>
-          <X className="h-4 w-4" />
-        </Button>
       </div>
 
       {/* Content */}

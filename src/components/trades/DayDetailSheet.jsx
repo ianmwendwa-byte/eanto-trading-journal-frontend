@@ -1,5 +1,4 @@
 ﻿import { format } from "date-fns";
-import { X } from "lucide-react";
 import {
   Sheet, SheetContent, SheetHeader, SheetTitle,
 } from "@/components/ui/sheet";
@@ -28,17 +27,9 @@ export const DayDetailSheet = ({
       >
         {/* Header */}
         <SheetHeader className="px-5 pt-5 pb-4 border-b border-border flex-shrink-0">
-          <div className="flex items-center justify-between">
-            <SheetTitle className="font-heading text-base font-semibold">
-              {parsedDate ? format(parsedDate, "EEEE, MMM d, yyyy") : "—"}
-            </SheetTitle>
-            <button
-              onClick={onClose}
-              className="h-7 w-7 rounded-md flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
-            >
-              <X className="h-4 w-4" />
-            </button>
-          </div>
+          <SheetTitle className="font-heading text-base font-semibold">
+            {parsedDate ? format(parsedDate, "EEEE, MMM d, yyyy") : "—"}
+          </SheetTitle>
         </SheetHeader>
 
         <div className="flex-1 overflow-y-auto">
