@@ -1,24 +1,40 @@
 import { useState, useRef, useCallback } from "react";
-import { X, Trash2, AlertTriangle, HelpCircle, CheckCircle2 } from "lucide-react";
+import {
+  X, Trash2, AlertTriangle, HelpCircle, CheckCircle2,
+  RefreshCw, Loader2, BookOpen, Pencil,
+} from "lucide-react";
 import { format } from "date-fns";
+import { Link } from "react-router-dom";
 import { Button }    from "@/components/ui/button";
 import { Textarea }  from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
+import { Skeleton }  from "@/components/ui/skeleton";
 import {
   AlertDialog, AlertDialogContent, AlertDialogDescription,
   AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import {
+  Dialog, DialogContent, DialogHeader, DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+} from "@/components/ui/select";
+import {
   Tooltip, TooltipContent, TooltipProvider, TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { DirectionBadge }      from "./DirectionBadge";
-import { OutcomeBadge }        from "./OutcomeBadge";
-import { SessionBadge }        from "./SessionBadge";
-import { GradeStars }          from "./GradeStars";
-import { PropComplianceBadge } from "./PropComplianceBadge";
-import { DisciplineScoreBadge } from "./DisciplineScoreBadge";
+import { DirectionBadge }         from "./DirectionBadge";
+import { OutcomeBadge }           from "./OutcomeBadge";
+import { SessionBadge, SessionBadges } from "./SessionBadge";
+import { GradeStars }             from "./GradeStars";
+import { PropComplianceBadge }    from "./PropComplianceBadge";
+import { DisciplineScoreBadge }   from "./DisciplineScoreBadge";
+import { SetupCriteriaChecklist } from "@/components/strategy/SetupCriteriaChecklist";
 import { useUpdateTrade, useDeleteTrade } from "@/hooks/useTrades";
-import { formatPnL, formatCurrency, getPnLColor, formatPips } from "@/utils/format";
+import { useCheckCompliance }     from "@/hooks/useTradeCompliance";
+import { useStrategies, useStrategy } from "@/hooks/useStrategies";
+import { useTagTradeStrategy }    from "@/hooks/useTradeStrategy";
+import { useAccountStrategies }   from "@/hooks/useStrategyAssignments";
+import { formatPnL, formatCurrency, getPnLColor, formatPips, formatRelativeTime } from "@/utils/format";
 import { getTradeDuration, isShortDuration } from "@/utils/tradeDuration";
 import { cn } from "@/lib/utils";
 
@@ -42,6 +58,39 @@ const SEVERITY_STYLES = {
   medium:   "bg-[var(--warning)]/10 border-[var(--warning)]/30 text-[var(--warning)]",
   high:     "bg-[var(--loss)]/10 border-[var(--loss)]/30 text-[var(--loss)]",
   critical: "bg-[var(--loss)]/15 border-[var(--loss)]/50 text-[var(--loss)]",
+};
+
+const SEVERITY_ORDER = { critical: 0, high: 1, medium: 2, warning: 3 };
+
+const formatRuleName = (rule) =>
+  rule
+    .replace(/_/g, " ")
+    .toLowerCase()
+    .replace(/\b\w/g, (c) => c.toUpperCase());
+
+const formatViolationValue = (rule, value) => {
+  if (value == null) return null;
+  if (rule.includes("_PERCENT") || rule.includes("RISK") || rule.includes("DRAWDOWN")) {
+    return `${Number(value).toFixed(2)}%`;
+  }
+  if (rule.includes("RR") || rule.includes("_RR")) {
+    return `${Number(value).toFixed(2)}R`;
+  }
+  if (rule.includes("LOT")) {
+    return `${Number(value).toFixed(2)} lots`;
+  }
+  return String(value);
+};
+
+const CHECK_LABELS = {
+  stopLoss:      "Stop Loss",
+  takeProfit:    "Take Profit",
+  riskPercent:   "Risk %",
+  rrRatio:       "RR Ratio",
+  dailyDrawdown: "Daily Drawdown",
+  lotSize:       "Lot Size",
+  session:       "Session",
+  newsWindow:    "News Window",
 };
 
 const getRiskQualityClass = (score) => {
@@ -81,13 +130,326 @@ const CheckRow = ({ label, value }) => (
   </div>
 );
 
-export const TradeDetailPanel = ({ trade, onClose, onDelete }) => {
-  const [deleteOpen, setDeleteOpen] = useState(false);
-  const [savedNote,  setSavedNote]  = useState(false);
+const PROP_ONLY_CHECK_KEYS = new Set(["dailyDrawdown", "lotSize", "session", "newsWindow"]);
+
+// ── Score color helper ────────────────────────────────────────
+const getScoreColor = (score) => {
+  if (score >= 80) return "var(--profit)";
+  if (score >= 60) return "var(--primary)";
+  if (score >= 40) return "var(--warning)";
+  return "var(--loss)";
+};
+
+const getScoreTextClass = (score) => {
+  if (score >= 80) return "text-[var(--profit)]";
+  if (score >= 60) return "text-primary";
+  if (score >= 40) return "text-[var(--warning)]";
+  return "text-[var(--loss)]";
+};
+
+// ── Strategy & Setup display ──────────────────────────────────
+const StrategySetupDisplay = ({ trade, onEditSetup }) => {
+  const { data: strategy, isLoading } = useStrategy(
+    typeof trade.strategy === "string" ? trade.strategy : trade.strategy?._id
+  );
+
+  if (isLoading) return <Skeleton className="h-12 w-full" />;
+
+  const strategyName     = strategy?.name ?? "—";
+  const strategyCategory = strategy?.category ?? null;
+  const hasCriteria      = (strategy?.setupCriteria?.length ?? 0) > 0;
+  const setup            = trade.setup;
+
+  const CATEGORY_LABELS = {
+    ict: "ICT", smc: "SMC", support_resistance: "S&R",
+    supply_demand: "S&D", volume_profile: "VP", price_action: "PA",
+    indicator_based: "Indicator", hybrid: "Hybrid", custom: "Custom",
+  };
+
+  return (
+    <div className="space-y-3">
+      <div className="flex items-center gap-2">
+        <p className="text-sm font-semibold text-foreground">{strategyName}</p>
+        {strategyCategory && (
+          <span className="inline-flex items-center px-1.5 py-0.5 rounded border text-[10px] font-medium bg-primary/10 text-primary border-primary/20">
+            {CATEGORY_LABELS[strategyCategory] ?? strategyCategory}
+          </span>
+        )}
+      </div>
+
+      {hasCriteria && setup?.criteriaChecked?.length > 0 && (
+        <div className="space-y-1.5">
+          <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Setup Criteria</p>
+          {strategy.setupCriteria.map((c) => {
+            const checked = setup.criteriaChecked.find((x) => x.id === c.id)?.checked ?? false;
+            return (
+              <div key={c.id} className="flex items-center justify-between text-xs">
+                <span className="text-muted-foreground">{c.label}</span>
+                <span className={checked ? "text-[var(--profit)]" : "text-[var(--loss)]"}>
+                  {checked ? "✓" : "✗"}
+                </span>
+              </div>
+            );
+          })}
+          <div className="flex items-center justify-between text-xs pt-1 border-t border-border">
+            <span className="font-medium text-foreground">Confluence</span>
+            <span className={setup.confluenceMet ? "text-[var(--profit)]" : "text-[var(--loss)]"}>
+              {setup.confluenceMet ? "✓ Met" : "✗ Not Met"}
+            </span>
+          </div>
+        </div>
+      )}
+
+      {hasCriteria && !setup && (
+        <p className="text-xs text-muted-foreground">
+          Setup criteria not yet assessed.{" "}
+          <button
+            type="button"
+            onClick={onEditSetup}
+            className="text-primary hover:underline"
+          >
+            Assess now
+          </button>
+        </p>
+      )}
+
+      <button
+        type="button"
+        onClick={onEditSetup}
+        className="text-[10px] text-primary hover:underline"
+      >
+        {setup ? "Edit Setup" : "Assess Setup"}
+      </button>
+    </div>
+  );
+};
+
+// ── Discipline section ────────────────────────────────────────
+const DisciplineSection = ({ trade, onAssignStrategy }) => {
+  const discipline = trade.discipline;
+
+  // No discipline object at all — no effective strategy found
+  if (!discipline || discipline.score === null) {
+    return (
+      <div className="space-y-2">
+        <p className="text-xs text-muted-foreground">
+          {!trade.strategy
+            ? "No strategy linked to this account."
+            : "Strategy required for scoring."}
+        </p>
+        {discipline?.feedback?.[0] && (
+          <p className="text-xs text-muted-foreground">{discipline.feedback[0]}</p>
+        )}
+        <button
+          type="button"
+          onClick={onAssignStrategy}
+          className="text-xs text-primary hover:underline"
+        >
+          {trade.strategy ? "Change Strategy →" : "Assign a Strategy →"}
+        </button>
+      </div>
+    );
+  }
+
+  const { score, isDisciplined, violations = {}, feedback = [], calculatedAt } = discipline;
+
+  // Fetch strategy to determine whether setupCriteria exists (for setup row null handling)
+  const strategyId = typeof trade.strategy === "string"
+    ? trade.strategy
+    : trade.strategy?._id;
+  const { data: strategy } = useStrategy(strategyId);
+  const hasCriteria = (strategy?.setupCriteria?.length ?? 0) > 0;
+
+  const setupViolation = violations.setup;
+
+  return (
+    <div className="space-y-3">
+      {/* Score + bar */}
+      <div className="space-y-1.5">
+        <div className="flex items-center justify-between">
+          <span className={cn("text-lg font-mono font-bold", getScoreTextClass(score))}>
+            {score} / 100
+          </span>
+          <span className={cn(
+            "text-xs font-medium px-2 py-0.5 rounded border",
+            isDisciplined
+              ? "bg-[var(--profit)]/10 text-[var(--profit)] border-[var(--profit)]/20"
+              : "bg-[var(--loss)]/10 text-[var(--loss)] border-[var(--loss)]/20"
+          )}>
+            {isDisciplined ? "✓ Disciplined" : "✗ Not Disciplined"}
+          </span>
+        </div>
+        <div className="relative h-1.5 rounded-full bg-muted overflow-hidden">
+          <div
+            className="absolute left-0 top-0 h-full rounded-full transition-all"
+            style={{ width: `${score}%`, backgroundColor: getScoreColor(score) }}
+          />
+        </div>
+      </div>
+
+      {/* Violation rows */}
+      <div className="space-y-1.5">
+        {[
+          { key: "session", label: "Session" },
+          { key: "risk",    label: "Risk" },
+          { key: "rr",      label: "RR" },
+        ].map(({ key, label }) => {
+          const violated = violations[key];
+          return (
+            <div key={key} className="flex items-center justify-between text-xs">
+              <span className="text-muted-foreground">{label}</span>
+              <span className={violated ? "text-[var(--loss)]" : "text-[var(--profit)]"}>
+                {violated ? "✗ Violated" : "✓ OK"}
+              </span>
+            </div>
+          );
+        })}
+
+        {/* Setup row — three states */}
+        <div className="flex items-center justify-between text-xs">
+          <span className="text-muted-foreground">Setup</span>
+          {setupViolation === null ? (
+            <span className="text-muted-foreground">
+              {hasCriteria
+                ? "— Not assessed"
+                : "— N/A (no setup criteria defined)"}
+            </span>
+          ) : setupViolation ? (
+            <span className="text-[var(--loss)]">✗ Violated</span>
+          ) : (
+            <span className="text-[var(--profit)]">✓ OK</span>
+          )}
+        </div>
+
+        {/* Prompt to assess when strategy has criteria but setup is null */}
+        {setupViolation === null && hasCriteria && !trade.setup && (
+          <p className="text-[11px] text-muted-foreground pl-0.5">
+            This strategy has setup criteria.{" "}
+            <button
+              type="button"
+              onClick={onAssignStrategy}
+              className="text-primary hover:underline"
+            >
+              Assess Setup →
+            </button>
+          </p>
+        )}
+      </div>
+
+      {/* Feedback */}
+      {feedback.length > 0 && (
+        <div className="space-y-1">
+          <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Feedback</p>
+          <ul className="space-y-1">
+            {feedback.map((f, i) => (
+              <li key={i} className="flex items-start gap-1.5 text-xs text-muted-foreground leading-snug">
+                <span className="mt-0.5 flex-shrink-0">•</span>
+                <span>{f}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {calculatedAt && (
+        <p className="text-[10px] text-muted-foreground">
+          Last calculated: {formatRelativeTime(calculatedAt)}
+        </p>
+      )}
+    </div>
+  );
+};
+
+// ── Tag Strategy Modal ────────────────────────────────────────
+const TagStrategyModal = ({ open, onClose, trade, account }) => {
+  const [selectedId,       setSelectedId]       = useState(trade?.strategy ?? "");
+  const [criteriaChecked,  setCriteriaChecked]  = useState(trade?.setup?.criteriaChecked ?? []);
+
+  const { data: accountStrategies = [] } = useAccountStrategies(account?._id);
+  const { data: allStrategies = [] }     = useStrategies();
+  const { data: selectedStrategy }       = useStrategy(selectedId || null);
+  const { mutate: tagStrategy, isPending } = useTagTradeStrategy(trade?._id);
+
+  // account-assigned strategies first, then remaining
+  const accountStrategyIds = accountStrategies.map((a) => a.strategy?._id ?? a.strategy);
+  const ordered = [
+    ...accountStrategies.map((a) => a.strategy).filter(Boolean),
+    ...allStrategies.filter((s) => !accountStrategyIds.includes(s._id)),
+  ];
+
+  const handleSubmit = () => {
+    if (!selectedId) return;
+    tagStrategy(
+      { strategyId: selectedId, criteriaChecked },
+      { onSuccess: onClose }
+    );
+  };
+
+  const handleClose = () => {
+    setSelectedId(trade?.strategy ?? "");
+    setCriteriaChecked(trade?.setup?.criteriaChecked ?? []);
+    onClose();
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={(o) => { if (!o) handleClose(); }}>
+      <DialogContent className="bg-card border-border max-w-md max-h-[85vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle className="font-heading">
+            {trade?.strategy ? "Change Strategy" : "Tag Strategy"}
+          </DialogTitle>
+        </DialogHeader>
+
+        <div className="space-y-4 mt-2">
+          <div className="space-y-1.5">
+            <label className="text-xs text-muted-foreground">Strategy</label>
+            <Select value={selectedId} onValueChange={(v) => { setSelectedId(v); setCriteriaChecked([]); }}>
+              <SelectTrigger className="bg-background border-border">
+                <SelectValue placeholder="Select a strategy..." />
+              </SelectTrigger>
+              <SelectContent className="bg-card border-border">
+                {ordered.map((s) => (
+                  <SelectItem key={s._id} value={s._id}>
+                    {s.name}
+                    {accountStrategyIds.includes(s._id) ? " ★" : ""}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {selectedStrategy && selectedStrategy.setupCriteria?.length > 0 && (
+            <SetupCriteriaChecklist
+              strategy={selectedStrategy}
+              initialChecked={criteriaChecked}
+              onSubmit={(checked) => setCriteriaChecked(checked)}
+            />
+          )}
+
+          <div className="flex gap-2 pt-1">
+            <Button variant="outline" className="flex-1" onClick={handleClose}>Cancel</Button>
+            <Button className="flex-1" onClick={handleSubmit} disabled={!selectedId || isPending}>
+              {isPending && <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />}
+              Save
+            </Button>
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
+export const TradeDetailPanel = ({ trade, account, onClose, onDelete }) => {
+  const [deleteOpen,       setDeleteOpen]       = useState(false);
+  const [savedNote,        setSavedNote]        = useState(false);
+  const [complianceChecks, setComplianceChecks] = useState(null);
+  const [checksExpanded,   setChecksExpanded]   = useState(false);
+  const [tagStrategyOpen,  setTagStrategyOpen]  = useState(false);
   const noteDebounce = useRef(null);
 
   const { mutate: updateTrade } = useUpdateTrade(trade?._id);
   const { mutate: deleteTrade, isPending: deleting } = useDeleteTrade();
+  const { mutate: checkCompliance, isPending: checkingCompliance } = useCheckCompliance(trade?._id);
 
   const handleGradeChange = (val) => {
     updateTrade({ setupQualityRating: val || null });
@@ -152,7 +514,9 @@ export const TradeDetailPanel = ({ trade, onClose, onDelete }) => {
               <div className="flex items-center gap-1.5 mt-1.5 flex-wrap">
                 <DirectionBadge direction={trade.direction} />
                 <OutcomeBadge   outcome={trade.outcome}    />
-                {trade.session && <SessionBadge session={trade.session} />}
+                {(trade.sessions?.length > 0) && trade.sessions.map((s) => (
+                  <SessionBadge key={s} session={s} small />
+                ))}
                 {propCompliance.checked && (
                   <PropComplianceBadge propCompliance={propCompliance} />
                 )}
@@ -176,6 +540,19 @@ export const TradeDetailPanel = ({ trade, onClose, onDelete }) => {
             </button>
           </div>
         </div>
+
+        {/* ── Critical violation banner (above all content) ──── */}
+        {(trade.complianceViolations ?? []).some((v) => v.severity === "critical") && (
+          <div className="flex items-start gap-2.5 px-4 py-3 bg-[var(--loss)]/10 border-b border-[var(--loss)]/30 flex-shrink-0">
+            <span className="text-[var(--loss)] text-base flex-shrink-0 mt-0.5">⚠</span>
+            <div className="space-y-0.5">
+              <p className="text-sm font-semibold text-[var(--loss)]">Critical Prop Firm Violation</p>
+              <p className="text-xs text-[var(--loss)]/80 leading-snug">
+                This trade may have breached your prop firm rules. Review immediately.
+              </p>
+            </div>
+          </div>
+        )}
 
         {/* ── Scrollable content ────────────────────── */}
         <div className="flex-1 overflow-y-auto">
@@ -381,7 +758,13 @@ export const TradeDetailPanel = ({ trade, onClose, onDelete }) => {
                   )}
                 </div>
               </div>
-              <MetaRow label="Session"  value={trade.session ?? null} />
+              <div className="space-y-0.5">
+                <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Session</p>
+                {trade.sessions?.length > 0
+                  ? <SessionBadges sessions={trade.sessions} small />
+                  : <p className="text-sm text-muted-foreground">—</p>
+                }
+              </div>
               {weekdayDisplay && <MetaRow label="Weekday" value={weekdayDisplay} />}
               <MetaRow
                 label="Period"
@@ -390,6 +773,28 @@ export const TradeDetailPanel = ({ trade, onClose, onDelete }) => {
                   : null}
               />
             </div>
+          </div>
+
+          {/* Section 3a — Strategy & Setup */}
+          <Separator />
+          <div className="px-5 py-4 space-y-3">
+            <div className="flex items-center justify-between">
+              <SectionTitle>Strategy</SectionTitle>
+              <button
+                type="button"
+                onClick={() => setTagStrategyOpen(true)}
+                className="flex items-center gap-1 text-[10px] text-primary hover:text-primary/80 transition-colors"
+              >
+                <Pencil className="h-3 w-3" />
+                {trade.strategy ? "Change" : "Tag Strategy"}
+              </button>
+            </div>
+
+            {trade.strategy ? (
+              <StrategySetupDisplay trade={trade} onEditSetup={() => setTagStrategyOpen(true)} />
+            ) : (
+              <p className="text-xs text-muted-foreground">No strategy tagged</p>
+            )}
           </div>
 
           {/* Section 3b — Risk Quality */}
@@ -431,42 +836,119 @@ export const TradeDetailPanel = ({ trade, onClose, onDelete }) => {
             </>
           )}
 
-          {/* Section 3c — Trade Compliance (isCompliant + violations) */}
-          {trade.isCompliant != null && (
-            <>
-              <Separator />
-              <div className="px-5 py-4 space-y-3">
+          {/* Section 3c — Trade Compliance */}
+          <>
+            <Separator />
+            <div className="px-5 py-4 space-y-3">
+              <div className="flex items-center justify-between">
                 <SectionTitle>Compliance</SectionTitle>
-                {trade.isCompliant ? (
-                  <div className="flex items-center gap-1.5 text-xs text-[var(--profit)]">
-                    <CheckCircle2 className="h-4 w-4" />
-                    <span className="font-medium">Trade compliant</span>
-                  </div>
-                ) : (
-                  <div className="space-y-2">
-                    {(trade.complianceViolations ?? []).map((v, i) => (
+                <button
+                  type="button"
+                  onClick={() =>
+                    checkCompliance(undefined, {
+                      onSuccess: (res) => {
+                        setComplianceChecks(res?.checks ?? null);
+                        setChecksExpanded(true);
+                      },
+                    })
+                  }
+                  disabled={checkingCompliance}
+                  className="flex items-center gap-1 text-[10px] text-muted-foreground hover:text-foreground transition-colors disabled:opacity-50"
+                >
+                  {checkingCompliance
+                    ? <Loader2 className="h-3 w-3 animate-spin" />
+                    : <RefreshCw className="h-3 w-3" />
+                  }
+                  Re-check Compliance
+                </button>
+              </div>
+
+              {trade.isCompliant == null ? (
+                <p className="text-xs text-muted-foreground">Not checked yet</p>
+              ) : trade.isCompliant ? (
+                <div className="flex items-center gap-1.5 text-xs text-[var(--profit)]">
+                  <CheckCircle2 className="h-4 w-4" />
+                  <span className="font-medium">Trade compliant</span>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  {[...(trade.complianceViolations ?? [])]
+                    .sort((a, b) =>
+                      (SEVERITY_ORDER[a.severity] ?? 99) - (SEVERITY_ORDER[b.severity] ?? 99)
+                    )
+                    .map((v, i) => (
                       <div
                         key={i}
                         className={cn(
-                          "flex items-start gap-1.5 px-2.5 py-2 rounded-lg border text-xs",
-                          SEVERITY_STYLES[v.severity] ?? SEVERITY_STYLES.warning
+                          "px-2.5 py-2 rounded-lg border text-xs space-y-0.5",
+                          SEVERITY_STYLES[v.severity] ?? SEVERITY_STYLES.warning,
+                          v.severity === "critical" && "animate-pulse"
                         )}
                       >
-                        <span className="shrink-0 mt-0.5">{v.severity === "critical" ? "✗" : "⚠"}</span>
-                        <div className="min-w-0">
-                          <p className="font-semibold">{v.rule}</p>
-                          {v.message && <p className="opacity-80 mt-0.5 leading-snug">{v.message}</p>}
+                        <div className="flex items-center gap-1.5">
+                          <span className="flex-shrink-0">{v.severity === "critical" ? "✗" : "⚠"}</span>
+                          <p className="font-semibold">{formatRuleName(v.rule)}</p>
+                          <span className="ml-auto text-[9px] font-medium uppercase opacity-70">{v.severity}</span>
                         </div>
+                        {v.message && <p className="opacity-80 leading-snug pl-4">{v.message}</p>}
+                        {(v.actual != null || v.limit != null) && (
+                          <p className="opacity-70 text-[10px] pl-4 font-mono">
+                            {v.actual != null && `Actual: ${formatViolationValue(v.rule, v.actual)}`}
+                            {v.actual != null && v.limit != null && "  •  "}
+                            {v.limit != null && `Limit: ${formatViolationValue(v.rule, v.limit)}`}
+                          </p>
+                        )}
                       </div>
-                    ))}
-                    {(trade.complianceViolations ?? []).length === 0 && (
-                      <p className="text-xs text-muted-foreground">Violations not detailed</p>
-                    )}
-                  </div>
-                )}
-              </div>
-            </>
-          )}
+                    ))
+                  }
+                  {(trade.complianceViolations ?? []).length === 0 && (
+                    <p className="text-xs text-muted-foreground">No violation details</p>
+                  )}
+                  {/* Prop challenge warning for high/critical on enforced prop accounts */}
+                  {account?.type === "prop" &&
+                    (trade.complianceViolations ?? []).some(
+                      (v) => v.severity === "high" || v.severity === "critical"
+                    ) && (
+                      <p className="text-[11px] text-[var(--warning)] border-t border-[var(--warning)]/20 pt-2 mt-1">
+                        ⚠ This violation may affect your prop challenge.
+                      </p>
+                    )
+                  }
+                </div>
+              )}
+
+              {/* Checks detail table — shown after re-check */}
+              {complianceChecks && (
+                <div className="space-y-1.5">
+                  <button
+                    type="button"
+                    onClick={() => setChecksExpanded((p) => !p)}
+                    className="text-[10px] text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    {checksExpanded ? "Hide" : "Show"} check details
+                  </button>
+                  {checksExpanded && (
+                    <div className="trading-card p-3 space-y-1.5">
+                      {Object.entries(complianceChecks)
+                        .filter(([key]) =>
+                          account?.type === "prop" || !PROP_ONLY_CHECK_KEYS.has(key)
+                        )
+                        .map(([key, passed]) => (
+                          <div key={key} className="flex items-center justify-between text-xs">
+                            <span className="text-muted-foreground">
+                              {CHECK_LABELS[key] ?? key}
+                            </span>
+                            <span className={passed ? "text-[var(--profit)]" : "text-[var(--loss)]"}>
+                              {passed ? "✓ Pass" : "✗ Fail"}
+                            </span>
+                          </div>
+                        ))}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          </>
 
           {/* Section 4 — Compliance (only if checked) */}
           {propCompliance.checked && (
@@ -496,32 +978,12 @@ export const TradeDetailPanel = ({ trade, onClose, onDelete }) => {
             </>
           )}
 
-          {/* Section 5 — Discipline */}
-          {discipline.score != null && (
-            <>
-              <Separator />
-              <div className="px-5 py-4 space-y-3">
-                <SectionTitle>Discipline</SectionTitle>
-                <DisciplineScoreBadge discipline={discipline} />
-
-                <div className="flex items-center justify-between text-xs">
-                  <span className="text-muted-foreground">Disciplined trade</span>
-                  <span className={discipline.isDisciplined ? "text-[var(--profit)]" : "text-[var(--loss)]"}>
-                    {discipline.isDisciplined ? "✓ Yes" : "✗ No"}
-                  </span>
-                </div>
-
-                {(discipline.feedback ?? []).length > 0 && (
-                  <div className="space-y-1.5 mt-1">
-                    <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Feedback</p>
-                    {discipline.feedback.map((f, i) => (
-                      <p key={i} className="text-xs text-muted-foreground leading-snug">{f}</p>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </>
-          )}
+          {/* Section 5 — Discipline Score */}
+          <Separator />
+          <div className="px-5 py-4 space-y-3">
+            <SectionTitle>Discipline Score</SectionTitle>
+            <DisciplineSection trade={trade} onAssignStrategy={() => setTagStrategyOpen(true)} />
+          </div>
 
           {/* Section 6 — Behavioural */}
           {(behavioural.isRevengeTrade || behavioural.isOvertrade || behavioural.afterConsecutiveLosses > 0) && (
@@ -651,6 +1113,14 @@ export const TradeDetailPanel = ({ trade, onClose, onDelete }) => {
           </Button>
         </div>
       </div>
+
+      {/* Tag / change strategy modal */}
+      <TagStrategyModal
+        open={tagStrategyOpen}
+        onClose={() => setTagStrategyOpen(false)}
+        trade={trade}
+        account={account}
+      />
 
       <AlertDialog open={deleteOpen} onOpenChange={setDeleteOpen}>
         <AlertDialogContent className="bg-card border-border">

@@ -37,6 +37,44 @@ const SOURCE_BADGE = {
   manual:     { label: "Manual", cls: "bg-muted text-muted-foreground border-border"            },
 };
 
+const SEVERITY_ORDER = { critical: 0, high: 1, medium: 2, warning: 3 };
+
+const getHighestSeverity = (violations = []) => {
+  if (!violations.length) return null;
+  return violations.reduce((best, v) =>
+    (SEVERITY_ORDER[v.severity] ?? 99) < (SEVERITY_ORDER[best.severity] ?? 99) ? v : best
+  ).severity;
+};
+
+const SEVERITY_DOT_CLS = {
+  critical: "bg-[var(--loss)] animate-pulse",
+  high:     "bg-[var(--loss)]",
+  medium:   "bg-[var(--warning)]",
+  warning:  "bg-muted-foreground",
+};
+
+const ComplianceDot = ({ trade }) => {
+  if (trade.isCompliant == null) return null;
+  if (trade.isCompliant === true) return null;
+
+  const severity = getHighestSeverity(trade.complianceViolations ?? []);
+  const cls = SEVERITY_DOT_CLS[severity] ?? SEVERITY_DOT_CLS.warning;
+  const count = (trade.complianceViolations ?? []).length;
+
+  return (
+    <TooltipProvider>
+      <Tooltip delayDuration={200}>
+        <TooltipTrigger asChild>
+          <span className={cn("inline-block h-2 w-2 rounded-full flex-shrink-0", cls)} />
+        </TooltipTrigger>
+        <TooltipContent side="top" className="text-xs">
+          {count} compliance issue{count !== 1 ? "s" : ""}
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  );
+};
+
 const SORTABLE_COLS = ["closedAt", "pair", "pnl", "netPnl", "realizedRR"];
 
 const SortIcon = ({ col, sort }) => {
@@ -139,9 +177,9 @@ export const TradesTable = ({
               <Th col="closedAt" sort={sort} onSort={onSort}>Date</Th>
               <Th col="pair"     sort={sort} onSort={onSort}>Pair</Th>
               <Th col="direction">Dir</Th>
-              <Th col="lotSize"  right>Lots</Th>
-              <Th col="entryPrice" right>Entry</Th>
-              <Th col="exitPrice"  right>Exit</Th>
+              <Th col="lotSize"  right className="hidden sm:table-cell">Lots</Th>
+              <Th col="entryPrice" right className="hidden md:table-cell">Entry</Th>
+              <Th col="exitPrice"  right className="hidden md:table-cell">Exit</Th>
               <Th col="netPnl" sort={sort} onSort={onSort} right>
                 <span className="inline-flex items-center gap-1">
                   Net P&amp;L
@@ -214,15 +252,15 @@ export const TradesTable = ({
                     <DirectionBadge direction={trade.direction} />
                   </Td>
 
-                  <Td mono right className="text-muted-foreground">
+                  <Td mono right className="text-muted-foreground hidden sm:table-cell">
                     {formatLots(trade.lotSize)}
                   </Td>
 
-                  <Td mono right className="text-muted-foreground text-xs">
+                  <Td mono right className="text-muted-foreground text-xs hidden md:table-cell">
                     {formatPrice(trade.entryPrice)}
                   </Td>
 
-                  <Td mono right className="text-muted-foreground text-xs">
+                  <Td mono right className="text-muted-foreground text-xs hidden md:table-cell">
                     {formatPrice(trade.exitPrice)}
                   </Td>
 
@@ -278,7 +316,10 @@ export const TradesTable = ({
                   </Td>
 
                   <Td className="hidden xl:table-cell">
-                    <PropComplianceBadge propCompliance={trade.propCompliance} />
+                    <div className="flex items-center gap-1.5">
+                      <ComplianceDot trade={trade} />
+                      <PropComplianceBadge propCompliance={trade.propCompliance} />
+                    </div>
                   </Td>
 
                   <Td className="hidden xl:table-cell">
@@ -291,7 +332,7 @@ export const TradesTable = ({
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity"
+                          className="h-7 w-7 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity"
                           onClick={(e) => e.stopPropagation()}
                         >
                           <MoreHorizontal className="h-3.5 w-3.5" />

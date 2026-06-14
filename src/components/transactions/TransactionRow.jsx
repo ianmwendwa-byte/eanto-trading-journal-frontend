@@ -80,7 +80,7 @@ export const TransactionRow = ({
     <>
       <div
         className={cn(
-          "flex items-center gap-3 px-4 py-3 border-b border-border last:border-0",
+          "flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-3 border-b border-border last:border-0",
           "hover:bg-muted/30 transition-colors",
           reversed && "opacity-60"
         )}
@@ -192,7 +192,7 @@ export const TransactionRow = ({
         </div>
 
         {/* ── Col 5: Amount ─────────────────────── */}
-        <div className="text-right flex-shrink-0 w-28">
+        <div className="text-right flex-shrink-0 w-20 sm:w-28">
           <span
             className={cn(
               "font-mono font-semibold text-sm",

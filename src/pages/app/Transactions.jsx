@@ -240,21 +240,21 @@ export const Transactions = () => {
       animate="animate"
       exit="exit"
       className={cn(
-        "p-6 space-y-4 transition-[padding] duration-300",
-        selectedTradeId && "pr-[444px]"
+        "p-4 sm:p-6 space-y-4 transition-[padding] duration-300",
+        selectedTradeId && "sm:pr-[444px]"
       )}
     >
       {/* ── Page header ──────────────────────────────── */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-heading font-bold text-foreground">Transactions</h1>
+          <h1 className="text-xl sm:text-2xl font-heading font-bold text-foreground">Transactions</h1>
           <p className="text-sm text-muted-foreground mt-0.5">
             {pagination.total ? `${pagination.total} transactions` : "Your financial history"}
           </p>
         </div>
-        <Button className="gap-2" onClick={() => setIsAddOpen(true)}>
+        <Button className="gap-2 px-3 sm:px-4" onClick={() => setIsAddOpen(true)}>
           <Plus className="h-4 w-4" />
-          Add Transaction
+          <span className="hidden sm:inline">Add Transaction</span>
         </Button>
       </div>
 
@@ -424,7 +424,7 @@ export const Transactions = () => {
       <Sheet open={!!selectedTx} onOpenChange={(v) => { if (!v) setSelectedTx(null); }}>
         <SheetContent
           side="right"
-          className="w-[400px] sm:w-[480px] p-0 bg-card border-border"
+          className="w-full sm:w-[400px] md:w-[480px] p-0 bg-card border-border"
         >
           <TransactionDetailSheet
             transaction={selectedTx}
@@ -446,7 +446,7 @@ export const Transactions = () => {
             animate={{ x: 0, opacity: 1 }}
             exit={{ x: 420, opacity: 0 }}
             transition={{ duration: 0.2, ease: "easeOut" }}
-            className="fixed top-14 right-0 h-[calc(100vh-3.5rem)] w-[420px] bg-card border-l border-border z-40 overflow-hidden"
+            className="fixed inset-0 sm:inset-auto sm:top-14 sm:right-0 sm:h-[calc(100vh-3.5rem)] sm:w-[420px] bg-card border-l border-border z-40 overflow-hidden"
           >
             <TradeDetailPanel
               trade={selectedTrade}

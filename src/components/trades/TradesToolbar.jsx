@@ -1,4 +1,4 @@
-﻿import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   Search, X, ChevronDown, LayoutList, CalendarDays, Plus,
 } from "lucide-react";
@@ -60,7 +60,7 @@ const SORT_OPTIONS = [
 ];
 
 const PillGroup = ({ options, value, onChange, colored = false }) => (
-  <div className="flex items-center gap-1 flex-wrap">
+  <div className="flex items-center gap-1">
     {options.map((opt) => {
       const active = value === opt.value;
       const isBuy  = opt.value === "buy";
@@ -85,6 +85,27 @@ const PillGroup = ({ options, value, onChange, colored = false }) => (
   </div>
 );
 
+// Period tabs shared between desktop inline and mobile scrollable
+const PeriodTabs = ({ value, onChange }) => (
+  <div className="flex items-center bg-muted/50 rounded-lg p-0.5 border border-border">
+    {PERIODS.map((p) => (
+      <button
+        key={p.value}
+        type="button"
+        onClick={() => onChange({ period: p.value, page: 1 })}
+        className={cn(
+          "px-2.5 py-1 rounded-md text-xs font-medium transition-all whitespace-nowrap",
+          (value ?? "30d") === p.value
+            ? "bg-background text-foreground shadow-sm"
+            : "text-muted-foreground hover:text-foreground"
+        )}
+      >
+        {p.label}
+      </button>
+    ))}
+  </div>
+);
+
 export const TradesToolbar = ({
   filters,
   onFilterChange,
@@ -98,7 +119,6 @@ export const TradesToolbar = ({
   const [searchInput, setSearchInput] = useState(filters.search ?? "");
   const debounceRef = useRef(null);
 
-  // Sync external filter change back to search input
   useEffect(() => {
     setSearchInput(filters.search ?? "");
   }, [filters.search]);
@@ -123,11 +143,11 @@ export const TradesToolbar = ({
   const currentSort = SORT_OPTIONS.find(s => s.value === (filters.sort ?? "closedAt_desc"));
 
   return (
-    <div className="space-y-3">
-      {/* ── Row 1 ───────────────────────────────────── */}
-      <div className="flex items-center gap-3 flex-wrap">
+    <div className="space-y-2">
+      {/* ── Row 1: Search + primary controls ─────────── */}
+      <div className="flex items-center gap-2">
         {/* Search */}
-        <div className="relative flex-1 min-w-[180px] max-w-xs">
+        <div className="relative flex-1 min-w-0 sm:max-w-xs">
           <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground pointer-events-none" />
           <Input
             value={searchInput}
@@ -148,13 +168,13 @@ export const TradesToolbar = ({
           )}
         </div>
 
-        {/* Account selector */}
+        {/* Account selector — inline on sm+, pushed to row 2 on mobile */}
         {accounts.length > 1 && (
           <Select
             value={filters.accountId ?? "all"}
             onValueChange={(v) => onFilterChange({ accountId: v === "all" ? "" : v, page: 1 })}
           >
-            <SelectTrigger className="h-9 w-44 bg-background border-border text-sm">
+            <SelectTrigger className="hidden sm:flex h-9 w-40 bg-background border-border text-sm">
               <SelectValue placeholder="All Accounts" />
             </SelectTrigger>
             <SelectContent className="bg-card border-border">
@@ -168,25 +188,12 @@ export const TradesToolbar = ({
           </Select>
         )}
 
-        <div className="flex items-center gap-2 ml-auto">
-          {/* Period tabs (table view only) */}
+        {/* Right-side controls */}
+        <div className="flex items-center gap-1.5 ml-auto shrink-0">
+          {/* Period tabs — hidden on mobile, shown on sm+ */}
           {view === "table" && (
-            <div className="flex items-center bg-muted/50 rounded-lg p-0.5 border border-border">
-              {PERIODS.map((p) => (
-                <button
-                  key={p.value}
-                  type="button"
-                  onClick={() => onFilterChange({ period: p.value, page: 1 })}
-                  className={cn(
-                    "px-2.5 py-1 rounded-md text-xs font-medium transition-all",
-                    (filters.period ?? "30d") === p.value
-                      ? "bg-background text-foreground shadow-sm"
-                      : "text-muted-foreground hover:text-foreground"
-                  )}
-                >
-                  {p.label}
-                </button>
-              ))}
+            <div className="hidden sm:block">
+              <PeriodTabs value={filters.period} onChange={onFilterChange} />
             </div>
           )}
 
@@ -218,78 +225,142 @@ export const TradesToolbar = ({
             </button>
           </div>
 
-          {/* Add Trade */}
-          <Button size="sm" onClick={onAddTrade} className="gap-1.5 h-9">
+          {/* Add Trade — icon-only on mobile, full label on sm+ */}
+          <Button size="sm" onClick={onAddTrade} className="gap-1.5 h-9 px-2.5 sm:px-3">
             <Plus className="h-3.5 w-3.5" />
-            Add Trade
+            <span className="hidden sm:inline">Add Trade</span>
           </Button>
         </div>
       </div>
 
-      {/* ── Row 2 ───────────────────────────────────── */}
-      <div className="flex items-center gap-3 flex-wrap">
-        <PillGroup
-          options={DIRECTIONS}
-          value={filters.direction ?? ""}
-          onChange={(v) => onFilterChange({ direction: v, page: 1 })}
-          colored
-        />
+      {/* ── Row 2 (mobile only): Account + Period ────── */}
+      {(accounts.length > 1 || view === "table") && (
+        <div className="flex items-center gap-2 sm:hidden">
+          {accounts.length > 1 && (
+            <Select
+              value={filters.accountId ?? "all"}
+              onValueChange={(v) => onFilterChange({ accountId: v === "all" ? "" : v, page: 1 })}
+            >
+              <SelectTrigger className="h-8 flex-1 bg-background border-border text-sm">
+                <SelectValue placeholder="All Accounts" />
+              </SelectTrigger>
+              <SelectContent className="bg-card border-border">
+                <SelectItem value="all">All Accounts</SelectItem>
+                {accounts.map((acc) => (
+                  <SelectItem key={acc._id} value={acc._id}>
+                    {acc.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
+          {view === "table" && (
+            <div className="flex-1 overflow-x-auto">
+              <PeriodTabs value={filters.period} onChange={onFilterChange} />
+            </div>
+          )}
+        </div>
+      )}
 
-        <div className="w-px h-4 bg-border" />
+      {/* ── Row 3: Filters (scrollable on mobile) ────── */}
+      <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0 pb-0.5">
+        <div className="flex items-center gap-2 min-w-max sm:min-w-0 sm:flex-wrap">
+          <PillGroup
+            options={DIRECTIONS}
+            value={filters.direction ?? ""}
+            onChange={(v) => onFilterChange({ direction: v, page: 1 })}
+            colored
+          />
 
-        <PillGroup
-          options={OUTCOMES}
-          value={filters.outcome ?? ""}
-          onChange={(v) => onFilterChange({ outcome: v, page: 1 })}
-        />
+          <div className="w-px h-4 bg-border shrink-0" />
 
-        <div className="w-px h-4 bg-border" />
+          <PillGroup
+            options={OUTCOMES}
+            value={filters.outcome ?? ""}
+            onChange={(v) => onFilterChange({ outcome: v, page: 1 })}
+          />
 
-        <PillGroup
-          options={SESSIONS}
-          value={filters.session ?? ""}
-          onChange={(v) => onFilterChange({ session: v, page: 1 })}
-        />
+          <div className="w-px h-4 bg-border shrink-0" />
 
-        <div className="w-px h-4 bg-border" />
+          <PillGroup
+            options={SESSIONS}
+            value={filters.session ?? ""}
+            onChange={(v) => onFilterChange({ session: v, page: 1 })}
+          />
 
-        <PillGroup
-          options={SOURCES}
-          value={filters.source ?? ""}
-          onChange={(v) => onFilterChange({ source: v, page: 1 })}
-        />
+          <div className="w-px h-4 bg-border shrink-0" />
 
-        {view === "table" && (
-          <>
-            <div className="w-px h-4 bg-border" />
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
+          <PillGroup
+            options={SOURCES}
+            value={filters.source ?? ""}
+            onChange={(v) => onFilterChange({ source: v, page: 1 })}
+          />
+
+          {view === "table" && (
+            <>
+              <div className="w-px h-4 bg-border shrink-0" />
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button
+                    type="button"
+                    className="flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-medium border border-border bg-transparent text-muted-foreground hover:text-foreground hover:border-border/60 transition-all whitespace-nowrap"
+                  >
+                    {currentSort?.label ?? "Sort"}
+                    <ChevronDown className="h-3 w-3" />
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="bg-card border-border w-44">
+                  <DropdownMenuRadioGroup
+                    value={filters.sort ?? "closedAt_desc"}
+                    onValueChange={(v) => onFilterChange({ sort: v, page: 1 })}
+                  >
+                    {SORT_OPTIONS.map((opt) => (
+                      <DropdownMenuRadioItem key={opt.value} value={opt.value} className="text-xs">
+                        {opt.label}
+                      </DropdownMenuRadioItem>
+                    ))}
+                  </DropdownMenuRadioGroup>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </>
+          )}
+
+          {/* Active chips + count — inline after filters on desktop */}
+          {(hasActiveFilters || !isLoading) && (
+            <div className="hidden sm:flex items-center gap-1.5 ml-auto flex-wrap">
+              {activeFilters.map((f) => (
+                <button
+                  key={f.key}
+                  type="button"
+                  onClick={() => onFilterChange({ [f.key]: "", page: 1 })}
+                  className="flex items-center gap-1 px-2 py-0.5 rounded-md bg-primary/10 text-primary text-xs border border-primary/20 hover:bg-primary/20 transition-colors"
+                >
+                  {f.label}
+                  <X className="h-2.5 w-2.5" />
+                </button>
+              ))}
+              {hasActiveFilters && (
                 <button
                   type="button"
-                  className="flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-medium border border-border bg-transparent text-muted-foreground hover:text-foreground hover:border-border/60 transition-all"
+                  onClick={() => onFilterChange({ direction: "", outcome: "", session: "", source: "", search: "", page: 1 })}
+                  className="text-xs text-muted-foreground hover:text-foreground transition-colors"
                 >
-                  {currentSort?.label ?? "Sort"}
-                  <ChevronDown className="h-3 w-3" />
+                  Clear all
                 </button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="bg-card border-border w-44">
-                <DropdownMenuRadioGroup
-                  value={filters.sort ?? "closedAt_desc"}
-                  onValueChange={(v) => onFilterChange({ sort: v, page: 1 })}
-                >
-                  {SORT_OPTIONS.map((opt) => (
-                    <DropdownMenuRadioItem key={opt.value} value={opt.value} className="text-xs">
-                      {opt.label}
-                    </DropdownMenuRadioItem>
-                  ))}
-                </DropdownMenuRadioGroup>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </>
-        )}
+              )}
+              {!isLoading && (
+                <span className="text-xs text-muted-foreground ml-1">
+                  {totalCount.toLocaleString()} trades
+                </span>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
 
-        {/* Active chips + count */}
-        <div className="flex items-center gap-1.5 ml-auto flex-wrap">
+      {/* Active chips on mobile — separate row below filters */}
+      {(hasActiveFilters || !isLoading) && (
+        <div className="flex items-center gap-1.5 flex-wrap sm:hidden">
           {activeFilters.map((f) => (
             <button
               key={f.key}
@@ -301,7 +372,6 @@ export const TradesToolbar = ({
               <X className="h-2.5 w-2.5" />
             </button>
           ))}
-
           {hasActiveFilters && (
             <button
               type="button"
@@ -311,14 +381,13 @@ export const TradesToolbar = ({
               Clear all
             </button>
           )}
-
           {!isLoading && (
-            <span className="text-xs text-muted-foreground ml-1">
+            <span className="text-xs text-muted-foreground ml-auto">
               {totalCount.toLocaleString()} trades
             </span>
           )}
         </div>
-      </div>
+      )}
     </div>
   );
 };

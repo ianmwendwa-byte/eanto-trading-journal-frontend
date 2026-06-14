@@ -122,6 +122,9 @@ export const Trades = () => {
 
   // ── Handlers ──────────────────────────────────────────────────
   const isPanelOpen = !!selectedTrade;
+  const selectedTradeAccount = selectedTrade
+    ? accounts.find((a) => a._id === selectedTrade.accountId) ?? null
+    : null;
 
   const handlePanelClose = () => {
     setSelectedTrade(null);
@@ -158,14 +161,14 @@ export const Trades = () => {
       animate="animate"
       exit="exit"
       className={cn(
-        "p-6 space-y-4 transition-[padding] duration-300",
-        isPanelOpen && "pr-[444px]"
+        "p-4 sm:p-6 space-y-4 transition-[padding] duration-300",
+        isPanelOpen && "sm:pr-[444px]"
       )}
     >
       {/* ── Page header ──────────────────────────────── */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="font-heading text-2xl font-bold text-foreground">Trade Journal</h1>
+          <h1 className="font-heading text-xl sm:text-2xl font-bold text-foreground">Trade Journal</h1>
           <p className="text-sm text-muted-foreground mt-0.5">
             {statTrades != null ? `${statTrades.toLocaleString()} closed trades` : "Your closed trade history"}
           </p>
@@ -173,7 +176,7 @@ export const Trades = () => {
       </div>
 
       {/* ── Stat cards ───────────────────────────────── */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-3">
         <TradeStatCard
           label="Total Trades"
           value={statTrades != null ? statTrades.toLocaleString() : null}
@@ -285,10 +288,11 @@ export const Trades = () => {
             animate={{ x: 0, opacity: 1 }}
             exit={{ x: 420, opacity: 0 }}
             transition={{ duration: 0.2, ease: "easeOut" }}
-            className="fixed top-14 right-0 h-[calc(100vh-3.5rem)] w-[420px] bg-card border-l border-border z-40 overflow-hidden"
+            className="fixed inset-0 sm:inset-auto sm:top-14 sm:right-0 sm:h-[calc(100vh-3.5rem)] sm:w-[420px] bg-card border-l border-border z-40 overflow-hidden"
           >
             <TradeDetailPanel
               trade={selectedTrade}
+              account={selectedTradeAccount}
               onClose={handlePanelClose}
               onDelete={handlePanelClose}
             />

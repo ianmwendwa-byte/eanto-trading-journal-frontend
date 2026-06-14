@@ -25,8 +25,9 @@ const NAV_SECTIONS = [
   {
     label: "TRADING",
     items: [
-      { label: "Trades",    icon: TrendingUp, path: "/trades" },
-      { label: "Analytics", icon: BarChart3,  path: "/analytics", soon: true },
+      { label: "Trades",      icon: TrendingUp, path: "/trades" },
+      { label: "Strategies",  icon: Target,     path: "/strategies" },
+      { label: "Analytics",   icon: BarChart3,  path: "/analytics", soon: true },
     ],
   },
   {
@@ -40,7 +41,6 @@ const NAV_SECTIONS = [
   {
     label: "COMING SOON",
     items: [
-      { label: "Strategies", icon: Target,    path: "/strategies", soon: true },
       { label: "Insights",   icon: Lightbulb, path: "/insights",   soon: true },
       { label: "AI Coach",   icon: Bot,       path: "/ai",         soon: true },
     ],

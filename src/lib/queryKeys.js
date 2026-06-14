@@ -57,6 +57,15 @@ export const dashboardKeys = {
   preferences: ()       => ["dashboard", "preferences"],
 };
 
+export const strategyKeys = {
+  all:         () => ["strategies"],
+  lists:       () => ["strategies", "list"],
+  list:        () => ["strategies", "list", "all"],
+  detail:      (id) => ["strategies", "detail", id],
+  templates:   () => ["strategies", "templates"],
+  assignments: (accountId) => ["strategies", "assignments", accountId],
+};
+
 export const eaKeys = {
   status:          (id)          => ["ea", "status", id],
   history:         (id)          => ["ea", "history", id],

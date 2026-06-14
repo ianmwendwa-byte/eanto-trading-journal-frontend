@@ -1,4 +1,4 @@
-﻿import { useRef } from "react";
+import { useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -12,6 +12,39 @@ import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 
 const WEEKDAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+
+// ── Color intensity helpers ────────────────────────────────────
+
+const TYPE_HEX = {
+  profit:    "#22C55E",
+  loss:      "#EF4444",
+  breakeven: "#6B7280",
+};
+
+// Color type is always driven by net P&L so that a big win covering
+// multiple losses still shows as a profit day (green), not a loss day.
+const getDominantType = ({ netPnl }) =>
+  netPnl > 0 ? "profit" : netPnl < 0 ? "loss" : "breakeven";
+
+const getDominantCount = (stats, type) =>
+  type === "profit"    ? stats.wins
+  : type === "loss"    ? stats.losses
+  : (stats.breakeven || stats.count);
+
+// Dynamic background + border via color-mix, scales with trade count
+const buildCellStyle = (type, count, hovered = false) => {
+  const hex = TYPE_HEX[type];
+  // bg:     8% for 1 trade, +6.5% per extra trade, max 42%
+  // border: 18% for 1 trade, +9%   per extra trade, max 68%
+  const bgBase     = Math.min(8  + (count - 1) * 6.5, 42);
+  const borderBase = Math.min(18 + (count - 1) * 9,   68);
+  const bg     = hovered ? bgBase + 8      : bgBase;
+  const border = hovered ? borderBase + 10 : borderBase;
+  return {
+    backgroundColor: `color-mix(in srgb, ${hex} ${bg.toFixed(0)}%, transparent)`,
+    borderColor:     `color-mix(in srgb, ${hex} ${border.toFixed(0)}%, transparent)`,
+  };
+};
 
 // ── Skeleton ──────────────────────────────────────────────────
 export const CalendarSkeleton = () => (
@@ -36,6 +69,7 @@ export const CalendarSkeleton = () => (
 
 // ── Day Cell ──────────────────────────────────────────────────
 const DayCell = ({ day, trades, onClick }) => {
+  const [hovered, setHovered] = useState(false);
   const stats = getDayStats(trades);
 
   if (!day.isCurrentMonth) {
@@ -46,19 +80,24 @@ const DayCell = ({ day, trades, onClick }) => {
     );
   }
 
-  const cellCls = cn(
-    "h-20 rounded-lg border p-1.5 relative transition-all duration-150",
-    stats
-      ? stats.isProfit
-        ? "bg-[hsl(var(--profit)/0.08)] border-[hsl(var(--profit)/0.25)] hover:bg-[hsl(var(--profit)/0.15)] hover:border-[hsl(var(--profit)/0.4)] cursor-pointer"
-        : stats.isLoss
-          ? "bg-[hsl(var(--loss)/0.08)] border-[hsl(var(--loss)/0.25)] hover:bg-[hsl(var(--loss)/0.15)] hover:border-[hsl(var(--loss)/0.4)] cursor-pointer"
-          : "bg-muted/50 border-border hover:bg-muted cursor-pointer"
-      : "bg-card/50 border-border/50"
+  // Determine color based on dominant outcome type
+  const dominantType  = stats ? getDominantType(stats) : null;
+  const dominantCount = dominantType ? getDominantCount(stats, dominantType) : 0;
+  const colorStyle    = stats ? buildCellStyle(dominantType, dominantCount, hovered) : {};
+
+  const baseCellCls = cn(
+    "h-20 rounded-lg border p-1.5 relative transition-colors duration-150",
+    stats ? "cursor-pointer" : "bg-card/50 border-border/50"
   );
 
   const cell = (
-    <div className={cellCls} onClick={stats ? () => onClick?.(day.dateStr, trades) : undefined}>
+    <div
+      className={baseCellCls}
+      style={colorStyle}
+      onMouseEnter={() => stats && setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      onClick={stats ? () => onClick?.(day.dateStr, trades) : undefined}
+    >
       {/* Date number */}
       <div className="flex justify-between items-start">
         {day.isToday ? (
@@ -79,33 +118,31 @@ const DayCell = ({ day, trades, onClick }) => {
         <>
           {/* P&L pill */}
           <div className="flex justify-center mt-1">
-            <span className={cn(
-              "text-[10px] font-mono font-semibold px-1.5 py-0.5 rounded-full",
-              stats.isProfit
-                ? "bg-[hsl(var(--profit)/0.15)] text-[var(--profit)]"
-                : stats.isLoss
-                  ? "bg-[hsl(var(--loss)/0.15)] text-[var(--loss)]"
-                  : "bg-muted text-muted-foreground"
-            )}>
+            <span
+              className="text-[10px] font-mono font-semibold px-1.5 py-0.5 rounded-full"
+              style={{
+                backgroundColor: `color-mix(in srgb, ${TYPE_HEX[dominantType]} 15%, transparent)`,
+                color: TYPE_HEX[dominantType],
+              }}
+            >
               {formatPnL(stats.netPnl)}
             </span>
           </div>
 
-          {/* Bottom row */}
+          {/* Bottom row — trade count + outcome dots */}
           <div className="absolute bottom-1 left-1.5 right-1.5 flex items-center justify-between">
             <span className="text-[9px] text-muted-foreground">
               {stats.count}t
             </span>
-            {/* Outcome dots */}
             <div className="flex items-center gap-0.5">
               {Array.from({ length: Math.min(stats.wins, 4) }).map((_, i) => (
-                <span key={`w${i}`} className="w-1.5 h-1.5 rounded-full bg-[var(--profit)]" />
+                <span key={`w${i}`} className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: TYPE_HEX.profit }} />
               ))}
               {Array.from({ length: Math.min(stats.losses, 4 - Math.min(stats.wins, 4)) }).map((_, i) => (
-                <span key={`l${i}`} className="w-1.5 h-1.5 rounded-full bg-[var(--loss)]" />
+                <span key={`l${i}`} className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: TYPE_HEX.loss }} />
               ))}
               {stats.breakeven > 0 && (
-                <span className="w-1.5 h-1.5 rounded-full bg-[hsl(var(--breakeven))]" />
+                <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: TYPE_HEX.breakeven }} />
               )}
             </div>
           </div>
@@ -120,15 +157,62 @@ const DayCell = ({ day, trades, onClick }) => {
     <TooltipProvider>
       <Tooltip>
         <TooltipTrigger asChild>{cell}</TooltipTrigger>
-        <TooltipContent side="top" className="bg-card border-border text-xs space-y-0.5">
-          <p className="font-semibold">{format(day.date, "MMM d")}</p>
-          <p>{stats.count} trade{stats.count !== 1 ? "s" : ""}</p>
-          <p className={cn("font-mono", getPnLColor(stats.netPnl))}>
-            Net P&L: {formatPnL(stats.netPnl)}
-          </p>
-          <p className="text-muted-foreground">
-            W: {stats.wins} · L: {stats.losses} · B: {stats.breakeven}
-          </p>
+        <TooltipContent
+          side="top"
+          sideOffset={6}
+          className="z-50 w-52 p-0 rounded-xl shadow-xl bg-popover text-popover-foreground border border-border overflow-hidden"
+        >
+          {/* Header bar */}
+          <div className="flex items-center justify-between px-3 py-2 border-b border-border/60 bg-muted/30">
+            <span className="text-xs font-semibold text-foreground">
+              {format(day.date, "EEE, MMM d")}
+            </span>
+            <span className="text-[10px] text-muted-foreground">
+              {stats.count} trade{stats.count !== 1 ? "s" : ""}
+            </span>
+          </div>
+
+          {/* W / L / B row */}
+          <div className="flex items-center divide-x divide-border/60 border-b border-border/60">
+            {[
+              { label: "W", count: stats.wins,     color: TYPE_HEX.profit    },
+              { label: "L", count: stats.losses,   color: TYPE_HEX.loss      },
+              { label: "B", count: stats.breakeven, color: TYPE_HEX.breakeven },
+            ].map(({ label, count, color }) => (
+              <div key={label} className="flex-1 flex flex-col items-center py-2 gap-0.5">
+                <span className="text-sm font-bold font-mono" style={{ color }}>
+                  {count}
+                </span>
+                <span className="text-[10px] text-muted-foreground">{label}</span>
+              </div>
+            ))}
+          </div>
+
+          {/* P&L stats */}
+          <div className="px-3 py-2 space-y-1">
+            <div className="flex items-center justify-between text-xs">
+              <span className="text-muted-foreground">Net P&L</span>
+              <span className="font-mono font-bold" style={{ color: stats.netPnl >= 0 ? TYPE_HEX.profit : TYPE_HEX.loss }}>
+                {formatPnL(stats.netPnl)}
+              </span>
+            </div>
+            {stats.bestTrade !== stats.worstTrade && (
+              <>
+                <div className="flex items-center justify-between text-xs">
+                  <span className="text-muted-foreground">Best trade</span>
+                  <span className="font-mono" style={{ color: TYPE_HEX.profit }}>
+                    {formatPnL(stats.bestTrade)}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between text-xs">
+                  <span className="text-muted-foreground">Worst trade</span>
+                  <span className="font-mono" style={{ color: TYPE_HEX.loss }}>
+                    {formatPnL(stats.worstTrade)}
+                  </span>
+                </div>
+              </>
+            )}
+          </div>
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>

@@ -47,6 +47,7 @@ const Settings       = lazy(() => import("@/pages/app/Settings").then(m => ({ de
 const EASync            = lazy(() => import("@/pages/app/EASync").then(m => ({ default: m.EASync })));
 const Score             = lazy(() => import("@/pages/app/Score").then(m => ({ default: m.Score })));
 const Reconciliation    = lazy(() => import("@/pages/app/Reconciliation").then(m => ({ default: m.Reconciliation })));
+const StrategyEditPage  = lazy(() => import("@/pages/app/StrategyEditPage").then(m => ({ default: m.StrategyEditPage })));
 
 const AppPageFallback = () => (
   <div className="min-h-[60vh] flex items-center justify-center">
@@ -150,7 +151,9 @@ export const router = createBrowserRouter([
               { path: "/accounts/:id",                      element: <AccountDetail /> },
               { path: "/accounts/:id/reconciliation",       element: <Reconciliation /> },
               { path: "/analytics",     element: <Analytics /> },
-              { path: "/strategies",    element: <Strategies /> },
+              { path: "/strategies",              element: <Strategies /> },
+              { path: "/strategies/new",          element: <StrategyEditPage /> },
+              { path: "/strategies/:id/edit",     element: <StrategyEditPage /> },
               { path: "/insights",      element: <Insights /> },
               { path: "/notifications", element: <Notifications /> },
               { path: "/transactions",  element: <Transactions /> },

@@ -33,6 +33,11 @@ import { AccountTypeBadge }   from "@/components/accounts/AccountTypeBadge";
 import { AccountStatusBadge } from "@/components/accounts/AccountStatusBadge";
 import { EASyncStatus }       from "@/components/accounts/EASyncStatus";
 import { PropChallengeCard }  from "@/components/accounts/PropChallengeCard";
+import { TrackRulesTab }      from "@/components/accounts/TrackRulesTab";
+import { GoalsTab }           from "@/components/accounts/GoalsTab";
+import { StrategyTab }        from "@/components/accounts/StrategyTab";
+import { WarConfigTab }       from "@/components/accounts/WarConfigTab";
+import { PropRulesTab }       from "@/components/accounts/PropRulesTab";
 import { VerificationBadge }  from "@/components/ea/VerificationBadge";
 import { InfoTooltip }        from "@/components/shared/InfoTooltip";
 import { ErrorState }       from "@/components/shared/ErrorState";
@@ -427,7 +432,7 @@ const EASyncTab = ({ accountId }) => {
 };
 
 // ── Account Trades Tab ────────────────────────────────────────
-const AccountTradesTab = ({ accountId, accountName }) => {
+const AccountTradesTab = ({ accountId, accountName, account }) => {
   const [selectedTrade, setSelectedTrade] = useState(null);
   const [isAddOpen, setIsAddOpen]         = useState(false);
 
@@ -549,6 +554,7 @@ const AccountTradesTab = ({ accountId, accountName }) => {
           >
             <TradeDetailPanel
               trade={selectedTrade}
+              account={account}
               onClose={() => setSelectedTrade(null)}
               onDelete={() => setSelectedTrade(null)}
             />
@@ -874,11 +880,28 @@ export const AccountDetail = () => {
 
       {/* ── Tabs ────────────────────────────────── */}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="bg-muted/50">
+        <TabsList className="bg-muted/50 flex-wrap h-auto gap-1">
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="trades">Trades</TabsTrigger>
           <TabsTrigger value="transactions">Transactions</TabsTrigger>
           <TabsTrigger value="ea">EA Sync</TabsTrigger>
+          <TabsTrigger value="rules">Rules</TabsTrigger>
+          <TabsTrigger value="goals">Goals</TabsTrigger>
+          {account.type === "normal" && (
+            <TabsTrigger value="strategy">Strategy</TabsTrigger>
+          )}
+          {account.type === "prop" && (
+            <>
+              <TabsTrigger value="strategy">Strategy</TabsTrigger>
+              <TabsTrigger value="prop-rules">Prop Firm Rules</TabsTrigger>
+            </>
+          )}
+          {account.type === "war" && (
+            <>
+              <TabsTrigger value="strategy">Strategy</TabsTrigger>
+              <TabsTrigger value="war-mode">War Mode</TabsTrigger>
+            </>
+          )}
           <TabsTrigger value="settings">Settings</TabsTrigger>
         </TabsList>
 
@@ -971,7 +994,7 @@ export const AccountDetail = () => {
 
         {/* ── Trades tab ─────────────────────────── */}
         <TabsContent value="trades" className="mt-4">
-          <AccountTradesTab accountId={id} accountName={account?.name} />
+          <AccountTradesTab accountId={id} accountName={account?.name} account={account} />
         </TabsContent>
 
         {/* ── Transactions tab ───────────────────── */}
@@ -983,6 +1006,35 @@ export const AccountDetail = () => {
         <TabsContent value="ea" className="mt-4">
           <AccountEATab account={account} isTabActive={activeTab === "ea"} />
         </TabsContent>
+
+        {/* ── Rules tab ──────────────────────────── */}
+        <TabsContent value="rules" className="mt-4">
+          <TrackRulesTab account={account} />
+        </TabsContent>
+
+        {/* ── Goals tab ──────────────────────────── */}
+        <TabsContent value="goals" className="mt-4">
+          <GoalsTab account={account} />
+        </TabsContent>
+
+        {/* ── Strategy tab (all account types) ────── */}
+        <TabsContent value="strategy" className="mt-4">
+          <StrategyTab account={account} />
+        </TabsContent>
+
+        {/* ── Prop Firm Rules tab (prop accounts) ── */}
+        {account.type === "prop" && (
+          <TabsContent value="prop-rules" className="mt-4">
+            <PropRulesTab account={account} />
+          </TabsContent>
+        )}
+
+        {/* ── War Mode tab (war accounts) ─────────── */}
+        {account.type === "war" && (
+          <TabsContent value="war-mode" className="mt-4">
+            <WarConfigTab account={account} />
+          </TabsContent>
+        )}
 
         {/* ── Settings tab ───────────────────────── */}
         <TabsContent value="settings" className="mt-4">

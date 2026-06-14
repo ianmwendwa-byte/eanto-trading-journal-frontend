@@ -65,7 +65,7 @@ const AllPersonalSummary = ({ data, isLoading }) => {
           No personal accounts yet
         </p>
       ) : (
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
           <Stat
             label="Current Balance"
             value={data?.totalCapital != null ? formatCurrency(data.totalCapital) : null}
@@ -110,7 +110,7 @@ const SinglePersonalSummary = ({ account, isLoading }) => {
           <Skeleton className="h-4 w-4 rounded-full" />
           <Skeleton className="h-4 w-36" />
         </div>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
           {Array.from({ length: 4 }).map((_, i) => (
             <div key={i} className="space-y-1.5">
               <Skeleton className="h-3 w-20" />
@@ -171,7 +171,7 @@ const SinglePersonalSummary = ({ account, isLoading }) => {
 
       {/* Second row — additional metrics */}
       {(metrics.totalDeposits != null || metrics.totalWithdrawals != null || metrics.returnOnCapital != null) && (
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4 pt-4 border-t border-border">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-border">
           <Stat
             label="Deposits"
             value={metrics.totalDeposits != null ? formatCurrency(metrics.totalDeposits) : null}

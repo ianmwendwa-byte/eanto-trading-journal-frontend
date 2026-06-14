@@ -122,8 +122,8 @@ export const TransactionsToolbar = ({
     <div className="space-y-2">
       {/* ── Main toolbar row ─────────────────────── */}
       <div className="flex items-center gap-2 flex-wrap">
-        {/* Search */}
-        <div className="relative flex-1 min-w-[180px] max-w-xs">
+        {/* Search — flexible width, doesn't overflow on mobile */}
+        <div className="relative flex-1 min-w-0 sm:max-w-xs">
           <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground pointer-events-none" />
           <Input
             value={searchInput}
@@ -142,19 +142,18 @@ export const TransactionsToolbar = ({
           )}
         </div>
 
-        {/* Account filter — sectioned by type */}
+        {/* Account filter */}
         {accounts.length > 0 && (
           <Select
             value={filters.accountId || "all"}
             onValueChange={(v) => onFilterChange({ accountId: v === "all" ? "" : v, page: 1 })}
           >
-            <SelectTrigger className="h-8 text-xs w-44 bg-background border-border">
+            <SelectTrigger className="h-8 text-xs w-36 sm:w-44 bg-background border-border shrink-0">
               <SelectValue placeholder="All Accounts" />
             </SelectTrigger>
             <SelectContent className="bg-card border-border">
               <SelectItem value="all">All Accounts</SelectItem>
 
-              {/* Personal section: normal + war */}
               {accounts.some((a) => a.type !== "prop") && (
                 <>
                   <SelectSeparator />
@@ -176,7 +175,6 @@ export const TransactionsToolbar = ({
                 </>
               )}
 
-              {/* Prop section */}
               {accounts.some((a) => a.type === "prop") && (
                 <>
                   <SelectSeparator />
@@ -204,11 +202,9 @@ export const TransactionsToolbar = ({
         {/* Type multi-select */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline" size="sm" className="h-8 text-xs gap-1 border-border">
+            <Button variant="outline" size="sm" className="h-8 text-xs gap-1 border-border shrink-0">
               <Filter className="h-3.5 w-3.5" />
-              {selectedTypes.length > 0
-                ? `Type: ${selectedTypes.length}`
-                : "Type: All"}
+              {selectedTypes.length > 0 ? `Type: ${selectedTypes.length}` : "Type"}
               <ChevronDown className="h-3 w-3 opacity-60" />
             </Button>
           </DropdownMenuTrigger>
@@ -249,8 +245,11 @@ export const TransactionsToolbar = ({
         {/* Group by */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline" size="sm" className="h-8 text-xs gap-1 border-border">
-              {GROUP_BY_OPTIONS.find((o) => o.value === groupBy)?.label ?? "Group by"}
+            <Button variant="outline" size="sm" className="h-8 text-xs gap-1 border-border shrink-0">
+              <span className="hidden sm:inline">
+                {GROUP_BY_OPTIONS.find((o) => o.value === groupBy)?.label ?? "Group by"}
+              </span>
+              <span className="sm:hidden">Group</span>
               <ChevronDown className="h-3 w-3 opacity-60" />
             </Button>
           </DropdownMenuTrigger>
@@ -261,11 +260,7 @@ export const TransactionsToolbar = ({
             <DropdownMenuSeparator />
             <DropdownMenuRadioGroup value={groupBy} onValueChange={onGroupByChange}>
               {GROUP_BY_OPTIONS.map((opt) => (
-                <DropdownMenuRadioItem
-                  key={opt.value}
-                  value={opt.value}
-                  className="text-xs"
-                >
+                <DropdownMenuRadioItem key={opt.value} value={opt.value} className="text-xs">
                   {opt.label}
                 </DropdownMenuRadioItem>
               ))}
@@ -273,61 +268,82 @@ export const TransactionsToolbar = ({
           </DropdownMenuContent>
         </DropdownMenu>
 
-        {/* Show reversed toggle */}
-        <div className="flex items-center gap-2 ml-auto">
+        {/* Show reversed + count — right-aligned, hidden on very small screens */}
+        <div className="hidden sm:flex items-center gap-3 ml-auto">
+          <div className="flex items-center gap-2">
+            <Switch
+              id="show-reversed"
+              checked={!!filters.showReversed}
+              onCheckedChange={(v) => onFilterChange({ showReversed: v, page: 1 })}
+            />
+            <Label htmlFor="show-reversed" className="text-xs text-muted-foreground cursor-pointer whitespace-nowrap">
+              Show reversed
+            </Label>
+          </div>
+          <p className="text-xs text-muted-foreground whitespace-nowrap">
+            {totalCount} transaction{totalCount !== 1 ? "s" : ""}
+          </p>
+        </div>
+      </div>
+
+      {/* Show reversed + count on mobile — separate row */}
+      <div className="flex items-center gap-3 sm:hidden">
+        <div className="flex items-center gap-2">
           <Switch
-            id="show-reversed"
+            id="show-reversed-mobile"
             checked={!!filters.showReversed}
             onCheckedChange={(v) => onFilterChange({ showReversed: v, page: 1 })}
           />
-          <Label htmlFor="show-reversed" className="text-xs text-muted-foreground cursor-pointer whitespace-nowrap">
+          <Label htmlFor="show-reversed-mobile" className="text-xs text-muted-foreground cursor-pointer">
             Show reversed
           </Label>
         </div>
-
-        {/* Result count */}
-        <p className="text-xs text-muted-foreground whitespace-nowrap">
+        <p className="text-xs text-muted-foreground ml-auto">
           {totalCount} transaction{totalCount !== 1 ? "s" : ""}
         </p>
       </div>
 
-      {/* ── Period + Category pills row ──────────── */}
-      <div className="flex items-center gap-4 flex-wrap">
-        {/* Period presets */}
-        <div className="flex items-center gap-1">
-          {PERIOD_PRESETS.map((p) => (
-            <PeriodPill
-              key={p.value}
-              value={p.value}
-              label={p.label}
-              active={(filters.period ?? "all") === p.value}
-              onClick={() => onFilterChange({ period: p.value, page: 1 })}
-            />
-          ))}
-        </div>
+      {/* ── Period + Category pills — scrollable on mobile ── */}
+      <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0 pb-0.5">
+        <div className="flex items-center gap-3 min-w-max sm:min-w-0 sm:flex-wrap">
+          {/* Period presets */}
+          <div className="flex items-center gap-1">
+            {PERIOD_PRESETS.map((p) => (
+              <PeriodPill
+                key={p.value}
+                value={p.value}
+                label={p.label}
+                active={(filters.period ?? "all") === p.value}
+                onClick={() => onFilterChange({ period: p.value, page: 1 })}
+              />
+            ))}
+          </div>
 
-        {/* Category pills */}
-        <div className="flex items-center gap-1">
-          <CategoryPill
-            value=""
-            label="All"
-            active={!filters.category}
-            onClick={() => onFilterChange({ category: "", page: 1 })}
-          />
-          {ALL_CATEGORIES.map((cat) => (
+          <div className="w-px h-4 bg-border shrink-0" />
+
+          {/* Category pills */}
+          <div className="flex items-center gap-1">
             <CategoryPill
-              key={cat}
-              value={cat}
-              label={CATEGORY_LABELS[cat]}
-              active={filters.category === cat}
-              onClick={() =>
-                onFilterChange({
-                  category: filters.category === cat ? "" : cat,
-                  page: 1,
-                })
-              }
+              value=""
+              label="All"
+              active={!filters.category}
+              onClick={() => onFilterChange({ category: "", page: 1 })}
             />
-          ))}
+            {ALL_CATEGORIES.map((cat) => (
+              <CategoryPill
+                key={cat}
+                value={cat}
+                label={CATEGORY_LABELS[cat]}
+                active={filters.category === cat}
+                onClick={() =>
+                  onFilterChange({
+                    category: filters.category === cat ? "" : cat,
+                    page: 1,
+                  })
+                }
+              />
+            ))}
+          </div>
         </div>
       </div>
 
