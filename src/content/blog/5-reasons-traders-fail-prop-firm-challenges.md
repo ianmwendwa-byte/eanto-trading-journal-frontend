@@ -73,6 +73,6 @@ None of this information is naturally visible in a MetaTrader terminal without a
 
 ## Pre-Challenge Checklist
 
-Before starting any prop firm evaluation, confirm the following: (1) You know your specific daily drawdown limit and the exact reset time for your firm. (2) You have calculated the maximum position size you will trade per trade at your chosen risk percentage, and this leaves at least 2× buffer within the daily limit. (3) You have documented the news window restrictions for the instruments you trade. (4) You have a rule for what happens after two consecutive losses — whether that is stopping for the day or reducing size by half. (5) You know your consistency rule cap, if one applies.
+Before starting any prop firm evaluation, confirm the following: (1) You know your specific daily drawdown limit and the exact reset time for your firm. (2) You have calculated the maximum position size you will trade per trade at your chosen risk percentage, and this leaves at least 2× buffer within the daily limit. (3) You have documented the news window restrictions for the instruments you trade. (4) You have a rule for what happens after two consecutive losses, whether that is stopping for the day or reducing size by half. (5) You know your consistency rule cap, if one applies.
 
 These five items directly address the five most common failure reasons before the challenge even starts. None of them require a better trading strategy. They require operational preparation that most traders skip in their rush to begin trading.

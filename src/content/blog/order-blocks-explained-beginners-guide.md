@@ -53,7 +53,7 @@ The speed and impulsiveness of the displacement candle is what validates the ord
 
 A bullish order block is typically a bearish (down) candle immediately before a strong upward move. This may seem counterintuitive, but the reasoning is that market makers were driving price down to fill buy orders before reversing aggressively upward. The down candle represents the last moment of selling before institutional buying took over.
 
-A bearish order block is the opposite: a bullish (up) candle immediately before a sharp downward displacement, where sell orders were being accumulated at the highs before the move down. The candle color is meaningful here — a bullish OB is a red candle before a strong up move; a bearish OB is a green candle before a strong down move. This opposing-color convention follows from the accumulation logic: the institution was doing the opposite of what the candle color implies in order to fill large orders at a controlled price.
+A bearish order block is the opposite: a bullish (up) candle immediately before a sharp downward displacement, where sell orders were being accumulated at the highs before the move down. The candle color is meaningful here. A bullish OB is a red candle before a strong up move; a bearish OB is a green candle before a strong down move. This opposing-color convention follows from the accumulation logic: the institution was doing the opposite of what the candle color implies in order to fill large orders at a controlled price.
 
 ## Order Block + FVG Confluence
 
@@ -63,20 +63,20 @@ The practical result is that the price level has two independent reasons to act 
 
 ## What is Order Block Mitigation?
 
-Mitigation refers to price returning to an order block zone and trading through it. The term comes from the idea that the original orders placed at that zone are being "mitigated" — filled or neutralized — as price revisits. Once the orders that defined the zone have been filled, the zone loses its significance.
+Mitigation refers to price returning to an order block zone and trading through it. The term comes from the idea that the original orders placed at that zone are being "mitigated" (filled or neutralized) as price revisits. Once the orders that defined the zone have been filled, the zone loses its significance.
 
 An order block that has been fully mitigated (price has completely traded through the zone, not just touched it) is generally considered less likely to act as support or resistance again. Traders typically look for entries on the first return to an order block, before full mitigation, not after. A second or third test of the same zone, especially after a clean sweep through it, is treated as a lower-probability entry because the original institutional orders that defined the zone may no longer be present.
 
 ## Common Order Block Mistakes
 
-The most common mistake beginners make is labelling too many candles as order blocks — essentially treating any bearish candle before an up move as a valid OB without checking whether there was a genuine impulsive displacement afterward. A valid order block requires a clear structural break or displacement following it, not just any directional candle followed by a modest move.
+The most common mistake beginners make is labelling too many candles as order blocks, essentially treating any bearish candle before an up move as a valid OB without checking whether there was a genuine impulsive displacement afterward. A valid order block requires a clear structural break or displacement following it, not just any directional candle followed by a modest move.
 
-The second common mistake is ignoring higher-timeframe context. A bullish order block on the five-minute chart that sits below a bearish order block on the four-hour chart is not a high-probability entry — the higher-timeframe structure is pointing in the opposite direction. Order blocks should always be evaluated relative to the higher-timeframe bias, not in isolation on a single timeframe.
+The second common mistake is ignoring higher-timeframe context. A bullish order block on the five-minute chart that sits below a bearish order block on the four-hour chart is not a high-probability entry. The higher-timeframe structure is pointing in the opposite direction. Order blocks should always be evaluated relative to the higher-timeframe bias, not in isolation on a single timeframe.
 
 The third mistake is treating mitigated order blocks as still-valid entry zones. Once price has cleanly traded through the zone, the orders that defined it have been absorbed. Waiting for price to return to an already-mitigated OB is waiting for a zone that no longer has the same institutional significance.
 
 ## Journaling Order Block Trades for Review
 
-Order blocks are a concept — how well they work for you specifically depends on your timeframe, pair selection, session preference, and how strictly you apply the entry criteria. The only way to know whether your OB-based entries are profitable is to track each trade and tag it with the setup type and the specific criteria you used to validate the OB.
+Order blocks are a concept. How well they work for you specifically depends on your timeframe, pair selection, session preference, and how strictly you apply the entry criteria. The only way to know whether your OB-based entries are profitable is to track each trade and tag it with the setup type and the specific criteria you used to validate the OB.
 
 Over 20 to 30 tagged trades you will start to see patterns: whether first-touch OBs outperform second-touch entries, whether four-hour OBs work better than one-hour OBs in your trading, and whether your OB entries actually align with your stated criteria or whether you are finding post-hoc justifications for trades you would have taken anyway. The data answers these questions in a way that intuition and memory cannot.
