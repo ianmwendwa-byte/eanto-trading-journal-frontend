@@ -124,6 +124,17 @@
 
   --spacing: 0.25rem;
   --tracking-normal: -0.01em;
+
+  /* ───────────────── BLOG PILLAR ACCENT COLORS ───────────────── */
+  /* Distinct from trading semantic colors (profit/loss/warning).   */
+  /* Used only for pillar badges, chips, and category headers.      */
+
+  --pillar-ict-smc: #8B5CF6;         /* Purple — ICT & Smart Money */
+  --pillar-prop-firm: #0EA5E9;       /* Sky blue — Prop Firm Rules */
+  --pillar-psychology: #F97316;      /* Orange — Psychology */
+  --pillar-business: #10B981;        /* Emerald — Trading as a Business */
+  --pillar-volume-order-flow: #06B6D4; /* Cyan — Volume & Order Flow */
+  --pillar-classic-ta: #EAB308;       /* Yellow — Classic Strategies & TA */
 }
 
 /* ─────────────────────────────────────────────

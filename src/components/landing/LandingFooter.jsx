@@ -18,6 +18,12 @@ const LINKS = {
     { label: "Community", href: "/community" },
     { label: "Contact",   href: "/contact" },
   ],
+  Blog: [
+    { label: "ICT & Smart Money",     href: "/blog/category/ict_smc" },
+    { label: "Prop Firm Rules",       href: "/blog/category/prop_firm_rules" },
+    { label: "Psychology",            href: "/blog/category/psychology" },
+    { label: "Trading as a Business", href: "/blog/category/trading_business" },
+  ],
   Legal: [
     { label: "Privacy Policy",  href: "/privacy" },
     { label: "Terms of Service", href: "/terms" },

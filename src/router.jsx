@@ -19,6 +19,11 @@ import { ContactPage }   from "@/pages/marketing/ContactPage";
 import { BlogPage }      from "@/pages/marketing/BlogPage";
 import { CommunityPage } from "@/pages/marketing/CommunityPage";
 
+// Blog system
+import { BlogIndexPage }    from "@/pages/blog/BlogIndexPage";
+import { BlogPostPage }     from "@/pages/blog/BlogPostPage";
+import { BlogCategoryPage } from "@/pages/blog/BlogCategoryPage";
+
 // Feature pages
 import { WarPage }      from "@/pages/marketing/WarPage";
 import { EASyncPage }   from "@/pages/marketing/EASyncPage";
@@ -122,8 +127,12 @@ export const router = createBrowserRouter([
       // Marketing
       { path: "/about",     element: <AboutPage /> },
       { path: "/contact",   element: <ContactPage /> },
-      { path: "/blog",      element: <BlogPage /> },
       { path: "/community", element: <CommunityPage /> },
+
+      // Blog system (replaces the old static BlogPage at /blog)
+      { path: "/blog",                     element: <BlogIndexPage /> },
+      { path: "/blog/:slug",               element: <BlogPostPage /> },
+      { path: "/blog/category/:pillar",    element: <BlogCategoryPage /> },
 
       // Feature pages
       { path: "/war-account",    element: <WarPage /> },

@@ -69,6 +69,10 @@ export const LandingNavbar = () => {
     { label: "FAQ", id: "faq" },
   ];
 
+  const pageLinks = [
+    { label: "Blog", href: "/blog" },
+  ];
+
   return (
     <motion.header
       initial={{ opacity: 0, y: -10 }}
@@ -100,6 +104,15 @@ export const LandingNavbar = () => {
               >
                 {label}
               </button>
+            ))}
+            {pageLinks.map(({ label, href }) => (
+              <Link
+                key={href}
+                to={href}
+                className="text-sm text-muted-foreground hover:text-foreground transition-colors duration-150"
+              >
+                {label}
+              </Link>
             ))}
           </nav>
 
@@ -148,6 +161,16 @@ export const LandingNavbar = () => {
                   >
                     {label}
                   </button>
+                ))}
+                {pageLinks.map(({ label, href }) => (
+                  <Link
+                    key={href}
+                    to={href}
+                    onClick={() => setMobileOpen(false)}
+                    className="text-base text-muted-foreground hover:text-foreground hover:bg-muted transition-colors text-left px-3 py-2.5 rounded-md"
+                  >
+                    {label}
+                  </Link>
                 ))}
               </nav>
 
