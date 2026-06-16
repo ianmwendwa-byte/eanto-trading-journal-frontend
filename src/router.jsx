@@ -16,10 +16,9 @@ import { TrackingPolicy }              from "@/pages/legal/TrackingPolicy";
 // Marketing pages
 import { AboutPage }     from "@/pages/marketing/AboutPage";
 import { ContactPage }   from "@/pages/marketing/ContactPage";
-import { BlogPage }      from "@/pages/marketing/BlogPage";
 import { CommunityPage } from "@/pages/marketing/CommunityPage";
 
-// Blog system
+// Blog pages
 import { BlogIndexPage }    from "@/pages/blog/BlogIndexPage";
 import { BlogPostPage }     from "@/pages/blog/BlogPostPage";
 import { BlogCategoryPage } from "@/pages/blog/BlogCategoryPage";
