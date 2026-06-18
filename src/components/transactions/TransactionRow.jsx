@@ -237,7 +237,7 @@ export const TransactionRow = ({
                   <DropdownMenuSeparator />
                   <DropdownMenuItem
                     className="text-xs gap-2 text-[var(--loss)] focus:text-[var(--loss)]"
-                    onClick={() => setReverseOpen(true)}
+                    onSelect={(e) => { e.preventDefault(); setReverseOpen(true); }}
                   >
                     <RotateCcw className="h-3.5 w-3.5" />
                     Reverse

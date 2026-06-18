@@ -151,7 +151,7 @@ export const Transactions = () => {
       ...(filters.type             ? { type:         filters.type         } : {}),
       ...(filters.category         ? { category:     filters.category     } : {}),
       ...(filters.search           ? { search:       filters.search       } : {}),
-      ...(filters.showReversed     ? { showReversed: true                 } : {}),
+      ...(filters.showReversed     ? { reversed: true                     } : {}),
       ...dateRange,
     };
   }, [filters, isSpecificAccount]);

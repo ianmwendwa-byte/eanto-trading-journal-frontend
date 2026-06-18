@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import api from "@/lib/axios";
-import { transactionKeys, accountKeys } from "@/lib/queryKeys";
+import { transactionKeys, accountKeys, dashboardKeys } from "@/lib/queryKeys";
 import { API } from "@/constants/api";
 import { useAuthStore } from "@/store/useAuthStore";
 
@@ -68,6 +68,7 @@ export const useCreateTransaction = () => {
     mutationFn: (data) => api.post(API.TRANSACTION.BASE, data),
     onSuccess: (_, variables) => {
       qc.invalidateQueries({ queryKey: transactionKeys.all() });
+      qc.invalidateQueries({ queryKey: ["dashboard", "overview"] });
       if (variables?.accountId) {
         qc.invalidateQueries({ queryKey: accountKeys.detail(variables.accountId) });
       }
@@ -84,6 +85,7 @@ export const useReverseTransaction = () => {
     mutationFn: (id) => api.post(API.TRANSACTION.REVERSE(id)),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: transactionKeys.all() });
+      qc.invalidateQueries({ queryKey: ["dashboard", "overview"] });
       toast.success("Transaction reversed");
     },
     onError: (error) => toast.error(error.message ?? "Failed to reverse transaction"),

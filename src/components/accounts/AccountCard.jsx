@@ -165,7 +165,7 @@ export const AccountCard = ({ account, viewMode = "grid", onEdit, onDelete }) =>
   const cfg      = TYPE_CONFIG[account.type] ?? TYPE_CONFIG.normal;
   const TypeIcon = cfg.Icon;
 
-  const accountSize = isProp ? (account.accountSize ?? 0) : (account.startingBalance ?? 0);
+  const accountSize = isProp ? (account.accountSize ?? 0) : (account.balanceSnapshot ?? 0);
   const pnl         = account.performance?.totalPnl ?? 0;
 
   const winRate     = account.performance?.winRate     ?? null;

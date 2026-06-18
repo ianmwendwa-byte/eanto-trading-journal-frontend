@@ -24,7 +24,10 @@ import {
 import { useCreateTransaction } from "@/hooks/useTransactions";
 import { cn } from "@/lib/utils";
 
-const today = () => new Date().toISOString().split("T")[0];
+const todayLocal = () => {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+};
 
 const schema = z.object({
   accountId:       z.string().min(1, "Account is required"),
@@ -85,7 +88,7 @@ export const AddTransactionModal = ({
       accountId:       defaultAccountId,
       type:            "",
       amount:          "",
-      transactionDate: today(),
+      transactionDate: todayLocal(),
       note:            "",
     },
   });
@@ -110,11 +113,17 @@ export const AddTransactionModal = ({
   });
 
   const onSubmit = (data) => {
+    const [y, m, d] = data.transactionDate.split("-").map(Number);
+    const selectedLocal = new Date(y, m - 1, d);
+    const now = new Date();
+    const isToday = selectedLocal.toDateString() === now.toDateString();
+    const transactionDate = isToday ? now.toISOString() : selectedLocal.toISOString();
+
     create(
-      { ...data, source: "manual" },
+      { ...data, transactionDate, source: "manual" },
       {
         onSuccess: () => {
-          reset({ accountId: defaultAccountId, type: "", amount: "", transactionDate: today(), note: "" });
+          reset({ accountId: defaultAccountId, type: "", amount: "", transactionDate: todayLocal(), note: "" });
           onClose();
         },
       }
@@ -216,7 +225,7 @@ export const AddTransactionModal = ({
               </Label>
               <Input
                 type="date"
-                max={today()}
+                max={todayLocal()}
                 className="bg-background border-border"
                 {...register("transactionDate")}
               />
