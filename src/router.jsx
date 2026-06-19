@@ -30,9 +30,11 @@ import { ScorePage }    from "@/pages/marketing/ScorePage";
 
 
 // Auth pages
-import { Login }          from "@/pages/auth/Login";
-import { Register }       from "@/pages/auth/Register";
-import { ForgotPassword } from "@/pages/auth/ForgotPassword";
+import { Login }            from "@/pages/auth/Login";
+import { Register }         from "@/pages/auth/Register";
+import { ForgotPassword }   from "@/pages/auth/ForgotPassword";
+import { VerifyEmailPage }  from "@/pages/auth/VerifyEmailPage";
+import { AuthActionPage }   from "@/pages/auth/AuthActionPage";
 
 // Onboarding
 import { Onboarding } from "@/pages/onboarding/Onboarding";
@@ -105,9 +107,12 @@ export const router = createBrowserRouter([
     element: <Root />,
     children: [
       // Auth
-      { path: "/login",           element: <Login /> },
-      { path: "/register",        element: <Register /> },
-      { path: "/forgot-password", element: <ForgotPassword /> },
+      { path: "/login",                element: <Login /> },
+      { path: "/register",             element: <Register /> },
+      { path: "/forgot-password",      element: <ForgotPassword /> },
+      { path: "/auth/forgot-password", element: <ForgotPassword /> },
+      { path: "/auth/verify-email",    element: <VerifyEmailPage /> },
+      { path: "/auth/action",          element: <AuthActionPage /> },
 
       // Onboarding
       {

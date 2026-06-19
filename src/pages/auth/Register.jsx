@@ -3,7 +3,6 @@ import { Helmet } from "react-helmet-async";
 import { Link, useNavigate } from "react-router-dom";
 import {
   createUserWithEmailAndPassword,
-  sendEmailVerification,
   signInWithPopup,
 } from "firebase/auth";
 import { useForm } from "react-hook-form";
@@ -17,10 +16,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { Mail, Lock, Eye, EyeOff, ShieldCheck, CheckCircle, RefreshCw, ArrowRight, Loader2 } from "lucide-react";
+import { Mail, Lock, Eye, EyeOff, ShieldCheck } from "lucide-react";
 import Logo from "@/components/shared/Logo";
-import api from "@/lib/axios";
-import { API } from "@/constants/api";
 
 const GoogleIcon = () => (
   <svg className="h-4 w-4" viewBox="0 0 24 24" aria-hidden="true">
@@ -40,141 +37,15 @@ const schema = z.object({
   path: ["confirmPassword"],
 });
 
-// ── Email verification screen shown after email/password sign-up ──
-const VerifyEmailScreen = ({ email, onContinue, onResend, continueLoading, verifyError }) => {
-  const [resending, setResending] = useState(false);
-  const [resent,    setResent]    = useState(false);
-  const [cooldown,  setCooldown]  = useState(0);
-
-  useEffect(() => {
-    if (cooldown <= 0) return;
-    const t = setTimeout(() => setCooldown((c) => c - 1), 1000);
-    return () => clearTimeout(t);
-  }, [cooldown]);
-
-  const handleResend = async () => {
-    if (cooldown > 0) return;
-    setResending(true);
-    try {
-      await onResend();
-      setResent(true);
-      setCooldown(60);
-      toast.success("Verification email resent.");
-    } catch (err) {
-      if (err?.code === "auth/too-many-requests") {
-        toast.error("Too many requests — please wait a moment before trying again.");
-      } else {
-        toast.error("Could not resend — please try again shortly.");
-      }
-    } finally {
-      setResending(false);
-    }
-  };
-
-  return (
-    <div className="space-y-8">
-      <div className="space-y-1">
-        <div className="mb-5">
-          <Logo variant="horizontal" size="lg" />
-        </div>
-        <h1 className="text-2xl font-bold font-heading tracking-tight">Check your inbox</h1>
-        <p className="text-muted-foreground text-sm">
-          One step before you start trading
-        </p>
-      </div>
-
-      <div className="bg-card border border-border rounded-2xl p-6 shadow-xl space-y-6">
-        {/* Icon + message */}
-        <div className="flex flex-col items-center text-center gap-4 py-2">
-          <div className="h-14 w-14 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center">
-            <Mail className="h-7 w-7 text-primary" />
-          </div>
-          <div className="space-y-1.5">
-            <p className="text-sm font-medium text-foreground">
-              We sent a verification link to
-            </p>
-            <p className="text-sm font-semibold text-primary break-all">{email}</p>
-            <p className="text-xs text-muted-foreground mt-2 leading-relaxed">
-              Click the link in that email to verify your account.
-              Check your spam folder if you don't see it within a minute.
-            </p>
-          </div>
-        </div>
-
-        {/* Inline error when backend says not verified yet */}
-        {verifyError && (
-          <p className="text-xs text-center" style={{ color: "var(--loss)" }}>
-            {verifyError}
-          </p>
-        )}
-
-        {/* Continue button */}
-        <Button className="w-full gap-2" onClick={onContinue} disabled={continueLoading}>
-          {continueLoading ? (
-            <><Loader2 className="h-4 w-4 animate-spin" /> Verifying...</>
-          ) : (
-            <>I've verified my email — Continue <ArrowRight className="h-4 w-4" /></>
-          )}
-        </Button>
-
-        {/* Resend */}
-        <div className="flex items-center justify-center gap-2">
-          <button
-            type="button"
-            onClick={handleResend}
-            disabled={resending || cooldown > 0}
-            className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-          >
-            {resending ? (
-              <RefreshCw className="h-3.5 w-3.5 animate-spin" />
-            ) : resent ? (
-              <CheckCircle className="h-3.5 w-3.5 text-[var(--profit)]" />
-            ) : (
-              <RefreshCw className="h-3.5 w-3.5" />
-            )}
-            {cooldown > 0
-              ? `Resend in ${cooldown}s`
-              : resent
-              ? "Email resent"
-              : "Resend verification email"}
-          </button>
-        </div>
-
-        {/* Skip verification */}
-        <p className="text-center text-xs text-muted-foreground/70">
-          <button
-            type="button"
-            onClick={onContinue}
-            disabled={continueLoading}
-            className="underline underline-offset-2 hover:text-muted-foreground transition-colors disabled:opacity-50"
-          >
-            Skip for now — verify later
-          </button>
-        </p>
-      </div>
-
-      <div className="flex items-center justify-center gap-1.5 text-xs text-muted-foreground/60">
-        <ShieldCheck className="h-3.5 w-3.5" />
-        Secured with Firebase
-      </div>
-    </div>
-  );
-};
-
-// ── Main component ────────────────────────────────────────────────
 export const Register = () => {
   const navigate = useNavigate();
   const { mongoUser, onboardingComplete, isLoading: apiLoading } = useAuthStore();
 
-  const [view,          setView]          = useState("form"); // "form" | "verify-email"
   const [loading,       setLoading]       = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
   const [pendingSync,   setPendingSync]   = useState(false);
-  const [pendingEmail,  setPendingEmail]  = useState("");
   const [showPassword,  setShowPassword]  = useState(false);
   const [showConfirm,   setShowConfirm]   = useState(false);
-  const [verifyLoading, setVerifyLoading] = useState(false);
-  const [verifyError,   setVerifyError]   = useState(null);
 
   const { register, handleSubmit, formState: { errors } } = useForm({
     resolver: zodResolver(schema),
@@ -215,107 +86,21 @@ export const Register = () => {
   const onSubmit = async (data) => {
     setLoading(true);
     try {
-      const credential = await createUserWithEmailAndPassword(
-        auth, data.email, data.password
-      );
-      await sendEmailVerification(credential.user);
-      // Show the "check your inbox" screen instead of navigating immediately.
-      // AuthProvider's onAuthStateChanged fires in the background and syncs
-      // the user with the backend — by the time the user clicks "Continue",
-      // mongoUser will already be ready.
-      setPendingEmail(data.email);
-      setView("verify-email");
-      setLoading(false);
+      // Create the Firebase user — the backend sends the verification email via
+      // Resend during the /auth/login call that AuthProvider fires on auth state change.
+      // We must NOT call sendEmailVerification() here — that would send a duplicate
+      // unbranded Firebase email alongside the branded Resend one.
+      await createUserWithEmailAndPassword(auth, data.email, data.password);
+
+      // Navigate to the verification pending screen. AuthProvider's onAuthStateChanged
+      // fires in the background and syncs the user with the backend — by the time the
+      // user clicks "Continue" on the verify page, mongoUser will already be ready.
+      navigate("/auth/verify-email", { replace: true });
     } catch (error) {
       toast.error(getFirebaseErrorMessage(error.code));
       setLoading(false);
     }
   };
-
-  const handleResend = async () => {
-    if (!auth.currentUser) throw new Error("No current user");
-    await sendEmailVerification(auth.currentUser);
-  };
-
-  const handleContinueAfterVerify = async () => {
-    setVerifyError(null);
-    setVerifyLoading(true);
-    try {
-      // reload() fetches the latest user profile from Firebase, updating
-      // auth.currentUser.emailVerified. getIdToken(true) then force-refreshes
-      // the JWT so the backend receives a token with email_verified: true.
-      await auth.currentUser?.reload();
-      await auth.currentUser?.getIdToken(true);
-    } catch {
-      setVerifyError("Could not reach Firebase. Check your connection and try again.");
-      setVerifyLoading(false);
-      return;
-    }
-
-    // Firebase is the authoritative source — hard block if not verified
-    if (!auth.currentUser?.emailVerified) {
-      setVerifyError("Please click the verification link in your email first.");
-      setVerifyLoading(false);
-      return;
-    }
-
-    // Mark verified on backend, then re-sync the full user from the same
-    // login endpoint AuthProvider uses so the store gets a fresh, complete object.
-    try {
-      await api.post(API.AUTH.VERIFY_EMAIL);
-    } catch {
-      // Non-blocking — proceed to re-sync regardless.
-    }
-    try {
-      const response = await api.post(API.AUTH.LOGIN, {
-        displayName: auth.currentUser?.displayName ?? "",
-        photoURL:    auth.currentUser?.photoURL    ?? "",
-      });
-      if (response?.user) {
-        useAuthStore.getState().setMongoUser(response.user);
-      }
-      if (response?.onboardingComplete !== undefined) {
-        useAuthStore.getState().setOnboardingComplete(response.onboardingComplete);
-      }
-    } catch {
-      // Fallback: patch directly if the re-sync call fails.
-      const current = useAuthStore.getState().mongoUser;
-      if (current) useAuthStore.getState().setMongoUser({ ...current, emailVerified: true });
-    }
-
-    setVerifyLoading(false);
-    const { mongoUser: freshUser, onboardingComplete: freshOnboarding } = useAuthStore.getState();
-    if (freshUser) {
-      const skippedAt = freshUser?.onboarding?.skippedAt;
-      if (freshOnboarding === false && !skippedAt) {
-        navigate("/onboarding", { replace: true });
-      } else {
-        navigate("/dashboard", { replace: true });
-      }
-    } else {
-      setPendingSync(true);
-    }
-  };
-
-  if (view === "verify-email") {
-    return (
-      <>
-        <Helmet>
-          <title>Verify Email — Kraviq</title>
-          <meta name="robots" content="noindex, follow" />
-        </Helmet>
-        <AuthLayout>
-          <VerifyEmailScreen
-            email={pendingEmail}
-            onContinue={handleContinueAfterVerify}
-            onResend={handleResend}
-            continueLoading={verifyLoading}
-            verifyError={verifyError}
-          />
-        </AuthLayout>
-      </>
-    );
-  }
 
   return (
     <>

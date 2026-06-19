@@ -15,6 +15,8 @@ import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { Mail, Lock, Eye, EyeOff, ShieldCheck } from "lucide-react";
 import Logo from "@/components/shared/Logo";
+import api from "@/lib/axios";
+import { API } from "@/constants/api";
 
 const GoogleIcon = () => (
   <svg className="h-4 w-4" viewBox="0 0 24 24" aria-hidden="true">
@@ -76,7 +78,22 @@ export const Login = () => {
   const onSubmit = async (data) => {
     setLoading(true);
     try {
-      await signInWithEmailAndPassword(auth, data.email, data.password);
+      const credential = await signInWithEmailAndPassword(auth, data.email, data.password);
+      if (!credential.user.emailVerified) {
+        // Auto-send a fresh verification email before gating them to the verify screen.
+        // The backend only sends on first registration, so returning unverified users
+        // would otherwise see the page with no email in their inbox.
+        try {
+          const idToken = await credential.user.getIdToken();
+          await api.post(API.AUTH.VERIFY_EMAIL, {}, {
+            headers: { Authorization: `Bearer ${idToken}` },
+          });
+        } catch {
+          // Non-fatal — user can still resend manually from the verify page
+        }
+        navigate("/auth/verify-email", { replace: true });
+        return;
+      }
       setPendingSync(true);
     } catch (error) {
       toast.error(getFirebaseErrorMessage(error.code));

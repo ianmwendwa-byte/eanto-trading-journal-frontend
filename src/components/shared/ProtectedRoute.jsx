@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Navigate, useLocation } from "react-router-dom";
-import { signOut, sendEmailVerification } from "firebase/auth";
+import { signOut } from "firebase/auth";
 import { auth } from "@/lib/firebase";
 import { useAuthStore } from "@/store/useAuthStore";
 import { Button } from "@/components/ui/button";
@@ -9,34 +9,23 @@ import { toast } from "sonner";
 import Logo from "@/components/shared/Logo";
 import api from "@/lib/axios";
 import { API } from "@/constants/api";
+import { useResendVerification } from "@/hooks/useResendVerification";
 
 const hasSessionSkip = () => {
   try { return sessionStorage.getItem("tc_onboarding_skipped") === "true"; }
   catch { return false; }
 };
 
-// ── Email verification gate ───────────────────────────────────
-// Shown to email/password users whose mongoUser.emailVerified === false.
+// ── Email verification gate ───────────────────────────────────────
+// Shown to email/password users whose emailVerified === false.
 // Google users always arrive with emailVerified === true so they never see this.
 const EmailVerificationGate = () => {
-  const { mongoUser, logout } = useAuthStore();
+  const { mongoUser, firebaseUser, logout }             = useAuthStore();
+  const { resend, status: resendStatus, countdown }     = useResendVerification();
+  const [verifying, setVerifying]                       = useState(false);
+  const [error,     setError]                           = useState(null);
 
-  const [verifying,  setVerifying]  = useState(false);
-  const [resending,  setResending]  = useState(false);
-  const [resent,     setResent]     = useState(false);
-  const [cooldown,   setCooldown]   = useState(0);
-  const [error,      setError]      = useState(null);
-
-  // Countdown timer for resend cooldown
-  const startCooldown = (seconds) => {
-    setCooldown(seconds);
-    const tick = () => setCooldown((c) => {
-      if (c <= 1) return 0;
-      setTimeout(tick, 1000);
-      return c - 1;
-    });
-    setTimeout(tick, 1000);
-  };
+  // Countdown timer is handled inside useResendVerification
 
   const handleVerified = async () => {
     setError(null);
@@ -61,8 +50,7 @@ const EmailVerificationGate = () => {
     }
 
     // Mark verified on backend, then re-sync the full user from the same
-    // login endpoint AuthProvider uses — MongoDB already has emailVerified:true
-    // after the verify-email call, so this returns a complete, fresh user object.
+    // login endpoint AuthProvider uses.
     try {
       await api.post(API.AUTH.VERIFY_EMAIL);
     } catch {
@@ -80,7 +68,6 @@ const EmailVerificationGate = () => {
         useAuthStore.getState().setOnboardingComplete(response.onboardingComplete);
       }
     } catch {
-      // Fallback: patch the field directly if the re-sync call fails.
       const current = useAuthStore.getState().mongoUser;
       if (current) useAuthStore.getState().setMongoUser({ ...current, emailVerified: true });
     }
@@ -88,31 +75,37 @@ const EmailVerificationGate = () => {
   };
 
   const handleResend = async () => {
-    if (cooldown > 0 || resending) return;
-    setResending(true);
-    try {
-      await sendEmailVerification(auth.currentUser);
-      setResent(true);
-      toast.success("Verification email sent. Check your inbox.");
-      startCooldown(60);
-    } catch (err) {
-      if (err?.code === "auth/too-many-requests") {
-        toast.error("Too many requests — please wait a moment before trying again.");
-        startCooldown(60);
-      } else {
-        toast.error("Could not resend. Try again in a moment.");
-      }
-    } finally {
-      setResending(false);
+    if (countdown > 0 || resendStatus === "loading") return;
+
+    const user = auth.currentUser;
+    if (!user) return;
+
+    const idToken = await user.getIdToken();
+    await resend(idToken);
+
+    if (resendStatus !== "error" && resendStatus !== "rate-limited") {
+      // Success feedback is shown inline via resendStatus
+    }
+    if (resendStatus === "already-verified") {
+      toast.success("Email already verified — please continue.");
     }
   };
 
   const handleSignOut = () => {
-    signOut(auth).catch(() => {}); // fire-and-forget
+    signOut(auth).catch(() => {});
     logout();
   };
 
-  const email = mongoUser?.email ?? "";
+  // Resend feedback
+  const resendLabel = () => {
+    if (resendStatus === "loading") return "Sending...";
+    if (countdown > 0)              return `Resend in ${countdown}s`;
+    if (resendStatus === "success") return "Email resent";
+    return "Resend verification email";
+  };
+
+  const resendDisabled = resendStatus === "loading" || countdown > 0;
+  const email = mongoUser?.email ?? firebaseUser?.email ?? "";
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center px-4">
@@ -143,10 +136,32 @@ const EmailVerificationGate = () => {
             </div>
           </div>
 
-          {/* Error */}
+          {/* Resend feedback */}
+          {resendStatus === "rate-limited" && (
+            <p className="text-xs text-center rounded-lg px-3 py-2 bg-warning/10 border border-warning/20 text-warning">
+              Too many attempts. Please wait a few minutes before trying again.
+            </p>
+          )}
+          {resendStatus === "error" && (
+            <p
+              className="text-xs text-center rounded-lg px-3 py-2 bg-destructive/10 border border-destructive/20"
+              style={{ color: "var(--loss)" }}
+            >
+              Could not resend. Please try again in a moment.
+            </p>
+          )}
+          {resendStatus === "success" && countdown > 0 && (
+            <p className="text-xs text-center text-[var(--profit)]">
+              Sent — check your inbox (including spam)
+            </p>
+          )}
+
+          {/* Verification error */}
           {error && (
-            <p className="text-xs text-center rounded-lg px-3 py-2 bg-destructive/10 border border-destructive/20"
-               style={{ color: "var(--loss)" }}>
+            <p
+              className="text-xs text-center rounded-lg px-3 py-2 bg-destructive/10 border border-destructive/20"
+              style={{ color: "var(--loss)" }}
+            >
               {error}
             </p>
           )}
@@ -165,21 +180,17 @@ const EmailVerificationGate = () => {
             <button
               type="button"
               onClick={handleResend}
-              disabled={resending || cooldown > 0}
+              disabled={resendDisabled}
               className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
-              {resending ? (
+              {resendStatus === "loading" ? (
                 <RefreshCw className="h-3.5 w-3.5 animate-spin" />
-              ) : resent ? (
+              ) : resendStatus === "success" ? (
                 <CheckCircle className="h-3.5 w-3.5 text-[var(--profit)]" />
               ) : (
                 <RefreshCw className="h-3.5 w-3.5" />
               )}
-              {cooldown > 0
-                ? `Resend in ${cooldown}s`
-                : resent
-                ? "Email resent"
-                : "Resend verification email"}
+              {resendLabel()}
             </button>
           </div>
 
@@ -200,9 +211,9 @@ const EmailVerificationGate = () => {
   );
 };
 
-// ── Protected route ───────────────────────────────────────────
+// ── Protected route ───────────────────────────────────────────────
 export const ProtectedRoute = ({ children }) => {
-  const { isAuthenticated, isLoading, mongoUser, onboardingComplete } = useAuthStore();
+  const { isAuthenticated, isLoading, firebaseUser, mongoUser, onboardingComplete } = useAuthStore();
   const location = useLocation();
 
   if (isLoading) {
@@ -218,8 +229,15 @@ export const ProtectedRoute = ({ children }) => {
   }
 
   // Block email/password users who haven't verified their email.
+  // We check firebaseUser.emailVerified (the authoritative Firebase value) AND
+  // mongoUser.emailVerified (backend record). Either being false gates access.
   // Google users always have emailVerified === true so this never triggers for them.
-  if (mongoUser && mongoUser.emailVerified === false) {
+  // /auth/verify-email is excluded from this guard (it IS the verification screen).
+  const emailUnverified =
+    (firebaseUser && firebaseUser.emailVerified === false) ||
+    (mongoUser && mongoUser.emailVerified === false);
+
+  if (emailUnverified) {
     return <EmailVerificationGate />;
   }
 
