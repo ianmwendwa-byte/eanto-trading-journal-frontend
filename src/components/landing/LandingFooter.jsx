@@ -61,8 +61,7 @@ export const LandingFooter = () => {
               <Logo variant="horizontal" size="lg" />
             </Link>
             <p className="text-sm text-muted-foreground leading-relaxed max-w-xs mb-6">
-              The operating system for retail forex traders. Track, score,
-              and scale your trading business.
+              Kraviq helps forex traders track trades, manage multiple accounts, and analyze trading performance — all in one platform.
             </p>
             <div className="flex gap-3">
               {SOCIALS.map(({ icon: Icon, label, href }) => (

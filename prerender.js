@@ -74,7 +74,18 @@ function getPillarIds() {
 
 // ── Route list ────────────────────────────────────────────────────────────────
 
-const STATIC_ROUTES = ["/"];
+const STATIC_ROUTES = [
+  "/",
+  "/about",
+  "/contact",
+  "/community",
+  "/privacy",
+  "/terms",
+  "/cookies",
+  "/war-account",
+  "/ea-sync",
+  "/business-score",
+];
 
 const blogSlugs = getBlogSlugs();
 const PILLAR_IDS = getPillarIds();
@@ -90,7 +101,7 @@ const ROUTES = [...STATIC_ROUTES, ...blogRoutes];
 
 async function prerender() {
   console.log("🔄 Starting prerender...");
-  console.log(`   Static routes: ${STATIC_ROUTES.length}`);
+  console.log(`   Static routes: ${STATIC_ROUTES.length} (/, /about, /contact, /community, /privacy, /terms, /cookies, /war-account, /ea-sync, /business-score)`);
   console.log(`   Blog routes:   ${blogRoutes.length} (${blogSlugs.length} posts + index + ${PILLAR_IDS.length} categories)`);
 
   const templatePath = path.resolve(__dirname, "dist/index.html");
