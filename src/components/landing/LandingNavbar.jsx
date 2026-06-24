@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import Logo from "@/components/shared/Logo";
 import { Button } from "@/components/ui/button";
+import { useIsMounted } from "@/hooks/useIsMounted";
 import {
   Sheet,
   SheetContent,
@@ -84,6 +85,7 @@ const ThemeToggle = () => {
 };
 
 export const LandingNavbar = () => {
+  const isMounted = useIsMounted();
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const { pathname } = useLocation();
@@ -118,7 +120,7 @@ export const LandingNavbar = () => {
 
   return (
     <motion.header
-      initial={{ opacity: 0, y: -10 }}
+      initial={isMounted ? { opacity: 0, y: -10 } : false}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, delay: 0.1 }}
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${

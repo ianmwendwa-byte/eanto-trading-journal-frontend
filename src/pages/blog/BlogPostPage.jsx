@@ -19,6 +19,7 @@ import { KraviqCTA } from "@/components/blog/KraviqCTA";
 import { PostCard } from "@/components/blog/PostCard";
 import { TableOfContents } from "@/components/blog/TableOfContents";
 import { getPostBySlug, getRelatedPosts, getReadTime } from "@/lib/blog";
+import { useIsMounted } from "@/hooks/useIsMounted";
 
 // ---------------------------------------------------------------------------
 // Extract H2 headings from markdown content for Table of Contents
@@ -148,6 +149,7 @@ const components = {
 // ---------------------------------------------------------------------------
 
 export const BlogPostPage = () => {
+  const isMounted = useIsMounted();
   const { slug } = useParams();
   const post = getPostBySlug(slug);
 
@@ -259,7 +261,7 @@ export const BlogPostPage = () => {
           </Link>
 
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={isMounted ? { opacity: 0, y: 20 } : false}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, ease: "easeOut" }}
           >

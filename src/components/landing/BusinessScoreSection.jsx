@@ -1,6 +1,7 @@
 import { motion, useInView } from "framer-motion";
 import { useRef, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { useIsMounted } from "@/hooks/useIsMounted";
 
 // ── Animated SVG score dial ───────────────────────────────────────────────────
 
@@ -108,6 +109,7 @@ const BANDS = [
 ];
 
 export const BusinessScoreSection = () => {
+  const isMounted = useIsMounted();
   return (
     <section
       className="py-24 md:py-32 border-t border-primary/10 relative overflow-hidden"
@@ -119,7 +121,7 @@ export const BusinessScoreSection = () => {
 
           {/* Left — Score visual */}
           <motion.div
-            initial={{ opacity: 0, x: -40 }}
+            initial={isMounted ? { opacity: 0, x: -40 } : false}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6, ease: "easeOut" }}
@@ -146,7 +148,7 @@ export const BusinessScoreSection = () => {
 
           {/* Right — Content */}
           <motion.div
-            initial={{ opacity: 0, x: 40 }}
+            initial={isMounted ? { opacity: 0, x: 40 } : false}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6, ease: "easeOut", delay: 0.1 }}

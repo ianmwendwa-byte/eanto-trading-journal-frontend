@@ -79,9 +79,13 @@ export const staggerItemVariants = {
 /**
  * Scroll-triggered reveal used across marketing/feature pages
  * (fade up + slide, fires once when scrolled into view).
+ *
+ * `mounted` gates the `initial` state so SSR/prerendered HTML never bakes
+ * `opacity:0` inline (which would hide content from non-JS crawlers).
+ * Pass `isMounted` from `useIsMounted()` at call sites.
  */
-export const reveal = (delay = 0) => ({
-  initial: { opacity: 0, y: 24 },
+export const reveal = (delay = 0, mounted = true) => ({
+  initial: mounted ? { opacity: 0, y: 24 } : false,
   whileInView: { opacity: 1, y: 0 },
   viewport: { once: true },
   transition: { duration: 0.5, ease: "easeOut", delay },

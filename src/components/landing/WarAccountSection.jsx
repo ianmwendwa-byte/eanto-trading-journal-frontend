@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { Swords, Shield, TrendingUp, Zap } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { useIsMounted } from "@/hooks/useIsMounted";
 
 const WarMockup = () => (
   <div className="bg-card border border-danger/30 rounded-2xl p-6 w-full max-w-sm shadow-2xl">
@@ -64,6 +65,7 @@ const POINTS = [
 ];
 
 export const WarAccountSection = () => {
+  const isMounted = useIsMounted();
   return (
     <section
       className="py-24 md:py-32 border-t border-border relative overflow-hidden"
@@ -87,7 +89,7 @@ export const WarAccountSection = () => {
         <div className="grid md:grid-cols-2 gap-16 items-center">
           {/* Content */}
           <motion.div
-            initial={{ opacity: 0, x: -60 }}
+            initial={isMounted ? { opacity: 0, x: -60 } : false}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6, ease: "easeOut" }}
@@ -131,7 +133,7 @@ export const WarAccountSection = () => {
 
           {/* Mockup */}
           <motion.div
-            initial={{ opacity: 0, x: 60 }}
+            initial={isMounted ? { opacity: 0, x: 60 } : false}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6, ease: "easeOut", delay: 0.1 }}

@@ -3,6 +3,7 @@ import { Calendar, Clock, Star } from "lucide-react";
 import { motion } from "framer-motion";
 import { PillarBadge } from "@/components/blog/PillarBadge";
 import { getReadTime, getExcerpt } from "@/lib/blog";
+import { useIsMounted } from "@/hooks/useIsMounted";
 
 /**
  * Reusable blog post card.
@@ -14,6 +15,7 @@ import { getReadTime, getExcerpt } from "@/lib/blog";
  *   animDelay  — optional framer-motion stagger delay
  */
 export const PostCard = ({ post, featured = false, compact = false, animDelay = 0 }) => {
+  const isMounted = useIsMounted();
   const { frontmatter, slug } = post;
   const readTime = getReadTime(frontmatter.estimatedWordCount);
   const excerpt = getExcerpt(post);
@@ -47,7 +49,7 @@ export const PostCard = ({ post, featured = false, compact = false, animDelay = 
   if (featured) {
     return (
       <motion.article
-        initial={{ opacity: 0, y: 24 }}
+        initial={isMounted ? { opacity: 0, y: 24 } : false}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
         transition={{ duration: 0.5, ease: "easeOut", delay: animDelay }}
@@ -83,7 +85,7 @@ export const PostCard = ({ post, featured = false, compact = false, animDelay = 
 
   return (
     <motion.article
-      initial={{ opacity: 0, y: 24 }}
+      initial={isMounted ? { opacity: 0, y: 24 } : false}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.45, ease: "easeOut", delay: animDelay }}

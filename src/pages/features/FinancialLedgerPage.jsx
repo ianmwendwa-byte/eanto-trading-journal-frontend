@@ -5,6 +5,7 @@ import { ArrowRight, Receipt, Calculator, LineChart, Layers, Star } from "lucide
 import { Button } from "@/components/ui/button";
 import { PageLayout } from "@/components/landing/PageLayout";
 import { reveal } from "@/lib/animations";
+import { useIsMounted } from "@/hooks/useIsMounted";
 import {
   buildFaqSchema,
   buildBreadcrumbSchema,
@@ -102,6 +103,7 @@ const breadcrumbItems = [
 ];
 
 export const FinancialLedgerPage = () => {
+  const isMounted = useIsMounted();
   const faqSchema = buildFaqSchema(FAQS);
   const breadcrumbSchema = buildBreadcrumbSchema(breadcrumbItems);
   const webPageSchema = buildWebPageSchema({
@@ -135,7 +137,7 @@ export const FinancialLedgerPage = () => {
         <div className="relative max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
           <FeatureBreadcrumb items={breadcrumbItems} />
           <motion.h1
-            initial={{ opacity: 0, y: 16 }}
+            initial={isMounted ? { opacity: 0, y: 16 } : false}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, ease: "easeOut" }}
             className="font-heading font-bold text-4xl md:text-5xl text-foreground leading-tight mb-5"
@@ -143,14 +145,14 @@ export const FinancialLedgerPage = () => {
             Financial Ledger
           </motion.h1>
           <motion.p
-            initial={{ opacity: 0, y: 12 }}
+            initial={isMounted ? { opacity: 0, y: 12 } : false}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, ease: "easeOut", delay: 0.05 }}
             className="text-lg text-muted-foreground leading-relaxed mb-8"
           >
             Every deposit, withdrawal, trade, swap, and commission, recorded as a transaction, so your true net P&L is never a guess.
           </motion.p>
-          <motion.div {...reveal(0.1)}>
+          <motion.div {...reveal(0.1, isMounted)}>
             <Button size="lg" asChild className="gap-2">
               <Link to="/register">
                 Start Free
@@ -164,17 +166,17 @@ export const FinancialLedgerPage = () => {
       {/* What it is */}
       <section className="py-16 border-t border-border">
         <div className="max-w-[720px] mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.h2 {...reveal(0)} className="font-heading font-semibold text-2xl text-foreground mb-6">
+          <motion.h2 {...reveal(0, isMounted)} className="font-heading font-semibold text-2xl text-foreground mb-6">
             What it is
           </motion.h2>
           <div className="space-y-5 text-[17px] leading-[1.75] text-muted-foreground">
-            <motion.p {...reveal(0.05)}>
+            <motion.p {...reveal(0.05, isMounted)}>
               The financial ledger is the accounting layer underneath every Kraviq account. It records every transaction that changes your balance: deposits, withdrawals, trade profit, trade loss, swap, and commission. Each one is its own entry, not a number folded into a bigger total.
             </motion.p>
-            <motion.p {...reveal(0.1)}>
+            <motion.p {...reveal(0.1, isMounted)}>
               Because every transaction is recorded individually, Kraviq can show you net P&L after costs instead of the gross figure your broker's terminal usually leads with. The gap between those two numbers is often the difference between a trader who thinks they're profitable and one who actually is.
             </motion.p>
-            <motion.p {...reveal(0.15)}>
+            <motion.p {...reveal(0.15, isMounted)}>
               Prop accounts use the same ledger structure but a different set of transaction types: challenge fees and payouts instead of deposits and withdrawals, since you're trading the firm's capital, not your own.
             </motion.p>
           </div>
@@ -184,7 +186,7 @@ export const FinancialLedgerPage = () => {
       {/* How it works */}
       <section className="py-16 border-t border-border">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.h2 {...reveal(0)} className="font-heading font-semibold text-2xl text-foreground mb-10 text-center">
+          <motion.h2 {...reveal(0, isMounted)} className="font-heading font-semibold text-2xl text-foreground mb-10 text-center">
             How it works
           </motion.h2>
           <div className="grid sm:grid-cols-2 gap-5">
@@ -193,7 +195,7 @@ export const FinancialLedgerPage = () => {
               return (
                 <motion.div
                   key={step.title}
-                  initial={{ opacity: 0, y: 24 }}
+                  initial={isMounted ? { opacity: 0, y: 24 } : false}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.45, ease: "easeOut", delay: i * 0.08 }}
@@ -214,10 +216,10 @@ export const FinancialLedgerPage = () => {
       {/* Why it matters */}
       <section className="py-16 border-t border-border">
         <div className="max-w-[720px] mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.h2 {...reveal(0)} className="font-heading font-semibold text-2xl text-foreground mb-6">
+          <motion.h2 {...reveal(0, isMounted)} className="font-heading font-semibold text-2xl text-foreground mb-6">
             Why it matters
           </motion.h2>
-          <motion.p {...reveal(0.05)} className="text-[17px] leading-[1.75] text-muted-foreground">
+          <motion.p {...reveal(0.05, isMounted)} className="text-[17px] leading-[1.75] text-muted-foreground">
             Commission and swap quietly erode returns that look fine on paper. A trader who wins 60% of trades at small size can still lose money once costs are subtracted, and never notice because the broker statement shows gross numbers by default. A ledger that tracks every transaction, not just trade outcomes, is the only way to know if a strategy is actually profitable after the cost of running it.
           </motion.p>
         </div>
@@ -226,14 +228,14 @@ export const FinancialLedgerPage = () => {
       {/* Key capabilities */}
       <section className="py-16 border-t border-border">
         <div className="max-w-[720px] mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.h2 {...reveal(0)} className="font-heading font-semibold text-2xl text-foreground mb-6">
+          <motion.h2 {...reveal(0, isMounted)} className="font-heading font-semibold text-2xl text-foreground mb-6">
             Key capabilities
           </motion.h2>
           <ul className="space-y-4">
             {CAPABILITIES.map((item, i) => (
               <motion.li
                 key={item}
-                initial={{ opacity: 0, x: -16 }}
+                initial={isMounted ? { opacity: 0, x: -16 } : false}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.4, ease: "easeOut", delay: i * 0.05 }}

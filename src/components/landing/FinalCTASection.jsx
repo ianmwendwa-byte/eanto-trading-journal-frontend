@@ -2,8 +2,10 @@ import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
+import { useIsMounted } from "@/hooks/useIsMounted";
 
 export const FinalCTASection = () => {
+  const isMounted = useIsMounted();
   return (
     <section
       className="py-24 md:py-32 border-t border-border relative overflow-hidden"
@@ -21,7 +23,7 @@ export const FinalCTASection = () => {
 
       <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         <motion.p
-          initial={{ opacity: 0, y: 12 }}
+          initial={isMounted ? { opacity: 0, y: 12 } : false}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.4, ease: "easeOut" }}
@@ -32,7 +34,7 @@ export const FinalCTASection = () => {
 
         <motion.h2
           id="cta-heading"
-          initial={{ opacity: 0, y: 20 }}
+          initial={isMounted ? { opacity: 0, y: 20 } : false}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.55, ease: "easeOut", delay: 0.05 }}
@@ -44,7 +46,7 @@ export const FinalCTASection = () => {
         </motion.h2>
 
         <motion.p
-          initial={{ opacity: 0, y: 16 }}
+          initial={isMounted ? { opacity: 0, y: 16 } : false}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5, ease: "easeOut", delay: 0.1 }}
@@ -55,7 +57,7 @@ export const FinalCTASection = () => {
         </motion.p>
 
         <motion.div
-          initial={{ opacity: 0, y: 16 }}
+          initial={isMounted ? { opacity: 0, y: 16 } : false}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5, ease: "easeOut", delay: 0.15 }}
@@ -76,7 +78,7 @@ export const FinalCTASection = () => {
 
         {/* Trust indicators */}
         <motion.div
-          initial={{ opacity: 0 }}
+          initial={isMounted ? { opacity: 0 } : false}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
           transition={{ duration: 0.4, delay: 0.2 }}

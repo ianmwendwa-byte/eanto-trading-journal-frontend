@@ -5,6 +5,7 @@ import { ArrowRight, Percent, Ruler, Scale, TrendingDown, Star } from "lucide-re
 import { Button } from "@/components/ui/button";
 import { PageLayout } from "@/components/landing/PageLayout";
 import { reveal } from "@/lib/animations";
+import { useIsMounted } from "@/hooks/useIsMounted";
 import {
   buildFaqSchema,
   buildBreadcrumbSchema,
@@ -102,6 +103,7 @@ const breadcrumbItems = [
 ];
 
 export const RiskCalculatorsPage = () => {
+  const isMounted = useIsMounted();
   const faqSchema = buildFaqSchema(FAQS);
   const breadcrumbSchema = buildBreadcrumbSchema(breadcrumbItems);
   const webPageSchema = buildWebPageSchema({
@@ -135,7 +137,7 @@ export const RiskCalculatorsPage = () => {
         <div className="relative max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
           <FeatureBreadcrumb items={breadcrumbItems} />
           <motion.h1
-            initial={{ opacity: 0, y: 16 }}
+            initial={isMounted ? { opacity: 0, y: 16 } : false}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, ease: "easeOut" }}
             className="font-heading font-bold text-4xl md:text-5xl text-foreground leading-tight mb-5"
@@ -143,14 +145,14 @@ export const RiskCalculatorsPage = () => {
             Risk Calculators
           </motion.h1>
           <motion.p
-            initial={{ opacity: 0, y: 12 }}
+            initial={isMounted ? { opacity: 0, y: 12 } : false}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, ease: "easeOut", delay: 0.05 }}
             className="text-lg text-muted-foreground leading-relaxed mb-8"
           >
             Position size and risk-to-reward, calculated against your real balance and drawdown, before you place the trade.
           </motion.p>
-          <motion.div {...reveal(0.1)}>
+          <motion.div {...reveal(0.1, isMounted)}>
             <Button size="lg" asChild className="gap-2">
               <Link to="/register">
                 Start Free
@@ -164,17 +166,17 @@ export const RiskCalculatorsPage = () => {
       {/* What it is */}
       <section className="py-16 border-t border-border">
         <div className="max-w-[720px] mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.h2 {...reveal(0)} className="font-heading font-semibold text-2xl text-foreground mb-6">
+          <motion.h2 {...reveal(0, isMounted)} className="font-heading font-semibold text-2xl text-foreground mb-6">
             What it is
           </motion.h2>
           <div className="space-y-5 text-[17px] leading-[1.75] text-muted-foreground">
-            <motion.p {...reveal(0.05)}>
+            <motion.p {...reveal(0.05, isMounted)}>
               The risk calculators turn account risk, stop-loss distance, and target price into position size and risk-to-reward, before you place a trade. Enter how much of your account you're willing to risk, where your stop sits, and where your target is. Kraviq returns the exact lot size and the resulting R:R ratio.
             </motion.p>
-            <motion.p {...reveal(0.1)}>
+            <motion.p {...reveal(0.1, isMounted)}>
               The numbers come from your actual account balance and, on prop challenges, your remaining drawdown room, not a figure you copy in from a separate spreadsheet. That matters because a position size that's safe on a $50,000 normal account can breach a prop challenge with a tighter daily limit.
             </motion.p>
-            <motion.p {...reveal(0.15)}>
+            <motion.p {...reveal(0.15, isMounted)}>
               Once you're satisfied with the size and the ratio, you can log the trade directly, carrying the same numbers into your trade history instead of re-entering them.
             </motion.p>
           </div>
@@ -184,7 +186,7 @@ export const RiskCalculatorsPage = () => {
       {/* How it works */}
       <section className="py-16 border-t border-border">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.h2 {...reveal(0)} className="font-heading font-semibold text-2xl text-foreground mb-10 text-center">
+          <motion.h2 {...reveal(0, isMounted)} className="font-heading font-semibold text-2xl text-foreground mb-10 text-center">
             How it works
           </motion.h2>
           <div className="grid sm:grid-cols-2 gap-5">
@@ -193,7 +195,7 @@ export const RiskCalculatorsPage = () => {
               return (
                 <motion.div
                   key={step.title}
-                  initial={{ opacity: 0, y: 24 }}
+                  initial={isMounted ? { opacity: 0, y: 24 } : false}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.45, ease: "easeOut", delay: i * 0.08 }}
@@ -214,10 +216,10 @@ export const RiskCalculatorsPage = () => {
       {/* Why it matters */}
       <section className="py-16 border-t border-border">
         <div className="max-w-[720px] mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.h2 {...reveal(0)} className="font-heading font-semibold text-2xl text-foreground mb-6">
+          <motion.h2 {...reveal(0, isMounted)} className="font-heading font-semibold text-2xl text-foreground mb-6">
             Why it matters
           </motion.h2>
-          <motion.p {...reveal(0.05)} className="text-[17px] leading-[1.75] text-muted-foreground">
+          <motion.p {...reveal(0.05, isMounted)} className="text-[17px] leading-[1.75] text-muted-foreground">
             Position sizing mistakes are rarely about strategy. They're arithmetic errors made under time pressure, right before a trade, when a trader rounds a lot size up because the exact calculation felt like too much friction in the moment. A 0.3% risk that quietly becomes 1.2% because of a rounding shortcut compounds over a hundred trades into a very different account than the one the trader thought they were running. A calculator that does the arithmetic exactly, every time, removes that entire category of mistake.
           </motion.p>
         </div>
@@ -226,14 +228,14 @@ export const RiskCalculatorsPage = () => {
       {/* Key capabilities */}
       <section className="py-16 border-t border-border">
         <div className="max-w-[720px] mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.h2 {...reveal(0)} className="font-heading font-semibold text-2xl text-foreground mb-6">
+          <motion.h2 {...reveal(0, isMounted)} className="font-heading font-semibold text-2xl text-foreground mb-6">
             Key capabilities
           </motion.h2>
           <ul className="space-y-4">
             {CAPABILITIES.map((item, i) => (
               <motion.li
                 key={item}
-                initial={{ opacity: 0, x: -16 }}
+                initial={isMounted ? { opacity: 0, x: -16 } : false}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.4, ease: "easeOut", delay: i * 0.05 }}

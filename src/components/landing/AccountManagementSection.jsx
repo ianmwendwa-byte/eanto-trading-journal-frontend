@@ -1,8 +1,9 @@
 import { motion } from "framer-motion";
 import { Check } from "lucide-react";
+import { useIsMounted } from "@/hooks/useIsMounted";
 
-const reveal = (dir = "left") => ({
-  initial: { opacity: 0, x: dir === "left" ? -40 : 40 },
+const reveal = (dir = "left", mounted = true) => ({
+  initial: mounted ? { opacity: 0, x: dir === "left" ? -40 : 40 } : false,
   whileInView: { opacity: 1, x: 0, transition: { duration: 0.6, ease: "easeOut" } },
 });
 
@@ -186,6 +187,7 @@ const ACCOUNT_TYPES = [
 ];
 
 export const AccountManagementSection = () => {
+  const isMounted = useIsMounted();
   return (
     <section
       className="py-24 md:py-32 border-t border-border overflow-hidden"
@@ -195,7 +197,7 @@ export const AccountManagementSection = () => {
         {/* Header */}
         <div className="text-center mb-20">
           <motion.p
-            initial={{ opacity: 0, y: 12 }}
+            initial={isMounted ? { opacity: 0, y: 12 } : false}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.4, ease: "easeOut" }}
@@ -205,7 +207,7 @@ export const AccountManagementSection = () => {
           </motion.p>
           <motion.h2
             id="accounts-heading"
-            initial={{ opacity: 0, y: 16 }}
+            initial={isMounted ? { opacity: 0, y: 16 } : false}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5, ease: "easeOut", delay: 0.05 }}
@@ -214,7 +216,7 @@ export const AccountManagementSection = () => {
             One platform. Every type of account.
           </motion.h2>
           <motion.p
-            initial={{ opacity: 0, y: 12 }}
+            initial={isMounted ? { opacity: 0, y: 12 } : false}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.4, ease: "easeOut", delay: 0.1 }}
@@ -242,7 +244,7 @@ export const AccountManagementSection = () => {
               >
                 {/* Content */}
                 <motion.div
-                  {...reveal(contentSide)}
+                  {...reveal(contentSide, isMounted)}
                   viewport={{ once: true }}
                 >
                   <div className="text-[80px] font-heading font-bold text-border/40 leading-none mb-4 select-none">
@@ -274,7 +276,7 @@ export const AccountManagementSection = () => {
 
                 {/* Mockup */}
                 <motion.div
-                  {...reveal(mockupSide)}
+                  {...reveal(mockupSide, isMounted)}
                   viewport={{ once: true }}
                   className="flex justify-center"
                 >

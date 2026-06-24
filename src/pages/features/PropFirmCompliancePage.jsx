@@ -5,6 +5,7 @@ import { ArrowRight, ShieldAlert, Gauge, Bell, GitBranch, Star } from "lucide-re
 import { Button } from "@/components/ui/button";
 import { PageLayout } from "@/components/landing/PageLayout";
 import { reveal } from "@/lib/animations";
+import { useIsMounted } from "@/hooks/useIsMounted";
 import {
   buildFaqSchema,
   buildBreadcrumbSchema,
@@ -102,6 +103,7 @@ const breadcrumbItems = [
 ];
 
 export const PropFirmCompliancePage = () => {
+  const isMounted = useIsMounted();
   const faqSchema = buildFaqSchema(FAQS);
   const breadcrumbSchema = buildBreadcrumbSchema(breadcrumbItems);
   const webPageSchema = buildWebPageSchema({
@@ -135,7 +137,7 @@ export const PropFirmCompliancePage = () => {
         <div className="relative max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
           <FeatureBreadcrumb items={breadcrumbItems} />
           <motion.h1
-            initial={{ opacity: 0, y: 16 }}
+            initial={isMounted ? { opacity: 0, y: 16 } : false}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, ease: "easeOut" }}
             className="font-heading font-bold text-4xl md:text-5xl text-foreground leading-tight mb-5"
@@ -143,14 +145,14 @@ export const PropFirmCompliancePage = () => {
             Prop Firm Compliance
           </motion.h1>
           <motion.p
-            initial={{ opacity: 0, y: 12 }}
+            initial={isMounted ? { opacity: 0, y: 12 } : false}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, ease: "easeOut", delay: 0.05 }}
             className="text-lg text-muted-foreground leading-relaxed mb-8"
           >
             Drawdown limits, trading days, lot size, and session rules, checked against every trade automatically, with warnings before you breach.
           </motion.p>
-          <motion.div {...reveal(0.1)}>
+          <motion.div {...reveal(0.1, isMounted)}>
             <Button size="lg" asChild className="gap-2">
               <Link to="/register">
                 Start Free
@@ -164,17 +166,17 @@ export const PropFirmCompliancePage = () => {
       {/* What it is */}
       <section className="py-16 border-t border-border">
         <div className="max-w-[720px] mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.h2 {...reveal(0)} className="font-heading font-semibold text-2xl text-foreground mb-6">
+          <motion.h2 {...reveal(0, isMounted)} className="font-heading font-semibold text-2xl text-foreground mb-6">
             What it is
           </motion.h2>
           <div className="space-y-5 text-[17px] leading-[1.75] text-muted-foreground">
-            <motion.p {...reveal(0.05)}>
+            <motion.p {...reveal(0.05, isMounted)}>
               Prop firm compliance tracking applies your challenge's actual rules to every trade you log, in the background, without you doing the math. Set the rules once when you create the prop account: maximum drawdown, daily drawdown, trading day requirements, lot size caps, session restrictions. Kraviq checks every trade against them from that point on.
             </motion.p>
-            <motion.p {...reveal(0.1)}>
+            <motion.p {...reveal(0.1, isMounted)}>
               Prop accounts in Kraviq always run in enforced rule mode and skip the broker field entirely, since you're trading the firm's capital under their terms, not your own account at your own broker. The account status moves through the real challenge lifecycle on its own: evaluation, then active, then funded, with breached and paused as the branches that happen when something goes wrong.
             </motion.p>
-            <motion.p {...reveal(0.15)}>
+            <motion.p {...reveal(0.15, isMounted)}>
               War accounts, used for testing aggressive strategies, are deliberately excluded from this and from every other aggregate metric, so they can't quietly distort your real compliance picture.
             </motion.p>
           </div>
@@ -184,7 +186,7 @@ export const PropFirmCompliancePage = () => {
       {/* How it works */}
       <section className="py-16 border-t border-border">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.h2 {...reveal(0)} className="font-heading font-semibold text-2xl text-foreground mb-10 text-center">
+          <motion.h2 {...reveal(0, isMounted)} className="font-heading font-semibold text-2xl text-foreground mb-10 text-center">
             How it works
           </motion.h2>
           <div className="grid sm:grid-cols-2 gap-5">
@@ -193,7 +195,7 @@ export const PropFirmCompliancePage = () => {
               return (
                 <motion.div
                   key={step.title}
-                  initial={{ opacity: 0, y: 24 }}
+                  initial={isMounted ? { opacity: 0, y: 24 } : false}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.45, ease: "easeOut", delay: i * 0.08 }}
@@ -214,10 +216,10 @@ export const PropFirmCompliancePage = () => {
       {/* Why it matters */}
       <section className="py-16 border-t border-border">
         <div className="max-w-[720px] mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.h2 {...reveal(0)} className="font-heading font-semibold text-2xl text-foreground mb-6">
+          <motion.h2 {...reveal(0, isMounted)} className="font-heading font-semibold text-2xl text-foreground mb-6">
             Why it matters
           </motion.h2>
-          <motion.p {...reveal(0.05)} className="text-[17px] leading-[1.75] text-muted-foreground">
+          <motion.p {...reveal(0.05, isMounted)} className="text-[17px] leading-[1.75] text-muted-foreground">
             Most prop challenges fail on a drawdown breach the trader didn't see coming until it was already over the line. Mental math during a live trade is unreliable, especially after a losing stretch, which is exactly when the limit matters most. A system that calculates your current drawdown against the firm's actual number after every trade, and warns you in stages before the limit, turns a guess into a fact you can act on.
           </motion.p>
         </div>
@@ -226,14 +228,14 @@ export const PropFirmCompliancePage = () => {
       {/* Key capabilities */}
       <section className="py-16 border-t border-border">
         <div className="max-w-[720px] mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.h2 {...reveal(0)} className="font-heading font-semibold text-2xl text-foreground mb-6">
+          <motion.h2 {...reveal(0, isMounted)} className="font-heading font-semibold text-2xl text-foreground mb-6">
             Key capabilities
           </motion.h2>
           <ul className="space-y-4">
             {CAPABILITIES.map((item, i) => (
               <motion.li
                 key={item}
-                initial={{ opacity: 0, x: -16 }}
+                initial={isMounted ? { opacity: 0, x: -16 } : false}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.4, ease: "easeOut", delay: i * 0.05 }}

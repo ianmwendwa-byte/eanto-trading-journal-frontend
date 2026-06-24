@@ -5,6 +5,7 @@ import { ArrowRight, Edit3, Upload, Wifi, ShieldCheck, BarChart3, Star } from "l
 import { Button } from "@/components/ui/button";
 import { PageLayout } from "@/components/landing/PageLayout";
 import { reveal } from "@/lib/animations";
+import { useIsMounted } from "@/hooks/useIsMounted";
 import {
   buildFaqSchema,
   buildBreadcrumbSchema,
@@ -102,6 +103,7 @@ const breadcrumbItems = [
 ];
 
 export const TradeTrackingPage = () => {
+  const isMounted = useIsMounted();
   const faqSchema = buildFaqSchema(FAQS);
   const breadcrumbSchema = buildBreadcrumbSchema(breadcrumbItems);
   const webPageSchema = buildWebPageSchema({
@@ -135,7 +137,7 @@ export const TradeTrackingPage = () => {
         <div className="relative max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
           <FeatureBreadcrumb items={breadcrumbItems} />
           <motion.h1
-            initial={{ opacity: 0, y: 16 }}
+            initial={isMounted ? { opacity: 0, y: 16 } : false}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, ease: "easeOut" }}
             className="font-heading font-bold text-4xl md:text-5xl text-foreground leading-tight mb-5"
@@ -143,14 +145,14 @@ export const TradeTrackingPage = () => {
             Trade Tracking
           </motion.h1>
           <motion.p
-            initial={{ opacity: 0, y: 12 }}
+            initial={isMounted ? { opacity: 0, y: 12 } : false}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, ease: "easeOut", delay: 0.05 }}
             className="text-lg text-muted-foreground leading-relaxed mb-8"
           >
             Every trade you take, recorded with pair, direction, size, P&L, and a discipline score, whether you type it in, import it, or let your EA sync it.
           </motion.p>
-          <motion.div {...reveal(0.1)}>
+          <motion.div {...reveal(0.1, isMounted)}>
             <Button size="lg" asChild className="gap-2">
               <Link to="/register">
                 Start Free
@@ -164,17 +166,17 @@ export const TradeTrackingPage = () => {
       {/* What it is */}
       <section className="py-16 border-t border-border">
         <div className="max-w-[720px] mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.h2 {...reveal(0)} className="font-heading font-semibold text-2xl text-foreground mb-6">
+          <motion.h2 {...reveal(0, isMounted)} className="font-heading font-semibold text-2xl text-foreground mb-6">
             What it is
           </motion.h2>
           <div className="space-y-5 text-[17px] leading-[1.75] text-muted-foreground">
-            <motion.p {...reveal(0.05)}>
+            <motion.p {...reveal(0.05, isMounted)}>
               Trade tracking in Kraviq is the record of every position you've opened and closed, across every account you run. It's not a spreadsheet you maintain on the side. It's the source of truth that the rest of the platform reads from: your ledger, your Business Score, and your prop firm compliance checks all pull from the same trade data.
             </motion.p>
-            <motion.p {...reveal(0.1)}>
+            <motion.p {...reveal(0.1, isMounted)}>
               You can add a trade by hand, drop in a CSV export from your broker, or install the Kraviq Expert Advisor so closed MT4 or MT5 trades sync the moment they happen. Whichever way a trade gets in, it carries the same fields: pair, direction, lot size, entry and exit price, open and close time, and net profit or loss.
             </motion.p>
-            <motion.p {...reveal(0.15)}>
+            <motion.p {...reveal(0.15, isMounted)}>
               Some fields are locked once a trade closes. Pair, direction, lot size, entry price, exit price, and P&L can't be edited after the fact, because a trade record that can be quietly rewritten isn't a record you can trust.
             </motion.p>
           </div>
@@ -184,7 +186,7 @@ export const TradeTrackingPage = () => {
       {/* How it works */}
       <section className="py-16 border-t border-border">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.h2 {...reveal(0)} className="font-heading font-semibold text-2xl text-foreground mb-10 text-center">
+          <motion.h2 {...reveal(0, isMounted)} className="font-heading font-semibold text-2xl text-foreground mb-10 text-center">
             How it works
           </motion.h2>
           <div className="grid sm:grid-cols-2 gap-5">
@@ -193,7 +195,7 @@ export const TradeTrackingPage = () => {
               return (
                 <motion.div
                   key={step.title}
-                  initial={{ opacity: 0, y: 24 }}
+                  initial={isMounted ? { opacity: 0, y: 24 } : false}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.45, ease: "easeOut", delay: i * 0.08 }}
@@ -214,10 +216,10 @@ export const TradeTrackingPage = () => {
       {/* Why it matters */}
       <section className="py-16 border-t border-border">
         <div className="max-w-[720px] mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.h2 {...reveal(0)} className="font-heading font-semibold text-2xl text-foreground mb-6">
+          <motion.h2 {...reveal(0, isMounted)} className="font-heading font-semibold text-2xl text-foreground mb-6">
             Why it matters
           </motion.h2>
-          <motion.p {...reveal(0.05)} className="text-[17px] leading-[1.75] text-muted-foreground">
+          <motion.p {...reveal(0.05, isMounted)} className="text-[17px] leading-[1.75] text-muted-foreground">
             A spreadsheet tells you what happened. It doesn't tell you why you keep losing on Fridays, or that three of your last five losses came within ten minutes of the previous loss. That kind of pattern only shows up when every trade is structured the same way, every time, and checked against the same rules. Most traders who track manually stop within a few weeks because the friction outweighs the insight. Kraviq removes the friction by handling the structure for you and surfacing the patterns without being asked.
           </motion.p>
         </div>
@@ -226,14 +228,14 @@ export const TradeTrackingPage = () => {
       {/* Key capabilities */}
       <section className="py-16 border-t border-border">
         <div className="max-w-[720px] mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.h2 {...reveal(0)} className="font-heading font-semibold text-2xl text-foreground mb-6">
+          <motion.h2 {...reveal(0, isMounted)} className="font-heading font-semibold text-2xl text-foreground mb-6">
             Key capabilities
           </motion.h2>
           <ul className="space-y-4">
             {CAPABILITIES.map((item, i) => (
               <motion.li
                 key={item}
-                initial={{ opacity: 0, x: -16 }}
+                initial={isMounted ? { opacity: 0, x: -16 } : false}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.4, ease: "easeOut", delay: i * 0.05 }}

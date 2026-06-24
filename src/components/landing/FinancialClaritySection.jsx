@@ -1,13 +1,16 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { Wallet, TrendingUp, Calculator, Star } from "lucide-react";
+import { useIsMounted } from "@/hooks/useIsMounted";
 
 // ── Node ─────────────────────────────────────────────────────────────────────
 // Uses border + bg to highlight — no scale() transforms that bleed outside layout box
 
-const FlowNode = ({ icon: Icon, label, value, highlight, delay }) => (
+const FlowNode = ({ icon: Icon, label, value, highlight, delay }) => {
+  const isMounted = useIsMounted();
+  return (
   <motion.div
-    initial={{ opacity: 0, y: 20 }}
+    initial={isMounted ? { opacity: 0, y: 20 } : false}
     whileInView={{ opacity: 1, y: 0 }}
     viewport={{ once: true }}
     transition={{ duration: 0.5, ease: "easeOut", delay }}
@@ -54,14 +57,17 @@ const FlowNode = ({ icon: Icon, label, value, highlight, delay }) => (
       </p>
     )}
   </motion.div>
-);
+  );
+};
 
 // ── Arrow connector ───────────────────────────────────────────────────────────
 // Sits in its own auto-width grid column — never overlaps nodes
 
-const FlowArrow = ({ label, costs, delay }) => (
+const FlowArrow = ({ label, costs, delay }) => {
+  const isMounted = useIsMounted();
+  return (
   <motion.div
-    initial={{ opacity: 0 }}
+    initial={isMounted ? { opacity: 0 } : false}
     whileInView={{ opacity: 1 }}
     viewport={{ once: true }}
     transition={{ duration: 0.4, ease: "easeOut", delay }}
@@ -96,7 +102,8 @@ const FlowArrow = ({ label, costs, delay }) => (
       </svg>
     </div>
   </motion.div>
-);
+  );
+};
 
 // ── Mobile step card ──────────────────────────────────────────────────────────
 
@@ -177,6 +184,7 @@ const MobileStep = ({ icon: Icon, label, value, highlight, connector, connectorC
 // ── Section ───────────────────────────────────────────────────────────────────
 
 export const FinancialClaritySection = () => {
+  const isMounted = useIsMounted();
   return (
     <section
       className="py-24 md:py-32 border-t border-border"
@@ -187,7 +195,7 @@ export const FinancialClaritySection = () => {
         {/* Header */}
         <div className="text-center mb-16">
           <motion.p
-            initial={{ opacity: 0, y: 12 }}
+            initial={isMounted ? { opacity: 0, y: 12 } : false}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.4, ease: "easeOut" }}
@@ -197,7 +205,7 @@ export const FinancialClaritySection = () => {
           </motion.p>
           <motion.h2
             id="clarity-heading"
-            initial={{ opacity: 0, y: 16 }}
+            initial={isMounted ? { opacity: 0, y: 16 } : false}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5, ease: "easeOut", delay: 0.05 }}
@@ -206,7 +214,7 @@ export const FinancialClaritySection = () => {
             Do you know what you actually made?
           </motion.h2>
           <motion.p
-            initial={{ opacity: 0, y: 12 }}
+            initial={isMounted ? { opacity: 0, y: 12 } : false}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.4, ease: "easeOut", delay: 0.1 }}
@@ -275,7 +283,7 @@ export const FinancialClaritySection = () => {
           {/* ── Mobile: vertical stack ── */}
           <motion.div
             className="flex md:hidden flex-col items-center w-full gap-0"
-            initial={{ opacity: 0 }}
+            initial={isMounted ? { opacity: 0 } : false}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
             transition={{ duration: 0.4, ease: "easeOut" }}
@@ -317,7 +325,7 @@ export const FinancialClaritySection = () => {
 
         {/* Caption */}
         <motion.p
-          initial={{ opacity: 0, y: 12 }}
+          initial={isMounted ? { opacity: 0, y: 12 } : false}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.4, ease: "easeOut", delay: 0.2 }}

@@ -3,9 +3,10 @@ import { Link } from "react-router-dom";
 import { Swords, Shield, TrendingUp, Zap, ArrowRight, Check, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PageLayout } from "@/components/landing/PageLayout";
+import { useIsMounted } from "@/hooks/useIsMounted";
 
-const reveal = (delay = 0) => ({
-  initial: { opacity: 0, y: 24 },
+const reveal = (delay = 0, mounted = true) => ({
+  initial: mounted ? { opacity: 0, y: 24 } : false,
   whileInView: { opacity: 1, y: 0 },
   viewport: { once: true },
   transition: { duration: 0.5, ease: "easeOut", delay },
@@ -76,7 +77,9 @@ const PIPELINE_STEPS = [
   },
 ];
 
-export const WarPage = () => (
+export const WarPage = () => {
+  const isMounted = useIsMounted();
+  return (
   <PageLayout title="War Account">
 
     {/* ── Hero ──────────────────────────────────────────────────────────── */}
@@ -93,7 +96,7 @@ export const WarPage = () => (
 
       <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         <motion.div
-          initial={{ opacity: 0, y: 12 }}
+          initial={isMounted ? { opacity: 0, y: 12 } : false}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, ease: "easeOut" }}
           className="inline-flex items-center gap-2 bg-danger/10 text-danger border border-danger/20 text-xs font-medium rounded-full px-3 py-1 mb-6"
@@ -103,7 +106,7 @@ export const WarPage = () => (
         </motion.div>
 
         <motion.h1
-          initial={{ opacity: 0, y: 16 }}
+          initial={isMounted ? { opacity: 0, y: 16 } : false}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, ease: "easeOut", delay: 0.05 }}
           className="font-heading font-bold text-5xl md:text-6xl text-foreground leading-tight mb-6"
@@ -114,7 +117,7 @@ export const WarPage = () => (
         </motion.h1>
 
         <motion.p
-          initial={{ opacity: 0, y: 12 }}
+          initial={isMounted ? { opacity: 0, y: 12 } : false}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, ease: "easeOut", delay: 0.1 }}
           className="text-lg text-muted-foreground max-w-2xl mx-auto mb-10 leading-relaxed"
@@ -125,7 +128,7 @@ export const WarPage = () => (
         </motion.p>
 
         <motion.div
-          initial={{ opacity: 0, y: 12 }}
+          initial={isMounted ? { opacity: 0, y: 12 } : false}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, ease: "easeOut", delay: 0.15 }}
           className="flex flex-col sm:flex-row gap-3 justify-center"
@@ -150,7 +153,7 @@ export const WarPage = () => (
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid md:grid-cols-2 gap-12 items-center">
           <motion.div
-            initial={{ opacity: 0, x: -32 }}
+            initial={isMounted ? { opacity: 0, x: -32 } : false}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.55, ease: "easeOut" }}
@@ -184,7 +187,7 @@ export const WarPage = () => (
 
           {/* Mock War Account card */}
           <motion.div
-            initial={{ opacity: 0, x: 32 }}
+            initial={isMounted ? { opacity: 0, x: 32 } : false}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.55, ease: "easeOut", delay: 0.1 }}
@@ -235,10 +238,10 @@ export const WarPage = () => (
     <section className="py-20 border-t border-border">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-14">
-          <motion.p {...reveal(0)} className="text-xs uppercase tracking-widest text-danger font-medium mb-4">
+          <motion.p {...reveal(0, isMounted)} className="text-xs uppercase tracking-widest text-danger font-medium mb-4">
             What's included
           </motion.p>
-          <motion.h2 {...reveal(0.05)} className="font-heading font-bold text-3xl md:text-4xl text-foreground">
+          <motion.h2 {...reveal(0.05, isMounted)} className="font-heading font-bold text-3xl md:text-4xl text-foreground">
             Everything a strategy test needs.
           </motion.h2>
         </div>
@@ -248,7 +251,7 @@ export const WarPage = () => (
             return (
               <motion.div
                 key={f.title}
-                initial={{ opacity: 0, y: 24 }}
+                initial={isMounted ? { opacity: 0, y: 24 } : false}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.45, ease: "easeOut", delay: i * 0.08 }}
@@ -270,13 +273,13 @@ export const WarPage = () => (
     <section className="py-20 border-t border-border">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-14">
-          <motion.p {...reveal(0)} className="text-xs uppercase tracking-widest text-primary font-medium mb-4">
+          <motion.p {...reveal(0, isMounted)} className="text-xs uppercase tracking-widest text-primary font-medium mb-4">
             The graduation pipeline
           </motion.p>
-          <motion.h2 {...reveal(0.05)} className="font-heading font-bold text-3xl md:text-4xl text-foreground mb-4">
+          <motion.h2 {...reveal(0.05, isMounted)} className="font-heading font-bold text-3xl md:text-4xl text-foreground mb-4">
             Discipline over impulse.
           </motion.h2>
-          <motion.p {...reveal(0.1)} className="text-muted-foreground max-w-lg mx-auto">
+          <motion.p {...reveal(0.1, isMounted)} className="text-muted-foreground max-w-lg mx-auto">
             Every strategy in the War Account follows the same four-stage
             process. No shortcuts.
           </motion.p>
@@ -286,7 +289,7 @@ export const WarPage = () => (
           {PIPELINE_STEPS.map((s, i) => (
             <motion.div
               key={s.step}
-              initial={{ opacity: 0, y: 24 }}
+              initial={isMounted ? { opacity: 0, y: 24 } : false}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.45, ease: "easeOut", delay: i * 0.1 }}
@@ -308,12 +311,12 @@ export const WarPage = () => (
     <section className="py-20 border-t border-border">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
-          <motion.h2 {...reveal(0)} className="font-heading font-bold text-3xl text-foreground">
+          <motion.h2 {...reveal(0, isMounted)} className="font-heading font-bold text-3xl text-foreground">
             War Account vs Normal Account
           </motion.h2>
         </div>
         <motion.div
-          initial={{ opacity: 0, y: 16 }}
+          initial={isMounted ? { opacity: 0, y: 16 } : false}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5, ease: "easeOut" }}
@@ -352,13 +355,13 @@ export const WarPage = () => (
     {/* ── CTA ───────────────────────────────────────────────────────────── */}
     <section className="py-20 border-t border-border">
       <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <motion.h2 {...reveal(0)} className="font-heading font-bold text-3xl md:text-4xl text-foreground mb-4">
+        <motion.h2 {...reveal(0, isMounted)} className="font-heading font-bold text-3xl md:text-4xl text-foreground mb-4">
           Start testing smarter.
         </motion.h2>
-        <motion.p {...reveal(0.05)} className="text-muted-foreground mb-8">
+        <motion.p {...reveal(0.05, isMounted)} className="text-muted-foreground mb-8">
           War Accounts are available on all Kraviq plans. Free to start.
         </motion.p>
-        <motion.div {...reveal(0.1)}>
+        <motion.div {...reveal(0.1, isMounted)}>
           <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="inline-block">
             <Button size="lg" asChild className="gap-2">
               <Link to="/register">
@@ -372,4 +375,5 @@ export const WarPage = () => (
     </section>
 
   </PageLayout>
-);
+  );
+};

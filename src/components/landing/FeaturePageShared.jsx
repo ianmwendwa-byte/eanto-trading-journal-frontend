@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { ArrowRight, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { reveal } from "@/lib/animations";
+import { useIsMounted } from "@/hooks/useIsMounted";
 
 /**
  * Breadcrumb trail for feature pages.
@@ -29,14 +30,16 @@ export const FeatureBreadcrumb = ({ items }) => (
  * FAQ section with plain Q&A blocks (matches brand voice — direct, no embellishment).
  * `faqs` is an array of { question, answer }.
  */
-export const FeatureFAQ = ({ faqs, eyebrowColor = "text-primary" }) => (
+export const FeatureFAQ = ({ faqs, eyebrowColor = "text-primary" }) => {
+  const isMounted = useIsMounted();
+  return (
   <section className="py-20 border-t border-border">
     <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
       <div className="text-center mb-12">
-        <motion.p {...reveal(0)} className={`text-xs uppercase tracking-widest font-medium mb-4 ${eyebrowColor}`}>
+        <motion.p {...reveal(0, isMounted)} className={`text-xs uppercase tracking-widest font-medium mb-4 ${eyebrowColor}`}>
           Questions
         </motion.p>
-        <motion.h2 {...reveal(0.05)} className="font-heading font-bold text-3xl md:text-4xl text-foreground">
+        <motion.h2 {...reveal(0.05, isMounted)} className="font-heading font-bold text-3xl md:text-4xl text-foreground">
           Frequently asked questions
         </motion.h2>
       </div>
@@ -44,7 +47,7 @@ export const FeatureFAQ = ({ faqs, eyebrowColor = "text-primary" }) => (
         {faqs.map((item, i) => (
           <motion.div
             key={item.question}
-            initial={{ opacity: 0, y: 16 }}
+            initial={isMounted ? { opacity: 0, y: 16 } : false}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.4, ease: "easeOut", delay: i * 0.06 }}
@@ -59,19 +62,22 @@ export const FeatureFAQ = ({ faqs, eyebrowColor = "text-primary" }) => (
       </div>
     </div>
   </section>
-);
+  );
+};
 
 /**
  * Related features card row. `items` is an array of { title, description, href }.
  */
-export const RelatedFeatures = ({ items }) => (
+export const RelatedFeatures = ({ items }) => {
+  const isMounted = useIsMounted();
+  return (
   <section className="py-20 border-t border-border">
     <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
       <div className="text-center mb-12">
-        <motion.p {...reveal(0)} className="text-xs uppercase tracking-widest text-primary font-medium mb-4">
+        <motion.p {...reveal(0, isMounted)} className="text-xs uppercase tracking-widest text-primary font-medium mb-4">
           Related
         </motion.p>
-        <motion.h2 {...reveal(0.05)} className="font-heading font-bold text-3xl md:text-4xl text-foreground">
+        <motion.h2 {...reveal(0.05, isMounted)} className="font-heading font-bold text-3xl md:text-4xl text-foreground">
           Other parts of the system
         </motion.h2>
       </div>
@@ -79,7 +85,7 @@ export const RelatedFeatures = ({ items }) => (
         {items.map((item, i) => (
           <motion.div
             key={item.href}
-            initial={{ opacity: 0, y: 24 }}
+            initial={isMounted ? { opacity: 0, y: 24 } : false}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.45, ease: "easeOut", delay: i * 0.08 }}
@@ -99,21 +105,24 @@ export const RelatedFeatures = ({ items }) => (
       </div>
     </div>
   </section>
-);
+  );
+};
 
 /**
  * Closing CTA banner — consistent across all feature pages.
  */
-export const FeatureCTABanner = ({ heading, subtext = "Start free. No card required." }) => (
+export const FeatureCTABanner = ({ heading, subtext = "Start free. No card required." }) => {
+  const isMounted = useIsMounted();
+  return (
   <section className="py-20 border-t border-border">
     <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-      <motion.h2 {...reveal(0)} className="font-heading font-bold text-3xl md:text-4xl text-foreground mb-4">
+      <motion.h2 {...reveal(0, isMounted)} className="font-heading font-bold text-3xl md:text-4xl text-foreground mb-4">
         {heading}
       </motion.h2>
-      <motion.p {...reveal(0.05)} className="text-muted-foreground mb-8">
+      <motion.p {...reveal(0.05, isMounted)} className="text-muted-foreground mb-8">
         {subtext}
       </motion.p>
-      <motion.div {...reveal(0.1)}>
+      <motion.div {...reveal(0.1, isMounted)}>
         <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="inline-block">
           <Button size="lg" asChild className="gap-2">
             <Link to="/register">
@@ -125,4 +134,5 @@ export const FeatureCTABanner = ({ heading, subtext = "Start free. No card requi
       </motion.div>
     </div>
   </section>
-);
+  );
+};

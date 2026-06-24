@@ -4,9 +4,10 @@ import { ArrowRight } from "lucide-react";
 import { Helmet } from "react-helmet-async";
 import { Button } from "@/components/ui/button";
 import { PageLayout } from "@/components/landing/PageLayout";
+import { useIsMounted } from "@/hooks/useIsMounted";
 
-const reveal = (delay = 0) => ({
-  initial: { opacity: 0, y: 24 },
+const reveal = (delay = 0, mounted = true) => ({
+  initial: mounted ? { opacity: 0, y: 24 } : false,
   whileInView: { opacity: 1, y: 0 },
   viewport: { once: true },
   transition: { duration: 0.5, ease: "easeOut", delay },
@@ -98,7 +99,9 @@ const FOUNDER_PARAGRAPHS = [
   "Kraviq exists so the next trader doesn't have to guess.",
 ];
 
-export const AboutPage = () => (
+export const AboutPage = () => {
+  const isMounted = useIsMounted();
+  return (
   <PageLayout title="About Kraviq | Business Operating System for Retail Traders">
     <Helmet>
       <title>About Kraviq | Business Operating System for Retail Traders</title>
@@ -127,13 +130,13 @@ export const AboutPage = () => (
       />
       <div className="relative max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         <motion.h1
-          {...reveal(0)}
+          {...reveal(0, isMounted)}
           className="font-heading font-bold text-5xl md:text-6xl text-foreground leading-tight mb-6"
         >
           About Kraviq
         </motion.h1>
         <motion.p
-          {...reveal(0.05)}
+          {...reveal(0.05, isMounted)}
           className="text-lg text-foreground max-w-2xl mx-auto leading-relaxed"
         >
           {DEFINITION_SENTENCE}
@@ -145,7 +148,7 @@ export const AboutPage = () => (
     <section className="py-24 border-t border-border">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid md:grid-cols-2 gap-8">
-          <motion.div {...reveal(0)}>
+          <motion.div {...reveal(0, isMounted)}>
             <p className="font-mono text-[11px] uppercase tracking-widest text-muted-foreground mb-3 pb-2 border-b border-border">
               Mission
             </p>
@@ -155,7 +158,7 @@ export const AboutPage = () => (
               it either.
             </p>
           </motion.div>
-          <motion.div {...reveal(0.08)}>
+          <motion.div {...reveal(0.08, isMounted)}>
             <p className="font-mono text-[11px] uppercase tracking-widest text-muted-foreground mb-3 pb-2 border-b border-border">
               Vision
             </p>
@@ -173,7 +176,7 @@ export const AboutPage = () => (
     <section className="py-24 border-t border-border">
       <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.h2
-          {...reveal(0)}
+          {...reveal(0, isMounted)}
           className="font-heading font-bold text-3xl md:text-4xl text-foreground mb-8"
         >
           What Kraviq does
@@ -182,7 +185,7 @@ export const AboutPage = () => (
           {WHAT_KRAVIQ_DOES.map((item, i) => (
             <motion.li
               key={item.text}
-              initial={{ opacity: 0, x: -16 }}
+              initial={isMounted ? { opacity: 0, x: -16 } : false}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.4, ease: "easeOut", delay: i * 0.06 }}
@@ -211,7 +214,7 @@ export const AboutPage = () => (
           {PILLARS.map((pillar, i) => (
             <motion.div
               key={pillar.title}
-              initial={{ opacity: 0, y: 24 }}
+              initial={isMounted ? { opacity: 0, y: 24 } : false}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.45, ease: "easeOut", delay: i * 0.08 }}
@@ -237,7 +240,7 @@ export const AboutPage = () => (
     <section className="py-24 border-t border-border">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.h2
-          {...reveal(0)}
+          {...reveal(0, isMounted)}
           className="font-heading font-bold text-3xl md:text-4xl text-foreground mb-12 text-center"
         >
           What we stand for
@@ -247,7 +250,7 @@ export const AboutPage = () => (
           {VALUES.map((v, i) => (
             <motion.div
               key={v.title}
-              initial={{ opacity: 0, y: 24 }}
+              initial={isMounted ? { opacity: 0, y: 24 } : false}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.45, ease: "easeOut", delay: i * 0.08 }}
@@ -267,14 +270,14 @@ export const AboutPage = () => (
     <section className="py-24 border-t border-border">
       <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.h2
-          {...reveal(0)}
+          {...reveal(0, isMounted)}
           className="font-heading font-bold text-3xl md:text-4xl text-foreground mb-8"
         >
           Founder
         </motion.h2>
         <div className="space-y-5 text-[17px] leading-[1.75] text-muted-foreground">
           {FOUNDER_PARAGRAPHS.map((p, i) => (
-            <motion.p key={p} {...reveal(0.05 * i)}>
+            <motion.p key={p} {...reveal(0.05 * i, isMounted)}>
               {p}
             </motion.p>
           ))}
@@ -285,7 +288,7 @@ export const AboutPage = () => (
     {/* ── Closing CTA ───────────────────────────────────────────────────── */}
     <section className="py-24 border-t border-border">
       <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <motion.div {...reveal(0)}>
+        <motion.div {...reveal(0, isMounted)}>
           <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="inline-block">
             <Button size="lg" asChild className="gap-2">
               <Link to="/register">
@@ -298,4 +301,5 @@ export const AboutPage = () => (
       </div>
     </section>
   </PageLayout>
-);
+  );
+};

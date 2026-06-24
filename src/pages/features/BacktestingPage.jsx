@@ -5,6 +5,7 @@ import { ArrowRight, FlaskConical, ShieldOff, GitMerge, Swords, Star } from "luc
 import { Button } from "@/components/ui/button";
 import { PageLayout } from "@/components/landing/PageLayout";
 import { reveal } from "@/lib/animations";
+import { useIsMounted } from "@/hooks/useIsMounted";
 import {
   buildFaqSchema,
   buildBreadcrumbSchema,
@@ -102,6 +103,7 @@ const breadcrumbItems = [
 ];
 
 export const BacktestingPage = () => {
+  const isMounted = useIsMounted();
   const faqSchema = buildFaqSchema(FAQS);
   const breadcrumbSchema = buildBreadcrumbSchema(breadcrumbItems);
   const webPageSchema = buildWebPageSchema({
@@ -135,7 +137,7 @@ export const BacktestingPage = () => {
         <div className="relative max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
           <FeatureBreadcrumb items={breadcrumbItems} />
           <motion.h1
-            initial={{ opacity: 0, y: 16 }}
+            initial={isMounted ? { opacity: 0, y: 16 } : false}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, ease: "easeOut" }}
             className="font-heading font-bold text-4xl md:text-5xl text-foreground leading-tight mb-5"
@@ -143,14 +145,14 @@ export const BacktestingPage = () => {
             Backtesting &amp; the War Room
           </motion.h1>
           <motion.p
-            initial={{ opacity: 0, y: 12 }}
+            initial={isMounted ? { opacity: 0, y: 12 } : false}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, ease: "easeOut", delay: 0.05 }}
             className="text-lg text-muted-foreground leading-relaxed mb-8"
           >
             Test aggressive or unproven strategies in a fully isolated War Account, with full margin allowed and zero impact on your real metrics.
           </motion.p>
-          <motion.div {...reveal(0.1)}>
+          <motion.div {...reveal(0.1, isMounted)}>
             <Button size="lg" asChild className="gap-2">
               <Link to="/register">
                 Start Free
@@ -164,17 +166,17 @@ export const BacktestingPage = () => {
       {/* What it is */}
       <section className="py-16 border-t border-border">
         <div className="max-w-[720px] mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.h2 {...reveal(0)} className="font-heading font-semibold text-2xl text-foreground mb-6">
+          <motion.h2 {...reveal(0, isMounted)} className="font-heading font-semibold text-2xl text-foreground mb-6">
             What it is
           </motion.h2>
           <div className="space-y-5 text-[17px] leading-[1.75] text-muted-foreground">
-            <motion.p {...reveal(0.05)}>
+            <motion.p {...reveal(0.05, isMounted)}>
               The War Account is Kraviq's sandbox for strategy testing. It's a separate account type, funded with its own seed balance, where full margin and news trading are allowed without the restrictions a normal or prop account would carry. You trade it exactly the way you'd want to test a strategy at full intensity.
             </motion.p>
-            <motion.p {...reveal(0.1)}>
+            <motion.p {...reveal(0.1, isMounted)}>
               The part that makes it useful rather than just another account: War Account trades, P&L, and drawdown are excluded from your aggregate metrics and Business Score entirely. A strategy that fails badly in testing doesn't drag your real numbers down with it, because it never touches them in the first place.
             </motion.p>
-            <motion.p {...reveal(0.15)}>
+            <motion.p {...reveal(0.15, isMounted)}>
               When a strategy proves itself against criteria you set yourself, the graduation pipeline moves it into a normal or prop account in one step, so deploying a tested idea is a deliberate decision rather than something that happens by default.
             </motion.p>
           </div>
@@ -184,7 +186,7 @@ export const BacktestingPage = () => {
       {/* How it works */}
       <section className="py-16 border-t border-border">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.h2 {...reveal(0)} className="font-heading font-semibold text-2xl text-foreground mb-10 text-center">
+          <motion.h2 {...reveal(0, isMounted)} className="font-heading font-semibold text-2xl text-foreground mb-10 text-center">
             How it works
           </motion.h2>
           <div className="grid sm:grid-cols-2 gap-5">
@@ -193,7 +195,7 @@ export const BacktestingPage = () => {
               return (
                 <motion.div
                   key={step.title}
-                  initial={{ opacity: 0, y: 24 }}
+                  initial={isMounted ? { opacity: 0, y: 24 } : false}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.45, ease: "easeOut", delay: i * 0.08 }}
@@ -214,10 +216,10 @@ export const BacktestingPage = () => {
       {/* Why it matters */}
       <section className="py-16 border-t border-border">
         <div className="max-w-[720px] mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.h2 {...reveal(0)} className="font-heading font-semibold text-2xl text-foreground mb-6">
+          <motion.h2 {...reveal(0, isMounted)} className="font-heading font-semibold text-2xl text-foreground mb-6">
             Why it matters
           </motion.h2>
-          <motion.p {...reveal(0.05)} className="text-[17px] leading-[1.75] text-muted-foreground">
+          <motion.p {...reveal(0.05, isMounted)} className="text-[17px] leading-[1.75] text-muted-foreground">
             Most traders test new ideas on their live account, which means every failed experiment contaminates the same statistics they use to judge their real edge. A losing stretch from a strategy that was never going to work anyway drags down win rate, P&L trend, and Business Score, and makes it harder to tell what's actually wrong. Separating the testing ground from the real account is the only way to know whether your core trading is sound while you still get to experiment.
           </motion.p>
         </div>
@@ -226,14 +228,14 @@ export const BacktestingPage = () => {
       {/* Key capabilities */}
       <section className="py-16 border-t border-border">
         <div className="max-w-[720px] mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.h2 {...reveal(0)} className="font-heading font-semibold text-2xl text-foreground mb-6">
+          <motion.h2 {...reveal(0, isMounted)} className="font-heading font-semibold text-2xl text-foreground mb-6">
             Key capabilities
           </motion.h2>
           <ul className="space-y-4">
             {CAPABILITIES.map((item, i) => (
               <motion.li
                 key={item}
-                initial={{ opacity: 0, x: -16 }}
+                initial={isMounted ? { opacity: 0, x: -16 } : false}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.4, ease: "easeOut", delay: i * 0.05 }}

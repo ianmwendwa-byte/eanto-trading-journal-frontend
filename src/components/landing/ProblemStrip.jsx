@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useIsMounted } from "@/hooks/useIsMounted";
 
 const PROBLEMS = [
   "You don't know if you're actually profitable.",
@@ -12,6 +13,7 @@ const PROBLEMS = [
 const INTERVAL_MS = 3200;
 
 export const ProblemStrip = () => {
+  const isMounted = useIsMounted();
   const [active, setActive] = useState(0);
   const [progress, setProgress] = useState(0);
   const startRef = useRef(Date.now());
@@ -53,7 +55,7 @@ export const ProblemStrip = () => {
       <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         {/* Section label */}
         <motion.p
-          initial={{ opacity: 0, y: 12 }}
+          initial={isMounted ? { opacity: 0, y: 12 } : false}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5, ease: "easeOut" }}
@@ -132,7 +134,7 @@ export const ProblemStrip = () => {
 
         {/* Resolution statement */}
         <motion.p
-          initial={{ opacity: 0, y: 12 }}
+          initial={isMounted ? { opacity: 0, y: 12 } : false}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5, ease: "easeOut", delay: 0.2 }}

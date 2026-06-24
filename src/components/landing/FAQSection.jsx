@@ -2,6 +2,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown } from "lucide-react";
 import { FAQS } from "@/lib/landingFaqs";
+import { useIsMounted } from "@/hooks/useIsMounted";
 
 const FAQItem = ({ item, isOpen, onToggle }) => {
   return (
@@ -44,6 +45,7 @@ const FAQItem = ({ item, isOpen, onToggle }) => {
 };
 
 export const FAQSection = () => {
+  const isMounted = useIsMounted();
   const [openIndex, setOpenIndex] = useState(null);
 
   const toggle = (i) => setOpenIndex((prev) => (prev === i ? null : i));
@@ -58,7 +60,7 @@ export const FAQSection = () => {
         {/* Header */}
         <div className="text-center mb-14">
           <motion.p
-            initial={{ opacity: 0, y: 12 }}
+            initial={isMounted ? { opacity: 0, y: 12 } : false}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.4, ease: "easeOut" }}
@@ -68,7 +70,7 @@ export const FAQSection = () => {
           </motion.p>
           <motion.h2
             id="faq-heading"
-            initial={{ opacity: 0, y: 16 }}
+            initial={isMounted ? { opacity: 0, y: 16 } : false}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5, ease: "easeOut", delay: 0.05 }}
@@ -80,7 +82,7 @@ export const FAQSection = () => {
 
         {/* FAQ list */}
         <motion.div
-          initial={{ opacity: 0, y: 16 }}
+          initial={isMounted ? { opacity: 0, y: 16 } : false}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5, ease: "easeOut", delay: 0.1 }}

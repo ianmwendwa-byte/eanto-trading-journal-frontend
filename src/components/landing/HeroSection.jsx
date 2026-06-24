@@ -9,6 +9,7 @@ import {
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, ChevronDown } from "lucide-react";
+import { useIsMounted } from "@/hooks/useIsMounted";
 
 // ── Mini screen mockups ───────────────────────────────────────────────────────
 
@@ -253,6 +254,7 @@ const LABELS = ["Dashboard", "Accounts", "Trades"];
 // ── Hero Section ─────────────────────────────────────────────────────────────
 
 export const HeroSection = () => {
+  const isMounted = useIsMounted();
   const [currentScreen, setCurrentScreen] = useState(0);
   const containerRef = useRef(null);
 
@@ -294,7 +296,7 @@ export const HeroSection = () => {
     animate: { transition: { staggerChildren: 0.1, delayChildren: 0.2 } },
   };
   const item = {
-    initial: { opacity: 0, y: 24 },
+    initial: isMounted ? { opacity: 0, y: 24 } : false,
     animate: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } },
   };
 
@@ -412,7 +414,7 @@ export const HeroSection = () => {
 
           {/* ── Right mockup ─────────────────────────────────────────────── */}
           <motion.div
-            initial={{ opacity: 0, x: 40 }}
+            initial={isMounted ? { opacity: 0, x: 40 } : false}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6, ease: "easeOut", delay: 0.3 }}
             className="relative hidden lg:flex items-center justify-center"

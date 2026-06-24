@@ -5,6 +5,7 @@ import { Wifi, Key, RefreshCw, Shield, CheckCircle, ArrowRight } from "lucide-re
 import { Button } from "@/components/ui/button";
 import { PageLayout } from "@/components/landing/PageLayout";
 import { reveal } from "@/lib/animations";
+import { useIsMounted } from "@/hooks/useIsMounted";
 import {
   buildFaqSchema,
   buildBreadcrumbSchema,
@@ -175,6 +176,7 @@ const SECURITY = [
 ];
 
 export const EASyncPage = () => {
+  const isMounted = useIsMounted();
   const faqSchema = buildFaqSchema(FAQS);
   const breadcrumbSchema = buildBreadcrumbSchema(breadcrumbItems);
   const webPageSchema = buildWebPageSchema({
@@ -211,7 +213,7 @@ export const EASyncPage = () => {
       <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         <FeatureBreadcrumb items={breadcrumbItems} />
         <motion.div
-          initial={{ opacity: 0, y: 12 }}
+          initial={isMounted ? { opacity: 0, y: 12 } : false}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, ease: "easeOut" }}
           className="inline-flex items-center gap-1.5 bg-primary/10 text-primary border border-primary/20 text-xs font-medium rounded-full px-3 py-1 mb-6"
@@ -221,7 +223,7 @@ export const EASyncPage = () => {
         </motion.div>
 
         <motion.h1
-          initial={{ opacity: 0, y: 16 }}
+          initial={isMounted ? { opacity: 0, y: 16 } : false}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, ease: "easeOut", delay: 0.05 }}
           className="font-heading font-bold text-5xl md:text-6xl text-foreground leading-tight mb-6"
@@ -232,7 +234,7 @@ export const EASyncPage = () => {
         </motion.h1>
 
         <motion.p
-          initial={{ opacity: 0, y: 12 }}
+          initial={isMounted ? { opacity: 0, y: 12 } : false}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, ease: "easeOut", delay: 0.1 }}
           className="text-lg text-muted-foreground max-w-2xl mx-auto mb-10 leading-relaxed"
@@ -243,7 +245,7 @@ export const EASyncPage = () => {
         </motion.p>
 
         <motion.div
-          initial={{ opacity: 0, y: 12 }}
+          initial={isMounted ? { opacity: 0, y: 12 } : false}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, ease: "easeOut", delay: 0.15 }}
           className="flex flex-col sm:flex-row gap-3 justify-center"
@@ -263,7 +265,7 @@ export const EASyncPage = () => {
 
         {/* Platform badges */}
         <motion.div
-          initial={{ opacity: 0 }}
+          initial={isMounted ? { opacity: 0 } : false}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.4, delay: 0.2 }}
           className="flex items-center justify-center gap-4 mt-8"
@@ -284,10 +286,10 @@ export const EASyncPage = () => {
     <section className="py-20 border-t border-border">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
-          <motion.p {...reveal(0)} className="text-xs uppercase tracking-widest text-primary font-medium mb-4">
+          <motion.p {...reveal(0, isMounted)} className="text-xs uppercase tracking-widest text-primary font-medium mb-4">
             Setup in 3 steps
           </motion.p>
-          <motion.h2 {...reveal(0.05)} className="font-heading font-bold text-3xl md:text-4xl text-foreground">
+          <motion.h2 {...reveal(0.05, isMounted)} className="font-heading font-bold text-3xl md:text-4xl text-foreground">
             Up and running in under 5 minutes.
           </motion.h2>
         </div>
@@ -302,7 +304,7 @@ export const EASyncPage = () => {
                 className={`grid md:grid-cols-2 gap-12 items-center ${isEven ? "md:[&>*:first-child]:order-2 md:[&>*:last-child]:order-1" : ""}`}
               >
                 <motion.div
-                  initial={{ opacity: 0, x: isEven ? 32 : -32 }}
+                  initial={isMounted ? { opacity: 0, x: isEven ? 32 : -32 } : false}
                   whileInView={{ opacity: 1, x: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.55, ease: "easeOut" }}
@@ -317,7 +319,7 @@ export const EASyncPage = () => {
                   <p className="text-muted-foreground leading-relaxed">{step.desc}</p>
                 </motion.div>
                 <motion.div
-                  initial={{ opacity: 0, x: isEven ? -32 : 32 }}
+                  initial={isMounted ? { opacity: 0, x: isEven ? -32 : 32 } : false}
                   whileInView={{ opacity: 1, x: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.55, ease: "easeOut", delay: 0.1 }}
@@ -342,7 +344,7 @@ export const EASyncPage = () => {
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid md:grid-cols-2 gap-12 items-center">
           <motion.div
-            initial={{ opacity: 0, x: -32 }}
+            initial={isMounted ? { opacity: 0, x: -32 } : false}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.55, ease: "easeOut" }}
@@ -369,7 +371,7 @@ export const EASyncPage = () => {
           </motion.div>
 
           <motion.div
-            initial={{ opacity: 0, x: 32 }}
+            initial={isMounted ? { opacity: 0, x: 32 } : false}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.55, ease: "easeOut", delay: 0.1 }}
@@ -409,10 +411,10 @@ export const EASyncPage = () => {
     <section className="py-20 border-t border-border">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-14">
-          <motion.p {...reveal(0)} className="text-xs uppercase tracking-widest text-primary font-medium mb-4">
+          <motion.p {...reveal(0, isMounted)} className="text-xs uppercase tracking-widest text-primary font-medium mb-4">
             Security
           </motion.p>
-          <motion.h2 {...reveal(0.05)} className="font-heading font-bold text-3xl md:text-4xl text-foreground">
+          <motion.h2 {...reveal(0.05, isMounted)} className="font-heading font-bold text-3xl md:text-4xl text-foreground">
             Your API key. Your data.
           </motion.h2>
         </div>
@@ -422,7 +424,7 @@ export const EASyncPage = () => {
             return (
               <motion.div
                 key={s.title}
-                initial={{ opacity: 0, y: 24 }}
+                initial={isMounted ? { opacity: 0, y: 24 } : false}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.45, ease: "easeOut", delay: i * 0.08 }}
@@ -446,13 +448,13 @@ export const EASyncPage = () => {
     {/* ── CTA ───────────────────────────────────────────────────────────── */}
     <section className="py-20 border-t border-border">
       <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <motion.h2 {...reveal(0)} className="font-heading font-bold text-3xl md:text-4xl text-foreground mb-4">
+        <motion.h2 {...reveal(0, isMounted)} className="font-heading font-bold text-3xl md:text-4xl text-foreground mb-4">
           Stop manually entering trades.
         </motion.h2>
-        <motion.p {...reveal(0.05)} className="text-muted-foreground mb-8">
+        <motion.p {...reveal(0.05, isMounted)} className="text-muted-foreground mb-8">
           EA Sync is available on Starter, Pro, and Elite plans. Free to try.
         </motion.p>
-        <motion.div {...reveal(0.1)}>
+        <motion.div {...reveal(0.1, isMounted)}>
           <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="inline-block">
             <Button size="lg" asChild className="gap-2">
               <Link to="/register">

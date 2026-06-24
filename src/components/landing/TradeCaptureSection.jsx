@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { PenLine, FileUp, Wifi } from "lucide-react";
+import { useIsMounted } from "@/hooks/useIsMounted";
 
 // ── Step mockups ──────────────────────────────────────────────────────────────
 
@@ -136,6 +137,7 @@ const STEPS = [
 ];
 
 export const TradeCaptureSection = () => {
+  const isMounted = useIsMounted();
   return (
     <section
       className="py-24 md:py-32 border-t border-border overflow-hidden"
@@ -145,7 +147,7 @@ export const TradeCaptureSection = () => {
         {/* Header */}
         <div className="text-center mb-20">
           <motion.p
-            initial={{ opacity: 0, y: 12 }}
+            initial={isMounted ? { opacity: 0, y: 12 } : false}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.4, ease: "easeOut" }}
@@ -155,7 +157,7 @@ export const TradeCaptureSection = () => {
           </motion.p>
           <motion.h2
             id="capture-heading"
-            initial={{ opacity: 0, y: 16 }}
+            initial={isMounted ? { opacity: 0, y: 16 } : false}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5, ease: "easeOut", delay: 0.05 }}
@@ -164,7 +166,7 @@ export const TradeCaptureSection = () => {
             Every trade captured. Your way.
           </motion.h2>
           <motion.p
-            initial={{ opacity: 0, y: 12 }}
+            initial={isMounted ? { opacity: 0, y: 12 } : false}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.4, ease: "easeOut", delay: 0.1 }}
@@ -197,7 +199,7 @@ export const TradeCaptureSection = () => {
               return (
                 <motion.div
                   key={step.num}
-                  initial={{ opacity: 0, x: -24 }}
+                  initial={isMounted ? { opacity: 0, x: -24 } : false}
                   whileInView={{ opacity: 1, x: 0 }}
                   viewport={{ once: true }}
                   transition={{

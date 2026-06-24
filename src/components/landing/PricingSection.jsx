@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { Check, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
+import { useIsMounted } from "@/hooks/useIsMounted";
 
 const TIERS = [
   {
@@ -84,12 +85,14 @@ const container = {
   initial: {},
   whileInView: { transition: { staggerChildren: 0.1 } },
 };
-const card = {
-  initial: { opacity: 0, y: 28 },
+const getCard = (mounted) => ({
+  initial: mounted ? { opacity: 0, y: 28 } : false,
   whileInView: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } },
-};
+});
 
 export const PricingSection = () => {
+  const isMounted = useIsMounted();
+  const card = getCard(isMounted);
   const [annual, setAnnual] = useState(false);
 
   return (
@@ -102,7 +105,7 @@ export const PricingSection = () => {
         {/* Header */}
         <div className="text-center mb-12">
           <motion.p
-            initial={{ opacity: 0, y: 12 }}
+            initial={isMounted ? { opacity: 0, y: 12 } : false}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.4, ease: "easeOut" }}
@@ -112,7 +115,7 @@ export const PricingSection = () => {
           </motion.p>
           <motion.h2
             id="pricing-heading"
-            initial={{ opacity: 0, y: 16 }}
+            initial={isMounted ? { opacity: 0, y: 16 } : false}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5, ease: "easeOut", delay: 0.05 }}
@@ -121,7 +124,7 @@ export const PricingSection = () => {
             Start free. Upgrade when ready.
           </motion.h2>
           <motion.p
-            initial={{ opacity: 0, y: 12 }}
+            initial={isMounted ? { opacity: 0, y: 12 } : false}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.4, ease: "easeOut", delay: 0.1 }}
@@ -132,7 +135,7 @@ export const PricingSection = () => {
 
           {/* Billing toggle */}
           <motion.div
-            initial={{ opacity: 0, y: 12 }}
+            initial={isMounted ? { opacity: 0, y: 12 } : false}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.4, ease: "easeOut", delay: 0.15 }}
@@ -263,7 +266,7 @@ export const PricingSection = () => {
 
         {/* Footnote */}
         <motion.p
-          initial={{ opacity: 0 }}
+          initial={isMounted ? { opacity: 0 } : false}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
           transition={{ duration: 0.4, delay: 0.3 }}

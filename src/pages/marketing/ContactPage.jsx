@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { PageLayout } from "@/components/landing/PageLayout";
+import { useIsMounted } from "@/hooks/useIsMounted";
 
 const schema = z.object({
   name:    z.string().min(2, "Name must be at least 2 characters"),
@@ -24,14 +25,15 @@ const TOPICS = [
   { label: "Data / privacy",     email: "privacy@kraviq.app" },
 ];
 
-const reveal = (delay = 0) => ({
-  initial: { opacity: 0, y: 20 },
+const reveal = (delay = 0, mounted = true) => ({
+  initial: mounted ? { opacity: 0, y: 20 } : false,
   whileInView: { opacity: 1, y: 0 },
   viewport: { once: true },
   transition: { duration: 0.45, ease: "easeOut", delay },
 });
 
 const ContactForm = () => {
+  const isMounted = useIsMounted();
   const [submitted, setSubmitted] = useState(false);
 
   const {
@@ -49,7 +51,7 @@ const ContactForm = () => {
   if (submitted) {
     return (
       <motion.div
-        initial={{ opacity: 0, scale: 0.97 }}
+        initial={isMounted ? { opacity: 0, scale: 0.97 } : false}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.35, ease: "easeOut" }}
         className="bg-card border border-border rounded-2xl p-10 text-center"
@@ -164,7 +166,9 @@ const ContactForm = () => {
   );
 };
 
-export const ContactPage = () => (
+export const ContactPage = () => {
+  const isMounted = useIsMounted();
+  return (
   <PageLayout title="Contact">
 
     {/* Header */}
@@ -178,16 +182,16 @@ export const ContactPage = () => (
         aria-hidden="true"
       />
       <div className="relative max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <motion.p {...reveal(0)} className="text-xs uppercase tracking-widest text-primary font-medium mb-4">
+        <motion.p {...reveal(0, isMounted)} className="text-xs uppercase tracking-widest text-primary font-medium mb-4">
           Contact
         </motion.p>
         <motion.h1
-          {...reveal(0.05)}
+          {...reveal(0.05, isMounted)}
           className="font-heading font-bold text-5xl md:text-6xl text-foreground mb-4"
         >
           Get in touch
         </motion.h1>
-        <motion.p {...reveal(0.1)} className="text-lg text-muted-foreground">
+        <motion.p {...reveal(0.1, isMounted)} className="text-lg text-muted-foreground">
           A question, a bug, a feature idea, or just want to say hello — we
           read everything.
         </motion.p>
@@ -201,7 +205,7 @@ export const ContactPage = () => (
 
           {/* Left — form */}
           <motion.div
-            initial={{ opacity: 0, x: -24 }}
+            initial={isMounted ? { opacity: 0, x: -24 } : false}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5, ease: "easeOut" }}
@@ -211,7 +215,7 @@ export const ContactPage = () => (
 
           {/* Right — info */}
           <motion.aside
-            initial={{ opacity: 0, x: 24 }}
+            initial={isMounted ? { opacity: 0, x: 24 } : false}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5, ease: "easeOut", delay: 0.1 }}
@@ -284,4 +288,5 @@ export const ContactPage = () => (
     </section>
 
   </PageLayout>
-);
+  );
+};

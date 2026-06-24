@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { TrendingUp, Star, BarChart3, Check } from "lucide-react";
+import { useIsMounted } from "@/hooks/useIsMounted";
 
 const PILLARS = [
   {
@@ -60,16 +61,18 @@ const container = {
   },
 };
 
-const card = {
-  initial: { opacity: 0, y: 32 },
+const getCard = (mounted) => ({
+  initial: mounted ? { opacity: 0, y: 32 } : false,
   whileInView: {
     opacity: 1,
     y: 0,
     transition: { duration: 0.5, ease: "easeOut" },
   },
-};
+});
 
 export const PillarsSection = () => {
+  const isMounted = useIsMounted();
+  const card = getCard(isMounted);
   return (
     <section
       id="features"
@@ -80,7 +83,7 @@ export const PillarsSection = () => {
         {/* Header */}
         <div className="text-center mb-16">
           <motion.p
-            initial={{ opacity: 0, y: 12 }}
+            initial={isMounted ? { opacity: 0, y: 12 } : false}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.4, ease: "easeOut" }}
@@ -90,7 +93,7 @@ export const PillarsSection = () => {
           </motion.p>
           <motion.h2
             id="pillars-heading"
-            initial={{ opacity: 0, y: 16 }}
+            initial={isMounted ? { opacity: 0, y: 16 } : false}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5, ease: "easeOut", delay: 0.05 }}
@@ -99,7 +102,7 @@ export const PillarsSection = () => {
             Trade. Score. Scale.
           </motion.h2>
           <motion.p
-            initial={{ opacity: 0, y: 12 }}
+            initial={isMounted ? { opacity: 0, y: 12 } : false}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.4, ease: "easeOut", delay: 0.1 }}

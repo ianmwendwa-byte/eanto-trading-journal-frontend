@@ -6,6 +6,7 @@ import { PostCard } from "@/components/blog/PostCard";
 import { getAllPosts } from "@/lib/blog";
 import { PILLARS } from "@/constants/blogPillars";
 import { cn } from "@/lib/utils";
+import { useIsMounted } from "@/hooks/useIsMounted";
 
 const allPosts = getAllPosts();
 
@@ -30,6 +31,7 @@ const PillarChip = ({ pillar, active, onClick }) => (
 );
 
 export const BlogIndexPage = () => {
+  const isMounted = useIsMounted();
   const [searchParams, setSearchParams] = useSearchParams();
   const activePillar = searchParams.get("pillar") ?? "all";
 
@@ -76,7 +78,7 @@ export const BlogIndexPage = () => {
         />
         <div className="relative max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <motion.p
-            initial={{ opacity: 0, y: 12 }}
+            initial={isMounted ? { opacity: 0, y: 12 } : false}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, ease: "easeOut" }}
             className="text-xs uppercase tracking-widest text-primary font-medium mb-4"
@@ -84,7 +86,7 @@ export const BlogIndexPage = () => {
             The Kraviq Blog
           </motion.p>
           <motion.h1
-            initial={{ opacity: 0, y: 16 }}
+            initial={isMounted ? { opacity: 0, y: 16 } : false}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, ease: "easeOut", delay: 0.05 }}
             className="font-heading font-bold text-5xl md:text-6xl text-foreground mb-4"
@@ -94,7 +96,7 @@ export const BlogIndexPage = () => {
             No fluff.
           </motion.h1>
           <motion.p
-            initial={{ opacity: 0, y: 12 }}
+            initial={isMounted ? { opacity: 0, y: 12 } : false}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, ease: "easeOut", delay: 0.1 }}
             className="text-lg text-muted-foreground"
@@ -111,7 +113,7 @@ export const BlogIndexPage = () => {
 
           {/* Pillar filter chips — data-driven from PILLARS constant */}
           <motion.div
-            initial={{ opacity: 0, y: 12 }}
+            initial={isMounted ? { opacity: 0, y: 12 } : false}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, ease: "easeOut", delay: 0.15 }}
             className="flex flex-wrap gap-2 mb-10"
@@ -146,7 +148,7 @@ export const BlogIndexPage = () => {
               Scales generically: 1 post = full width, 2 = 2-col, 3+ = 3-col (desktop). */}
           {cornerstonePosts.length > 0 && (
             <motion.div
-              initial={{ opacity: 0, y: 16 }}
+              initial={isMounted ? { opacity: 0, y: 16 } : false}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.45, ease: "easeOut", delay: 0.2 }}
               className="mb-12"
@@ -194,7 +196,7 @@ export const BlogIndexPage = () => {
             </div>
           ) : (
             <motion.div
-              initial={{ opacity: 0, y: 16 }}
+              initial={isMounted ? { opacity: 0, y: 16 } : false}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4 }}
               className="py-16 text-center"

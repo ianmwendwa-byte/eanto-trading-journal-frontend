@@ -5,8 +5,10 @@ import { PageLayout } from "@/components/landing/PageLayout";
 import { PostCard } from "@/components/blog/PostCard";
 import { getPostsByPillar } from "@/lib/blog";
 import { PILLAR_MAP, BACKLOG_BY_PILLAR } from "@/constants/blogPillars";
+import { useIsMounted } from "@/hooks/useIsMounted";
 
 export const BlogCategoryPage = () => {
+  const isMounted = useIsMounted();
   const { pillar: pillarId } = useParams();
   const pillar = PILLAR_MAP[pillarId];
 
@@ -47,7 +49,7 @@ export const BlogCategoryPage = () => {
         />
         <div className="relative max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <motion.span
-            initial={{ opacity: 0, y: 8 }}
+            initial={isMounted ? { opacity: 0, y: 8 } : false}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4 }}
             className="inline-block text-xs uppercase tracking-widest font-medium mb-4"
@@ -56,7 +58,7 @@ export const BlogCategoryPage = () => {
             Category
           </motion.span>
           <motion.h1
-            initial={{ opacity: 0, y: 16 }}
+            initial={isMounted ? { opacity: 0, y: 16 } : false}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, ease: "easeOut", delay: 0.05 }}
             className="font-heading font-bold text-4xl md:text-5xl text-foreground mb-4"
@@ -64,7 +66,7 @@ export const BlogCategoryPage = () => {
             {pillar.name}
           </motion.h1>
           <motion.p
-            initial={{ opacity: 0, y: 12 }}
+            initial={isMounted ? { opacity: 0, y: 12 } : false}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, ease: "easeOut", delay: 0.1 }}
             className="text-lg text-muted-foreground max-w-xl mx-auto"
@@ -109,7 +111,7 @@ export const BlogCategoryPage = () => {
           ) : (
             /* All posts are backlog — nothing published yet */
             <motion.div
-              initial={{ opacity: 0, y: 16 }}
+              initial={isMounted ? { opacity: 0, y: 16 } : false}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4 }}
               className="py-12"

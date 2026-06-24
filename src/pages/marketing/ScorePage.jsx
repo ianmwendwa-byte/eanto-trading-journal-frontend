@@ -6,6 +6,7 @@ import { Star, TrendingUp, Shield, BarChart3, Target, Repeat, ArrowRight } from 
 import { Button } from "@/components/ui/button";
 import { PageLayout } from "@/components/landing/PageLayout";
 import { reveal } from "@/lib/animations";
+import { useIsMounted } from "@/hooks/useIsMounted";
 import {
   buildFaqSchema,
   buildBreadcrumbSchema,
@@ -190,6 +191,7 @@ const BANDS = [
 ];
 
 export const ScorePage = () => {
+  const isMounted = useIsMounted();
   const faqSchema = buildFaqSchema(FAQS);
   const breadcrumbSchema = buildBreadcrumbSchema(breadcrumbItems);
   const webPageSchema = buildWebPageSchema({
@@ -226,7 +228,7 @@ export const ScorePage = () => {
       <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         <FeatureBreadcrumb items={breadcrumbItems} />
         <motion.div
-          initial={{ opacity: 0, y: 12 }}
+          initial={isMounted ? { opacity: 0, y: 12 } : false}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, ease: "easeOut" }}
           className="inline-flex items-center gap-2 bg-warning/10 text-warning border border-warning/20 text-xs font-medium rounded-full px-3 py-1 mb-6"
@@ -235,7 +237,7 @@ export const ScorePage = () => {
           Business Score
         </motion.div>
         <motion.h1
-          initial={{ opacity: 0, y: 16 }}
+          initial={isMounted ? { opacity: 0, y: 16 } : false}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, ease: "easeOut", delay: 0.05 }}
           className="font-heading font-bold text-5xl md:text-6xl text-foreground leading-tight mb-6"
@@ -247,7 +249,7 @@ export const ScorePage = () => {
           Complete clarity.
         </motion.h1>
         <motion.p
-          initial={{ opacity: 0, y: 12 }}
+          initial={isMounted ? { opacity: 0, y: 12 } : false}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, ease: "easeOut", delay: 0.1 }}
           className="text-lg text-muted-foreground max-w-2xl mx-auto mb-10 leading-relaxed"
@@ -257,7 +259,7 @@ export const ScorePage = () => {
           you're running a sustainable trading business.
         </motion.p>
         <motion.div
-          initial={{ opacity: 0, y: 12 }}
+          initial={isMounted ? { opacity: 0, y: 12 } : false}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, ease: "easeOut", delay: 0.15 }}
           className="flex flex-col sm:flex-row gap-3 justify-center"
@@ -283,7 +285,7 @@ export const ScorePage = () => {
         <div className="grid md:grid-cols-2 gap-16 items-center">
           {/* Dial + pillar bars */}
           <motion.div
-            initial={{ opacity: 0, x: -32 }}
+            initial={isMounted ? { opacity: 0, x: -32 } : false}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.55, ease: "easeOut" }}
@@ -299,7 +301,7 @@ export const ScorePage = () => {
 
           {/* Bands + explanation */}
           <motion.div
-            initial={{ opacity: 0, x: 32 }}
+            initial={isMounted ? { opacity: 0, x: 32 } : false}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.55, ease: "easeOut", delay: 0.1 }}
@@ -348,13 +350,13 @@ export const ScorePage = () => {
     <section className="py-20 border-t border-border">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
-          <motion.p {...reveal(0)} className="text-xs uppercase tracking-widest text-primary font-medium mb-4">
+          <motion.p {...reveal(0, isMounted)} className="text-xs uppercase tracking-widest text-primary font-medium mb-4">
             The five pillars
           </motion.p>
-          <motion.h2 {...reveal(0.05)} className="font-heading font-bold text-3xl md:text-4xl text-foreground mb-4">
+          <motion.h2 {...reveal(0.05, isMounted)} className="font-heading font-bold text-3xl md:text-4xl text-foreground mb-4">
             Every dimension of your trading. Measured.
           </motion.h2>
-          <motion.p {...reveal(0.1)} className="text-muted-foreground max-w-xl mx-auto">
+          <motion.p {...reveal(0.1, isMounted)} className="text-muted-foreground max-w-xl mx-auto">
             Each pillar is scored from 0–100. The composite Business Score is a
             weighted average. Improving any pillar improves your score.
           </motion.p>
@@ -366,7 +368,7 @@ export const ScorePage = () => {
             return (
               <motion.div
                 key={p.title}
-                initial={{ opacity: 0, y: 24 }}
+                initial={isMounted ? { opacity: 0, y: 24 } : false}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.45, ease: "easeOut", delay: i * 0.07 }}
@@ -405,16 +407,16 @@ export const ScorePage = () => {
     <section className="py-20 border-t border-border">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
-          <motion.h2 {...reveal(0)} className="font-heading font-bold text-3xl md:text-4xl text-foreground mb-4">
+          <motion.h2 {...reveal(0, isMounted)} className="font-heading font-bold text-3xl md:text-4xl text-foreground mb-4">
             Why not just track P&L?
           </motion.h2>
-          <motion.p {...reveal(0.05)} className="text-muted-foreground leading-relaxed">
+          <motion.p {...reveal(0.05, isMounted)} className="text-muted-foreground leading-relaxed">
             P&L tells you the outcome. The Business Score tells you the process.
           </motion.p>
         </div>
 
         <motion.div
-          initial={{ opacity: 0, y: 16 }}
+          initial={isMounted ? { opacity: 0, y: 16 } : false}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5, ease: "easeOut" }}
@@ -463,13 +465,13 @@ export const ScorePage = () => {
     {/* ── CTA ───────────────────────────────────────────────────────────── */}
     <section className="py-20 border-t border-border">
       <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <motion.h2 {...reveal(0)} className="font-heading font-bold text-3xl md:text-4xl text-foreground mb-4">
+        <motion.h2 {...reveal(0, isMounted)} className="font-heading font-bold text-3xl md:text-4xl text-foreground mb-4">
           Find out your score.
         </motion.h2>
-        <motion.p {...reveal(0.05)} className="text-muted-foreground mb-8">
+        <motion.p {...reveal(0.05, isMounted)} className="text-muted-foreground mb-8">
           Free to start. Requires at least 10 closed trades to generate.
         </motion.p>
-        <motion.div {...reveal(0.1)}>
+        <motion.div {...reveal(0.1, isMounted)}>
           <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="inline-block">
             <Button size="lg" asChild className="gap-2">
               <Link to="/register">
