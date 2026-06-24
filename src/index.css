@@ -318,6 +318,9 @@
   html {
     font-family: var(--font-ui);
     scroll-behavior: smooth;
+    /* Reserve scrollbar space permanently so Radix's scroll-lock (dropdowns,
+       sheets, dialogs) never changes viewport width and shifts the fixed navbar. */
+    scrollbar-gutter: stable;
   }
 
   body {

@@ -13,6 +13,8 @@ import { PricingSection } from "@/components/landing/PricingSection";
 import { FAQSection } from "@/components/landing/FAQSection";
 import { FinalCTASection } from "@/components/landing/FinalCTASection";
 import { LandingFooter } from "@/components/landing/LandingFooter";
+import { buildFaqSchema } from "@/lib/featurePageSchemas";
+import { FAQS } from "@/lib/landingFaqs";
 
 // ── Hash-based section scroll ─────────────────────────────────────────────────
 
@@ -44,19 +46,38 @@ export const LandingPage = () => {
     setMounted(true);
   }, []);
 
+  // SoftwareApplication + Organization schemas already live sitewide in
+  // index.html (every page is part of the same app/brand, so that's valid
+  // everywhere). FAQPage schema is NOT sitewide-valid — it must only appear
+  // where the matching Q&A content is actually visible, so it's built here
+  // from the same FAQS data FAQSection renders, scoped to the homepage only.
+  const faqSchema = buildFaqSchema(
+    FAQS.map(({ q, a }) => ({ question: q, answer: a }))
+  );
+
   return (
     <>
       {mounted && (
         <Helmet>
-          <title>Kraviq — Forex Trading OS for Prop &amp; Manual Traders</title>
+          <title>Kraviq — Trading Business OS for Retail Traders | Ledger, Risk Calculators &amp; EA Sync</title>
           <meta
             name="description"
-            content="Track every trade, manage prop firm challenges, and score your trading business. Kraviq is the all-in-one forex trading OS with EA sync, CSV import, and Business Score. Free to start."
+            content="Kraviq is a trading business operating system for retail traders. Run your ledger, backtest strategies, calculate risk, sync your MT4/MT5 EA, and score your trading performance — in one platform."
           />
           <link rel="canonical" href="https://kraviq.app" />
-          <meta property="og:title" content="Kraviq — Forex Trading OS" />
+          <meta property="og:title" content="Kraviq — Trading Business OS for Retail Traders" />
+          <meta
+            property="og:description"
+            content="Kraviq is a trading business operating system for retail traders. Run your ledger, backtest strategies, calculate risk, sync your MT4/MT5 EA, and score your trading performance — in one platform."
+          />
           <meta property="og:url" content="https://kraviq.app" />
+          <meta name="twitter:title" content="Kraviq — Trading Business OS for Retail Traders" />
+          <meta
+            name="twitter:description"
+            content="Kraviq is a trading business operating system for retail traders. Run your ledger, backtest strategies, calculate risk, sync your MT4/MT5 EA, and score your trading performance — in one platform."
+          />
           <meta name="robots" content="index, follow" />
+          <script type="application/ld+json">{faqSchema}</script>
         </Helmet>
       )}
 

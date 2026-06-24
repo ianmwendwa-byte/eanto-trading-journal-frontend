@@ -22,7 +22,7 @@ export const BlogCategoryPage = () => {
   return (
     <PageLayout title={pillar.name}>
       <Helmet>
-        <title>{pillar.name} — Kraviq Blog</title>
+        <title>{`${pillar.name} — Kraviq Blog`}</title>
         <meta name="description" content={pillar.description} />
         <link
           rel="canonical"

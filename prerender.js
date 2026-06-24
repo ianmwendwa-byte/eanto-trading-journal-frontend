@@ -72,6 +72,28 @@ function getPillarIds() {
   }
 }
 
+/**
+ * Maps blog slug -> most recent date (updatedAt falling back to publishedAt)
+ * from frontmatter, for sitemap <lastmod> values.
+ */
+function getBlogDates() {
+  const dates = {};
+  try {
+    const files = fs.readdirSync(BLOG_CONTENT_DIR).filter((f) => f.endsWith(".md"));
+    for (const file of files) {
+      const raw = fs.readFileSync(path.join(BLOG_CONTENT_DIR, file), "utf-8");
+      const updated = raw.match(/^updatedAt:\s*"?([^"\n]+)"?\s*$/m);
+      const published = raw.match(/^publishedAt:\s*"?([^"\n]+)"?\s*$/m);
+      const slug = file.replace(/\.md$/, "");
+      const date = (updated && updated[1]) || (published && published[1]);
+      if (date) dates[slug] = date.trim();
+    }
+  } catch {
+    // Fine to fall back to today's date for every blog route.
+  }
+  return dates;
+}
+
 // ── Route list ────────────────────────────────────────────────────────────────
 
 const STATIC_ROUTES = [
@@ -85,6 +107,12 @@ const STATIC_ROUTES = [
   "/war-account",
   "/ea-sync",
   "/business-score",
+  "/features/trade-tracking",
+  "/features/financial-ledger",
+  "/features/prop-firm-compliance",
+  "/features/risk-calculators",
+  "/features/backtesting",
+  "/features/strategy",
 ];
 
 const blogSlugs = getBlogSlugs();
@@ -97,11 +125,61 @@ const blogRoutes = [
 
 const ROUTES = [...STATIC_ROUTES, ...blogRoutes];
 
+// ── Sitemap ───────────────────────────────────────────────────────────────────
+// public/sitemap.xml only ever listed 3 URLs (/, /login, /register) — every
+// marketing, feature, and blog page was invisible to crawlers via the sitemap.
+// Generate it here from the same ROUTES list that drives prerendering, so the
+// two can never drift apart again.
+
+const SITEMAP_PRIORITY = {
+  "/": "1.0",
+  "/blog": "0.8",
+};
+
+function priorityFor(url) {
+  if (SITEMAP_PRIORITY[url]) return SITEMAP_PRIORITY[url];
+  if (url.startsWith("/features/") || ["/business-score", "/ea-sync", "/war-account"].includes(url)) return "0.8";
+  if (url.startsWith("/blog/")) return "0.6";
+  return "0.5";
+}
+
+function changefreqFor(url) {
+  if (url === "/") return "weekly";
+  if (url.startsWith("/blog")) return "monthly";
+  return "monthly";
+}
+
+function generateSitemap(blogDates) {
+  const today = new Date().toISOString().slice(0, 10);
+  const urls = ROUTES.map((url) => {
+    const slug = url.startsWith("/blog/") ? url.replace("/blog/", "") : null;
+    const lastmod = (slug && blogDates[slug]) || today;
+    return `  <url>
+    <loc>https://kraviq.app${url}</loc>
+    <lastmod>${lastmod}</lastmod>
+    <changefreq>${changefreqFor(url)}</changefreq>
+    <priority>${priorityFor(url)}</priority>
+  </url>`;
+  }).join("\n\n");
+
+  const xml = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+
+${urls}
+
+</urlset>
+`;
+
+  const outPath = path.resolve(__dirname, "dist/sitemap.xml");
+  fs.writeFileSync(outPath, xml, "utf-8");
+  console.log(`  ✅ Sitemap written: ${outPath} (${ROUTES.length} URLs)`);
+}
+
 // ── Prerender ─────────────────────────────────────────────────────────────────
 
 async function prerender() {
   console.log("🔄 Starting prerender...");
-  console.log(`   Static routes: ${STATIC_ROUTES.length} (/, /about, /contact, /community, /privacy, /terms, /cookies, /war-account, /ea-sync, /business-score)`);
+  console.log(`   Static routes: ${STATIC_ROUTES.length} (/, /about, /contact, /community, /privacy, /terms, /cookies, /war-account, /ea-sync, /business-score, /features/trade-tracking, /features/financial-ledger, /features/prop-firm-compliance, /features/risk-calculators, /features/backtesting, /features/strategy)`);
   console.log(`   Blog routes:   ${blogRoutes.length} (${blogSlugs.length} posts + index + ${PILLAR_IDS.length} categories)`);
 
   const templatePath = path.resolve(__dirname, "dist/index.html");
@@ -118,12 +196,48 @@ async function prerender() {
     console.log(`  Rendering: ${url}`);
 
     try {
-      const { html: appHtml } = render(url);
+      const { html: rawAppHtml } = render(url);
 
-      const html = template.replace(
+      // React 19 hoists <title>/<meta>/<link> rendered inside <Helmet> (or any
+      // component) directly into the SSR output as a literal prefix on the
+      // string returned by renderToString — there is no real <head> element
+      // in the tree we render (just <StaticRouter><PublicRoutes /></...>), so
+      // react-helmet-async's `helmetContext.helmet` API (which targets older
+      // React versions without native head-hoisting) never populates. See
+      // https://github.com/staylor/react-helmet-async — the "React 19 SSR
+      // note" in its README documents this exact behavior change.
+      //
+      // <script> tags are NOT hoisted this way — they stay exactly where the
+      // <Helmet> component sits in the render tree (e.g. inside <main>),
+      // which is harmless: Google and other crawlers parse JSON-LD anywhere
+      // in the document, not just inside <head>.
+      //
+      // So: strip the hoisted title/meta/link prefix off the front of
+      // appHtml, move it into the static template's <head> (replacing the
+      // homepage's own static title/canonical/OG/Twitter tags so there is
+      // exactly one copy of each), and leave the JSON-LD <script> tags inline
+      // in the body exactly where React placed them.
+      const headTagPrefixMatch = rawAppHtml.match(
+        /^((?:<title>[\s\S]*?<\/title>|<meta[^>]*\/?>|<link[^>]*\/?>)\s*)+/
+      );
+      const headTagPrefix = headTagPrefixMatch ? headTagPrefixMatch[0] : "";
+      const appHtml = rawAppHtml.slice(headTagPrefix.length);
+
+      let html = template.replace(
         '<div id="root"></div>',
         `<div id="root">${appHtml}</div>`
       );
+
+      if (headTagPrefix.trim()) {
+        html = html
+          .replace(/<title>[\s\S]*?<\/title>\s*\n?/, "")
+          .replace(/<link rel="canonical"[\s\S]*?\/>\s*\n?/, "")
+          .replace(/<meta\s+name="description"[\s\S]*?\/>\s*\n?/, "")
+          .replace(/<meta\s+property="og:[\s\S]*?\/>\s*\n?/g, "")
+          .replace(/<meta\s+name="twitter:[\s\S]*?\/>\s*\n?/g, "");
+
+        html = html.replace("</head>", `    ${headTagPrefix}\n  </head>`);
+      }
 
       // Determine output file path
       // "/" → dist/index.html
@@ -150,6 +264,8 @@ async function prerender() {
       }
     }
   }
+
+  generateSitemap(getBlogDates());
 
   console.log("✅ Prerender complete");
 }

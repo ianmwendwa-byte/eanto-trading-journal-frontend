@@ -1,9 +1,9 @@
 import { renderToString } from "react-dom/server";
-import { MemoryRouter } from "react-router-dom";
+import { StaticRouter } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { HelmetProvider } from "react-helmet-async";
 import { ThemeProvider } from "./components/theme-provider";
-import { LandingPage } from "./pages/landing/LandingPage";
+import { PublicRoutes } from "./PublicRoutes";
 
 export function render(url) {
   const queryClient = new QueryClient({
@@ -22,9 +22,9 @@ export function render(url) {
     <HelmetProvider context={helmetContext}>
       <ThemeProvider defaultTheme="dark" storageKey="kraviq-ui">
         <QueryClientProvider client={queryClient}>
-          <MemoryRouter initialEntries={[url]}>
-            <LandingPage />
-          </MemoryRouter>
+          <StaticRouter location={url}>
+            <PublicRoutes />
+          </StaticRouter>
         </QueryClientProvider>
       </ThemeProvider>
     </HelmetProvider>

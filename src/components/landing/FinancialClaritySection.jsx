@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
 import { Wallet, TrendingUp, Calculator, Star } from "lucide-react";
 
 // ── Node ─────────────────────────────────────────────────────────────────────
@@ -212,7 +213,12 @@ export const FinancialClaritySection = () => {
             className="text-muted-foreground text-lg max-w-xl mx-auto"
           >
             Most traders confuse gross profit with real profit. Kraviq shows
-            you the full picture — every cost, every withdrawal, every dollar.
+            you the full picture — every cost, every withdrawal, every dollar,
+            tracked in your{" "}
+            <Link to="/features/financial-ledger" className="text-primary hover:underline">
+              financial ledger
+            </Link>
+            .
           </motion.p>
         </div>
 

@@ -1,22 +1,78 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
 import { Wifi, Key, RefreshCw, Shield, CheckCircle, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PageLayout } from "@/components/landing/PageLayout";
+import { reveal } from "@/lib/animations";
+import {
+  buildFaqSchema,
+  buildBreadcrumbSchema,
+  buildWebPageSchema,
+} from "@/lib/featurePageSchemas";
+import {
+  FeatureBreadcrumb,
+  FeatureFAQ,
+  RelatedFeatures,
+} from "@/components/landing/FeaturePageShared";
 
-const reveal = (delay = 0) => ({
-  initial: { opacity: 0, y: 24 },
-  whileInView: { opacity: 1, y: 0 },
-  viewport: { once: true },
-  transition: { duration: 0.5, ease: "easeOut", delay },
-});
+const PAGE_TITLE = "MT4/MT5 EA Auto-Sync for Trade Tracking | Kraviq";
+const PAGE_DESCRIPTION =
+  "Install the Kraviq Expert Advisor on MT4 or MT5 and every closed trade syncs automatically: pair, direction, lot size, P&L, swap, and commission, with no manual entry.";
+const PAGE_URL = "https://kraviq.app/ea-sync";
+
+const FAQS = [
+  {
+    question: "Is the EA API key shown more than once?",
+    answer:
+      "No. The key is shown exactly once, right after you generate it. Kraviq stores only a cryptographic hash, so if you lose the key, you generate a new one, which immediately revokes the old one.",
+  },
+  {
+    question: "Does EA Sync work with both MT4 and MT5?",
+    answer:
+      "Yes. The same Expert Advisor installs on either platform. Attach it to any chart, enter your API key in the EA's input settings, and it starts syncing on the next trade close.",
+  },
+  {
+    question: "What happens if my EA goes offline?",
+    answer:
+      "Kraviq marks the connection offline if no heartbeat arrives for five minutes. Past trades already synced stay intact, and syncing resumes automatically once the EA reconnects, no re-setup required.",
+  },
+  {
+    question: "Does EA Sync replace manual trade entry entirely?",
+    answer:
+      "For the account it's running on, yes. You can still add trades manually if you want to log something the EA didn't catch, and you can choose to show EA trades only, manual trades only, or both.",
+  },
+];
+
+const RELATED_FEATURES = [
+  {
+    title: "Trade Tracking",
+    description: "See how EA-synced trades fit into your full trade history and grading.",
+    href: "/features/trade-tracking",
+  },
+  {
+    title: "Financial Ledger",
+    description: "Synced trades create matching ledger transactions automatically.",
+    href: "/features/financial-ledger",
+  },
+  {
+    title: "Prop Firm Compliance",
+    description: "EA Sync keeps a prop challenge's trade history current without manual work.",
+    href: "/features/prop-firm-compliance",
+  },
+];
+
+const breadcrumbItems = [
+  { label: "Home", href: "/" },
+  { label: "EA Sync" },
+];
 
 const STEPS = [
   {
     num: "01",
     icon: Key,
     title: "Generate your API key",
-    desc: "In Kraviq, open your account settings and generate an EA API key. It is shown once — copy it and keep it safe. We store only a secure hash.",
+    desc: "In Kraviq, open your account settings and generate an EA API key. It is shown once, so copy it and keep it safe. We store only a secure hash.",
     mockup: (
       <div className="bg-card border border-border rounded-xl p-4 text-sm shadow-lg max-w-xs w-full">
         <p className="text-xs text-muted-foreground mb-3 font-medium">EA API Key</p>
@@ -60,7 +116,7 @@ const STEPS = [
     num: "03",
     icon: Wifi,
     title: "Trades sync automatically",
-    desc: "That's it. Every trade that closes in MT4/MT5 is pushed to Kraviq instantly — pair, direction, lot size, P&L, open and close times, and balance snapshot.",
+    desc: "That's it. Every trade that closes in MT4/MT5 is pushed to Kraviq instantly: pair, direction, lot size, P&L, open and close times, and balance snapshot.",
     mockup: (
       <div className="bg-card border border-border rounded-xl p-4 text-sm shadow-lg max-w-xs w-full">
         <div className="flex items-center justify-between mb-4">
@@ -90,7 +146,7 @@ const STEPS = [
 
 const DATA_FIELDS = [
   "Currency pair (e.g. EURUSD, XAUUSD)",
-  "Trade direction — Buy or Sell",
+  "Trade direction (Buy or Sell)",
   "Lot size",
   "Open and close price",
   "Open and close timestamp",
@@ -104,7 +160,7 @@ const SECURITY = [
   {
     icon: Key,
     title: "One-time key display",
-    body: "Your API key is shown once at generation and never again. Store it safely — lose it and you generate a new one (which instantly revokes the old).",
+    body: "Your API key is shown once at generation and never again. Store it safely. If you lose it, generating a new one instantly revokes the old.",
   },
   {
     icon: Shield,
@@ -118,8 +174,29 @@ const SECURITY = [
   },
 ];
 
-export const EASyncPage = () => (
+export const EASyncPage = () => {
+  const faqSchema = buildFaqSchema(FAQS);
+  const breadcrumbSchema = buildBreadcrumbSchema(breadcrumbItems);
+  const webPageSchema = buildWebPageSchema({
+    name: PAGE_TITLE,
+    description: PAGE_DESCRIPTION,
+    url: PAGE_URL,
+  });
+
+  return (
   <PageLayout title="EA Sync">
+    <Helmet>
+      <title>{PAGE_TITLE}</title>
+      <meta name="description" content={PAGE_DESCRIPTION} />
+      <link rel="canonical" href={PAGE_URL} />
+      <meta property="og:title" content={PAGE_TITLE} />
+      <meta property="og:description" content={PAGE_DESCRIPTION} />
+      <meta property="og:url" content={PAGE_URL} />
+      <meta name="robots" content="index, follow" />
+      <script type="application/ld+json">{webPageSchema}</script>
+      <script type="application/ld+json">{breadcrumbSchema}</script>
+      <script type="application/ld+json">{faqSchema}</script>
+    </Helmet>
 
     {/* ── Hero ──────────────────────────────────────────────────────────── */}
     <section className="relative pt-32 pb-20 overflow-hidden">
@@ -132,6 +209,7 @@ export const EASyncPage = () => (
         aria-hidden="true"
       />
       <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <FeatureBreadcrumb items={breadcrumbItems} />
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
@@ -160,7 +238,7 @@ export const EASyncPage = () => (
           className="text-lg text-muted-foreground max-w-2xl mx-auto mb-10 leading-relaxed"
         >
           Install the Kraviq Expert Advisor on any MT4 or MT5 chart. Every
-          trade that closes syncs to your journal instantly — automatically,
+          trade that closes syncs to your account instantly, automatically,
           with zero manual input.
         </motion.p>
 
@@ -173,7 +251,7 @@ export const EASyncPage = () => (
           <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
             <Button size="lg" asChild className="gap-2">
               <Link to="/register">
-                Get Started — It's Free
+                Get Started, It's Free
                 <ArrowRight className="h-4 w-4" />
               </Link>
             </Button>
@@ -362,6 +440,9 @@ export const EASyncPage = () => (
       </div>
     </section>
 
+    <FeatureFAQ faqs={FAQS} />
+    <RelatedFeatures items={RELATED_FEATURES} />
+
     {/* ── CTA ───────────────────────────────────────────────────────────── */}
     <section className="py-20 border-t border-border">
       <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
@@ -385,4 +466,5 @@ export const EASyncPage = () => (
     </section>
 
   </PageLayout>
-);
+  );
+};

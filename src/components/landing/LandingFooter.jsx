@@ -6,11 +6,16 @@ const FOUNDING_YEAR = 2026;
 
 const LINKS = {
   Product: [
-    { label: "Features",       href: "/#features" },
-    { label: "Pricing",        href: "/#pricing" },
-    { label: "Business Score", href: "/business-score" },
-    { label: "War Account",    href: "/war-account" },
-    { label: "EA Sync",        href: "/ea-sync" },
+    { label: "Pricing",               href: "/#pricing" },
+    { label: "Trade Tracking",        href: "/features/trade-tracking" },
+    { label: "Financial Ledger",      href: "/features/financial-ledger" },
+    { label: "Business Score",        href: "/business-score" },
+    { label: "Prop Firm Compliance",  href: "/features/prop-firm-compliance" },
+    { label: "Risk Calculators",      href: "/features/risk-calculators" },
+    { label: "War Account",           href: "/war-account" },
+    { label: "Backtesting",           href: "/features/backtesting" },
+    { label: "EA Sync",               href: "/ea-sync" },
+    { label: "Strategy & Playbook",   href: "/features/strategy" },
   ],
   Company: [
     { label: "About",     href: "/about" },

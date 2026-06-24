@@ -75,3 +75,14 @@ export const staggerItemVariants = {
     transition: { duration: 0.2, ease: "easeOut" },
   },
 };
+
+/**
+ * Scroll-triggered reveal used across marketing/feature pages
+ * (fade up + slide, fires once when scrolled into view).
+ */
+export const reveal = (delay = 0) => ({
+  initial: { opacity: 0, y: 24 },
+  whileInView: { opacity: 1, y: 0 },
+  viewport: { once: true },
+  transition: { duration: 0.5, ease: "easeOut", delay },
+});

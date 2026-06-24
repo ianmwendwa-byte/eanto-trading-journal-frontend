@@ -202,7 +202,7 @@ const TradesScreen = () => (
     className="p-3 h-full overflow-hidden"
   >
     <div className="text-[7px] text-muted-foreground mb-2 font-mono">
-      Trades Journal · 127 trades
+      Trade History · 127 trades
     </div>
     <div className="grid grid-cols-5 gap-1 mb-1 pb-1 border-b border-border/40">
       {["Pair", "Dir", "P&L", "R:R", "Grade"].map((h) => (
@@ -356,18 +356,11 @@ export const HeroSection = () => {
               variants={item}
               className="text-lg text-muted-foreground max-w-md leading-relaxed mb-3"
             >
-              Kraviq is the operating system for serious retail forex
-              traders. Track every trade, score your business, and grow with
-              data — not guesswork.
+              Kraviq is a trading business operating system for retail traders.
+              Track every trade, score your business, and grow with data not
+              guesswork.
             </motion.p>
 
-            {/* Plain-language description — visible to search engines and Google OAuth review */}
-            <motion.p
-              variants={item}
-              className="text-sm text-muted-foreground max-w-md leading-relaxed mb-8"
-            >
-              Kraviq is a web application that helps forex traders log and analyze their trades, track performance across multiple trading accounts, and monitor compliance with prop trading firm rules.
-            </motion.p>
 
             {/* CTAs */}
             <motion.div

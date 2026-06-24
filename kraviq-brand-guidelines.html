@@ -1,0 +1,978 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Kraviq — Brand Guidelines v1.0</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --primary:#4f6ef7;
+  --primary-50:#eef1fe;
+  --primary-100:#c5ceff;
+  --primary-200:#99aaff;
+  --primary-300:#6b86ff;
+  --primary-400:#4f6ef7;
+  --primary-600:#3654d4;
+  --primary-800:#1e3bad;
+  --background:#0a0a0f;
+  --card:#111118;
+  --muted:#1e1e2e;
+  --border:#2a2a3e;
+  --foreground:#f8f8ff;
+  --muted-fg:#9898a8;
+  --subtle:#5a5a6a;
+  --profit:#22c55e;
+  --loss:#ef4444;
+  --warning:#f59e0b;
+  --breakeven:#6b7280;
+  --font-display:'Space Grotesk',sans-serif;
+  --font-body:'Inter',sans-serif;
+  --font-mono:'JetBrains Mono',monospace;
+  --r-sm:4px;--r-md:8px;--r-lg:12px;--r-xl:16px;--r-2xl:24px;--r-full:999px;
+}
+html{scroll-behavior:smooth;}
+body{background:var(--background);color:var(--foreground);font-family:var(--font-body);font-size:16px;line-height:1.6;}
+
+/* Layout */
+.wrap{max-width:960px;margin:0 auto;padding:0 32px;}
+section{padding:96px 0;border-bottom:1px solid var(--muted);}
+section:last-of-type{border-bottom:none;}
+
+/* Sidebar nav */
+.sidebar{position:fixed;top:0;left:0;width:220px;height:100vh;background:var(--card);border-right:1px solid var(--muted);overflow-y:auto;padding:28px 0;z-index:100;display:flex;flex-direction:column;}
+.sidebar-logo{padding:0 20px 24px;border-bottom:1px solid var(--muted);margin-bottom:16px;}
+.sidebar-logo svg{width:100px;height:auto;}
+.nav-item{display:block;padding:9px 20px;font-size:12px;color:var(--muted-fg);text-decoration:none;font-family:var(--font-body);font-weight:500;letter-spacing:0.01em;transition:all 150ms;border-left:2px solid transparent;}
+.nav-item:hover{color:var(--foreground);background:var(--muted);}
+.nav-item.active{color:var(--primary);border-left-color:var(--primary);background:rgba(79,110,247,0.08);}
+.nav-num{font-family:var(--font-mono);font-size:10px;color:var(--subtle);margin-right:8px;}
+.main{margin-left:220px;}
+
+/* Section header */
+.sec-num{font-family:var(--font-mono);font-size:11px;color:var(--subtle);letter-spacing:0.14em;text-transform:uppercase;margin-bottom:8px;}
+.sec-title{font-family:var(--font-display);font-size:36px;font-weight:700;letter-spacing:-0.02em;margin-bottom:8px;}
+.sec-sub{color:var(--muted-fg);font-size:16px;max-width:560px;line-height:1.6;margin-bottom:40px;}
+
+/* Cards */
+.card{background:var(--card);border:1px solid var(--muted);border-radius:var(--r-lg);padding:24px;}
+.card-dark{background:var(--background);border:1px solid var(--muted);border-radius:var(--r-lg);padding:32px;display:flex;align-items:center;justify-content:center;}
+.card-light{background:#f5f5f7;border:1px solid #e0e0e8;border-radius:var(--r-lg);padding:32px;display:flex;align-items:center;justify-content:center;}
+.card-blue{background:var(--primary);border-radius:var(--r-lg);padding:32px;display:flex;align-items:center;justify-content:center;}
+
+/* Grid systems */
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
+.grid4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:12px;}
+.grid7{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;}
+
+/* Labels */
+.label{font-size:11px;color:var(--muted-fg);text-align:center;margin-top:10px;font-family:var(--font-mono);}
+.divlabel{font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:var(--subtle);margin:32px 0 12px;padding-bottom:8px;border-bottom:1px solid var(--muted);}
+
+/* Color swatches */
+.swatch{border-radius:var(--r-md);overflow:hidden;border:1px solid var(--muted);}
+.swatch-color{height:72px;}
+.swatch-info{padding:12px;background:var(--card);}
+.swatch-name{font-size:13px;font-weight:500;color:var(--foreground);margin-bottom:2px;}
+.swatch-hex{font-size:11px;font-family:var(--font-mono);color:var(--muted-fg);}
+.swatch-vals{font-size:10px;font-family:var(--font-mono);color:var(--subtle);margin-top:4px;line-height:1.7;}
+
+/* Type specimens */
+.type-row{padding:20px 0;border-bottom:1px solid var(--muted);}
+.type-row:last-child{border-bottom:none;}
+.type-meta{font-size:11px;color:var(--subtle);font-family:var(--font-mono);margin-top:6px;}
+
+/* Code block */
+.code{background:var(--background);border:1px solid var(--muted);border-radius:var(--r-md);padding:24px;font-family:var(--font-mono);font-size:13px;line-height:1.8;overflow-x:auto;white-space:pre;}
+.code .prop{color:var(--primary);}
+.code .val{color:var(--foreground);}
+.code .cmt{color:var(--subtle);}
+.code .str{color:#22c55e;}
+
+/* Buttons preview */
+.btn{display:inline-flex;align-items:center;gap:8px;padding:10px 20px;border-radius:var(--r-md);font-family:var(--font-body);font-size:14px;font-weight:500;cursor:pointer;border:none;transition:all 150ms;}
+.btn-primary{background:var(--primary);color:#fff;}
+.btn-primary:hover{background:var(--primary-600);}
+.btn-outline{background:transparent;border:1px solid var(--border);color:var(--foreground);}
+.btn-outline:hover{border-color:var(--primary);background:rgba(79,110,247,0.08);}
+.btn-ghost{background:transparent;color:var(--muted-fg);}
+.btn-ghost:hover{background:var(--muted);color:var(--foreground);}
+.btn-destructive{background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);color:#ef4444;}
+
+/* Badges */
+.badge{display:inline-flex;align-items:center;padding:3px 10px;border-radius:var(--r-full);font-size:11px;font-weight:500;font-family:var(--font-body);}
+.badge-profit{background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.2);color:#22c55e;}
+.badge-loss{background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.2);color:#ef4444;}
+.badge-warning{background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.2);color:#f59e0b;}
+.badge-primary{background:rgba(79,110,247,0.1);border:1px solid rgba(79,110,247,0.2);color:#4f6ef7;}
+.badge-neutral{background:var(--muted);border:1px solid var(--border);color:var(--muted-fg);}
+
+/* Input */
+.input{width:100%;background:var(--background);border:1px solid var(--muted);border-radius:var(--r-md);padding:10px 14px;color:var(--foreground);font-family:var(--font-body);font-size:14px;outline:none;}
+.input:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(79,110,247,0.2);}
+.input::placeholder{color:var(--subtle);}
+
+/* Rule cards */
+.rule-card{border-radius:var(--r-md);padding:20px;border:1px solid var(--muted);}
+.rule-do{border-left:3px solid #22c55e;}
+.rule-dont{border-left:3px solid #ef4444;}
+.rule-title{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:12px;}
+.rule-title.do{color:#22c55e;}
+.rule-title.dont{color:#ef4444;}
+.rule-item{font-size:13px;color:var(--muted-fg);margin-bottom:8px;line-height:1.5;display:flex;gap:8px;}
+
+/* Cover */
+#cover{min-height:100vh;display:flex;align-items:center;justify-content:center;text-align:center;background:radial-gradient(ellipse 80% 60% at 50% 0%, rgba(79,110,247,0.12) 0%, transparent 70%), var(--background);padding:80px 40px;border-bottom:1px solid var(--muted);}
+.cover-inner{display:flex;flex-direction:column;align-items:center;gap:24px;}
+.cover-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(79,110,247,0.1);border:1px solid rgba(79,110,247,0.2);color:var(--primary);font-size:12px;font-weight:500;padding:6px 14px;border-radius:var(--r-full);font-family:var(--font-body);}
+.cover-title{font-family:var(--font-display);font-size:72px;font-weight:700;letter-spacing:-0.03em;line-height:1;}
+.cover-title .q{color:var(--primary);}
+.cover-label{font-family:var(--font-display);font-size:18px;font-weight:300;color:var(--muted-fg);letter-spacing:0.06em;text-transform:uppercase;}
+.cover-tagline{font-family:var(--font-body);font-size:18px;font-weight:300;color:var(--muted-fg);}
+.cover-meta{font-size:11px;color:var(--subtle);font-family:var(--font-mono);margin-top:16px;}
+.cover-divider{width:48px;height:1px;background:var(--muted);}
+
+/* Stat card example */
+.stat-card{background:var(--card);border:1px solid var(--muted);border-radius:var(--r-lg);padding:20px;min-width:160px;}
+.stat-label{font-size:12px;font-weight:500;color:var(--muted-fg);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px;}
+.stat-value{font-family:var(--font-mono);font-size:28px;font-weight:700;color:#22c55e;line-height:1.2;}
+.stat-sub{font-size:12px;color:var(--subtle);margin-top:4px;font-family:var(--font-mono);}
+
+/* Pillar cards */
+.pillar{background:var(--card);border:1px solid var(--muted);border-radius:var(--r-lg);padding:28px;display:flex;flex-direction:column;gap:12px;}
+.pillar-icon{width:40px;height:40px;background:rgba(79,110,247,0.1);border-radius:var(--r-md);display:flex;align-items:center;justify-content:center;}
+.pillar-title{font-family:var(--font-display);font-size:20px;font-weight:600;}
+.pillar-desc{font-size:14px;color:var(--muted-fg);line-height:1.6;}
+
+/* Voice examples */
+.voice-yes{background:rgba(34,197,94,0.05);border:1px solid rgba(34,197,94,0.15);border-radius:var(--r-md);padding:16px;margin-bottom:8px;}
+.voice-no{background:rgba(239,68,68,0.05);border:1px solid rgba(239,68,68,0.15);border-radius:var(--r-md);padding:16px;margin-bottom:8px;}
+.voice-text{font-size:14px;line-height:1.6;font-style:italic;}
+.voice-yes .voice-text{color:#d1fae5;}
+.voice-no .voice-text{color:#fecaca;}
+
+/* Table */
+table{width:100%;border-collapse:collapse;font-size:13px;}
+th{text-align:left;padding:10px 14px;background:var(--muted);color:var(--muted-fg);font-weight:500;font-size:11px;text-transform:uppercase;letter-spacing:0.06em;}
+td{padding:12px 14px;border-bottom:1px solid var(--muted);color:var(--foreground);}
+td:first-child{color:var(--muted-fg);font-family:var(--font-mono);font-size:12px;}
+tr:last-child td{border-bottom:none;}
+
+/* Logo don'ts */
+.dont-item{background:var(--card);border:1px solid rgba(239,68,68,0.2);border-radius:var(--r-md);padding:20px;text-align:center;display:flex;flex-direction:column;gap:10px;align-items:center;}
+.dont-icon{width:36px;height:36px;background:rgba(239,68,68,0.1);border-radius:var(--r-full);display:flex;align-items:center;justify-content:center;color:#ef4444;font-size:18px;font-weight:700;}
+.dont-text{font-size:12px;color:var(--muted-fg);line-height:1.4;}
+
+/* Clearspace */
+.clearspace-wrap{padding:40px;background:var(--background);border-radius:var(--r-lg);border:1px solid var(--muted);display:flex;align-items:center;justify-content:center;}
+.clearspace-inner{border:1.5px dashed rgba(79,110,247,0.4);padding:32px;border-radius:4px;position:relative;}
+.cs-label{position:absolute;font-size:10px;color:var(--primary);font-family:var(--font-mono);letter-spacing:0.06em;}
+.cs-top{top:-20px;left:50%;transform:translateX(-50%);}
+.cs-bottom{bottom:-20px;left:50%;transform:translateX(-50%);}
+.cs-left{left:-68px;top:50%;transform:translateY(-50%);}
+.cs-right{right:-68px;top:50%;transform:translateY(-50%);}
+
+/* Responsive */
+@media(max-width:900px){
+  .sidebar{display:none;}
+  .main{margin-left:0;}
+  .grid3,.grid4{grid-template-columns:1fr 1fr;}
+  .cover-title{font-size:48px;}
+}
+@media(max-width:600px){
+  .grid2,.grid3,.grid4{grid-template-columns:1fr;}
+  .wrap{padding:0 20px;}
+}
+
+/* Footer */
+.doc-footer{text-align:center;padding:60px 32px;border-top:1px solid var(--muted);display:flex;flex-direction:column;align-items:center;gap:16px;}
+.doc-footer-meta{font-size:12px;color:var(--subtle);font-family:var(--font-mono);}
+
+/* Icon size demo row */
+.icon-sizes{display:flex;gap:24px;align-items:flex-end;flex-wrap:wrap;padding:24px;background:var(--card);border-radius:var(--r-lg);border:1px solid var(--muted);}
+.icon-size-item{display:flex;flex-direction:column;align-items:center;gap:8px;}
+.icon-size-label{font-size:10px;color:var(--subtle);font-family:var(--font-mono);}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<nav class="sidebar">
+  <div class="sidebar-logo">
+    <!-- Icon only wordmark for sidebar -->
+    <svg viewBox="0 0 190.7 189.78" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:36px;height:36px;">
+      <path fill="#4f6ef7" d="M115.62,176.71A95.2,95.2,0,0,1,82,183.19c-24,.06-44.5-7.87-60-26.62C9.63,141.63,4.83,124.09,5.62,104.89,7.43,60.33,42.79,18.8,88,8c22.84-5.44,45-3.53,65.09,9.61s30.45,32.15,32.19,55.85c1.94,26.29-7.06,49.07-23.15,69.41-.51.64-1.11,1.2-1.89,2q-9.5-9.9-18.64-19.47c3-4.93,6.23-9.6,8.9-14.56A72.24,72.24,0,0,0,159.26,75c-.46-30.21-23.58-53.7-53.71-55.13C65.6,18,28.2,48.37,21.53,88.36c-4.28,25.69,7.19,50.21,29.14,61.41C65.5,157.33,81.13,158,97,153.9c2.37-.61,3.46-.1,4.69,1.81C106.2,162.66,110.83,169.5,115.62,176.71Z"/>
+      <path fill="#4f6ef7" d="M123,32.86a48.09,48.09,0,0,1,17.55,14.31C126.42,63,112.32,78.81,98.07,94.77L182.78,183c-1.59.09-2.48.19-3.36.19-14.41,0-28.83,0-43.24.05a4.61,4.61,0,0,1-4.33-2.26Q103.07,139.2,74.14,97.49c-1.39-2-1.46-3.23.18-5.22,15.74-19.08,31.33-38.28,47-57.44C121.81,34.19,122.38,33.6,123,32.86Z"/>
+      <path fill="#4f6ef7" d="M68.69,143.87A48.13,48.13,0,0,1,48.44,133a4.4,4.4,0,0,1-1.24-3.09C48,114.58,48.9,99.27,49.75,84c.62-11.14,1.14-22.29,1.84-33.42a6.33,6.33,0,0,1,1.63-3.81A66.71,66.71,0,0,1,73,33.35c.4-.17.83-.27,1.7-.55C72.66,69.94,70.68,106.76,68.69,143.87Z"/>
+    </svg>
+  </div>
+  <a href="#cover" class="nav-item active"><span class="nav-num">00</span>Cover</a>
+  <a href="#story" class="nav-item"><span class="nav-num">01</span>Brand Story</a>
+  <a href="#logo" class="nav-item"><span class="nav-num">02</span>Logo System</a>
+  <a href="#color" class="nav-item"><span class="nav-num">03</span>Color Palette</a>
+  <a href="#type" class="nav-item"><span class="nav-num">04</span>Typography</a>
+  <a href="#icons" class="nav-item"><span class="nav-num">05</span>Iconography</a>
+  <a href="#components" class="nav-item"><span class="nav-num">06</span>UI Components</a>
+  <a href="#voice" class="nav-item"><span class="nav-num">07</span>Brand Voice</a>
+  <a href="#rules" class="nav-item"><span class="nav-num">08</span>Usage Rules</a>
+  <a href="#formats" class="nav-item"><span class="nav-num">09</span>File Formats</a>
+  <a href="#tokens" class="nav-item"><span class="nav-num">10</span>Dev Tokens</a>
+</nav>
+
+<div class="main">
+
+<!-- 00 COVER -->
+<div id="cover">
+  <div class="cover-inner">
+    <div class="cover-badge">Brand Guidelines · v1.0</div>
+    <!-- Full logo icon -->
+    <svg viewBox="0 0 190.7 189.78" style="width:100px;height:100px;" xmlns="http://www.w3.org/2000/svg">
+      <path fill="#4f6ef7" d="M115.62,176.71A95.2,95.2,0,0,1,82,183.19c-24,.06-44.5-7.87-60-26.62C9.63,141.63,4.83,124.09,5.62,104.89,7.43,60.33,42.79,18.8,88,8c22.84-5.44,45-3.53,65.09,9.61s30.45,32.15,32.19,55.85c1.94,26.29-7.06,49.07-23.15,69.41-.51.64-1.11,1.2-1.89,2q-9.5-9.9-18.64-19.47c3-4.93,6.23-9.6,8.9-14.56A72.24,72.24,0,0,0,159.26,75c-.46-30.21-23.58-53.7-53.71-55.13C65.6,18,28.2,48.37,21.53,88.36c-4.28,25.69,7.19,50.21,29.14,61.41C65.5,157.33,81.13,158,97,153.9c2.37-.61,3.46-.1,4.69,1.81C106.2,162.66,110.83,169.5,115.62,176.71Z"/>
+      <path fill="#4f6ef7" d="M123,32.86a48.09,48.09,0,0,1,17.55,14.31C126.42,63,112.32,78.81,98.07,94.77L182.78,183c-1.59.09-2.48.19-3.36.19-14.41,0-28.83,0-43.24.05a4.61,4.61,0,0,1-4.33-2.26Q103.07,139.2,74.14,97.49c-1.39-2-1.46-3.23.18-5.22,15.74-19.08,31.33-38.28,47-57.44C121.81,34.19,122.38,33.6,123,32.86Z"/>
+      <path fill="#4f6ef7" d="M68.69,143.87A48.13,48.13,0,0,1,48.44,133a4.4,4.4,0,0,1-1.24-3.09C48,114.58,48.9,99.27,49.75,84c.62-11.14,1.14-22.29,1.84-33.42a6.33,6.33,0,0,1,1.63-3.81A66.71,66.71,0,0,1,73,33.35c.4-.17.83-.27,1.7-.55C72.66,69.94,70.68,106.76,68.69,143.87Z"/>
+    </svg>
+    <div class="cover-title">Kravi<span class="q">q</span></div>
+    <div class="cover-label">Brand Guidelines</div>
+    <div class="cover-divider"></div>
+    <div class="cover-tagline">You Trade Well. Run It Like a Business.</div>
+    <div class="cover-meta">v1.0 · June 2026 · kraviq.app · Confidential — Internal Use</div>
+  </div>
+</div>
+
+<!-- 01 BRAND STORY -->
+<section id="story">
+  <div class="wrap">
+    <p class="sec-num">Section 01</p>
+    <h2 class="sec-title">Brand Story</h2>
+    <p class="sec-sub">Who we are, why we exist, and what we stand for.</p>
+
+    <div class="card" style="margin-bottom:40px;padding:36px;border-left:3px solid var(--primary);">
+      <p style="font-family:var(--font-display);font-size:18px;font-weight:400;line-height:1.8;color:var(--muted-fg);max-width:700px;">
+        Kraviq was built by a forex trader who was tired of running his trading business from spreadsheets, scattered journals, and gut feeling. The vision is simple: give every retail forex trader the infrastructure that professional trading firms take for granted. One platform that tracks every trade, monitors every prop firm rule, scores your business health, and grows with you.<br><br>
+        <strong style="color:var(--foreground);">Kraviq is not a journal. It is not an analytics tool. It is the operating system for your trading business.</strong>
+      </p>
+    </div>
+
+    <p class="divlabel">Brand Pillars</p>
+    <div class="grid3">
+      <div class="pillar">
+        <div class="pillar-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4f6ef7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+        </div>
+        <div class="pillar-title">Trade</div>
+        <div class="pillar-desc">Capture every trade — manually, via CSV, or through your MT4/MT5 EA. Full compliance tracking and behavioural analysis built in.</div>
+      </div>
+      <div class="pillar" style="border-color:rgba(79,110,247,0.3);background:rgba(79,110,247,0.04);">
+        <div class="pillar-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4f6ef7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        </div>
+        <div class="pillar-title">Score</div>
+        <div class="pillar-desc">The Trading Business Score measures five pillars: Consistency, Risk, Profitability, Discipline, Growth. Know exactly where you stand.</div>
+      </div>
+      <div class="pillar">
+        <div class="pillar-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4f6ef7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+        </div>
+        <div class="pillar-title">Scale</div>
+        <div class="pillar-desc">True net P&amp;L after all costs. Prop firm challenge tracking. War account graduation pipeline. Run it like a business.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 02 LOGO SYSTEM -->
+<section id="logo">
+  <div class="wrap">
+    <p class="sec-num">Section 02</p>
+    <h2 class="sec-title">Logo System</h2>
+    <p class="sec-sub">The Kraviq mark, wordmark, and all approved combinations.</p>
+
+    <p class="divlabel">The Mark — Concept</p>
+    <div class="card" style="margin-bottom:16px;padding:28px;">
+      <p style="font-size:14px;color:var(--muted-fg);line-height:1.8;max-width:640px;">The Kraviq mark is a unified symbol of K and Q — two letters sharing one form. The Q provides the outer circular arc. The K lives inside, its strokes filling the circle with precision. The Q's tail descends bottom-right, completing the letterform. K and Q are not placed side by side. They share the same space — one mark, two letters, one identity.</p>
+    </div>
+
+    <p class="divlabel">Primary Mark — All Sizes</p>
+    <div class="icon-sizes">
+      <div class="icon-size-item">
+        <svg viewBox="0 0 190.7 189.78" style="width:80px;height:80px;" xmlns="http://www.w3.org/2000/svg"><path fill="#4f6ef7" d="M115.62,176.71A95.2,95.2,0,0,1,82,183.19c-24,.06-44.5-7.87-60-26.62C9.63,141.63,4.83,124.09,5.62,104.89,7.43,60.33,42.79,18.8,88,8c22.84-5.44,45-3.53,65.09,9.61s30.45,32.15,32.19,55.85c1.94,26.29-7.06,49.07-23.15,69.41-.51.64-1.11,1.2-1.89,2q-9.5-9.9-18.64-19.47c3-4.93,6.23-9.6,8.9-14.56A72.24,72.24,0,0,0,159.26,75c-.46-30.21-23.58-53.7-53.71-55.13C65.6,18,28.2,48.37,21.53,88.36c-4.28,25.69,7.19,50.21,29.14,61.41C65.5,157.33,81.13,158,97,153.9c2.37-.61,3.46-.1,4.69,1.81C106.2,162.66,110.83,169.5,115.62,176.71Z"/><path fill="#4f6ef7" d="M123,32.86a48.09,48.09,0,0,1,17.55,14.31C126.42,63,112.32,78.81,98.07,94.77L182.78,183c-1.59.09-2.48.19-3.36.19-14.41,0-28.83,0-43.24.05a4.61,4.61,0,0,1-4.33-2.26Q103.07,139.2,74.14,97.49c-1.39-2-1.46-3.23.18-5.22,15.74-19.08,31.33-38.28,47-57.44C121.81,34.19,122.38,33.6,123,32.86Z"/><path fill="#4f6ef7" d="M68.69,143.87A48.13,48.13,0,0,1,48.44,133a4.4,4.4,0,0,1-1.24-3.09C48,114.58,48.9,99.27,49.75,84c.62-11.14,1.14-22.29,1.84-33.42a6.33,6.33,0,0,1,1.63-3.81A66.71,66.71,0,0,1,73,33.35c.4-.17.83-.27,1.7-.55C72.66,69.94,70.68,106.76,68.69,143.87Z"/></svg>
+        <span class="icon-size-label">80px</span>
+      </div>
+      <div class="icon-size-item">
+        <svg viewBox="0 0 190.7 189.78" style="width:56px;height:56px;" xmlns="http://www.w3.org/2000/svg"><path fill="#4f6ef7" d="M115.62,176.71A95.2,95.2,0,0,1,82,183.19c-24,.06-44.5-7.87-60-26.62C9.63,141.63,4.83,124.09,5.62,104.89,7.43,60.33,42.79,18.8,88,8c22.84-5.44,45-3.53,65.09,9.61s30.45,32.15,32.19,55.85c1.94,26.29-7.06,49.07-23.15,69.41-.51.64-1.11,1.2-1.89,2q-9.5-9.9-18.64-19.47c3-4.93,6.23-9.6,8.9-14.56A72.24,72.24,0,0,0,159.26,75c-.46-30.21-23.58-53.7-53.71-55.13C65.6,18,28.2,48.37,21.53,88.36c-4.28,25.69,7.19,50.21,29.14,61.41C65.5,157.33,81.13,158,97,153.9c2.37-.61,3.46-.1,4.69,1.81C106.2,162.66,110.83,169.5,115.62,176.71Z"/><path fill="#4f6ef7" d="M123,32.86a48.09,48.09,0,0,1,17.55,14.31C126.42,63,112.32,78.81,98.07,94.77L182.78,183c-1.59.09-2.48.19-3.36.19-14.41,0-28.83,0-43.24.05a4.61,4.61,0,0,1-4.33-2.26Q103.07,139.2,74.14,97.49c-1.39-2-1.46-3.23.18-5.22,15.74-19.08,31.33-38.28,47-57.44C121.81,34.19,122.38,33.6,123,32.86Z"/><path fill="#4f6ef7" d="M68.69,143.87A48.13,48.13,0,0,1,48.44,133a4.4,4.4,0,0,1-1.24-3.09C48,114.58,48.9,99.27,49.75,84c.62-11.14,1.14-22.29,1.84-33.42a6.33,6.33,0,0,1,1.63-3.81A66.71,66.71,0,0,1,73,33.35c.4-.17.83-.27,1.7-.55C72.66,69.94,70.68,106.76,68.69,143.87Z"/></svg>
+        <span class="icon-size-label">56px</span>
+      </div>
+      <div class="icon-size-item">
+        <svg viewBox="0 0 190.7 189.78" style="width:40px;height:40px;" xmlns="http://www.w3.org/2000/svg"><path fill="#4f6ef7" d="M115.62,176.71A95.2,95.2,0,0,1,82,183.19c-24,.06-44.5-7.87-60-26.62C9.63,141.63,4.83,124.09,5.62,104.89,7.43,60.33,42.79,18.8,88,8c22.84-5.44,45-3.53,65.09,9.61s30.45,32.15,32.19,55.85c1.94,26.29-7.06,49.07-23.15,69.41-.51.64-1.11,1.2-1.89,2q-9.5-9.9-18.64-19.47c3-4.93,6.23-9.6,8.9-14.56A72.24,72.24,0,0,0,159.26,75c-.46-30.21-23.58-53.7-53.71-55.13C65.6,18,28.2,48.37,21.53,88.36c-4.28,25.69,7.19,50.21,29.14,61.41C65.5,157.33,81.13,158,97,153.9c2.37-.61,3.46-.1,4.69,1.81C106.2,162.66,110.83,169.5,115.62,176.71Z"/><path fill="#4f6ef7" d="M123,32.86a48.09,48.09,0,0,1,17.55,14.31C126.42,63,112.32,78.81,98.07,94.77L182.78,183c-1.59.09-2.48.19-3.36.19-14.41,0-28.83,0-43.24.05a4.61,4.61,0,0,1-4.33-2.26Q103.07,139.2,74.14,97.49c-1.39-2-1.46-3.23.18-5.22,15.74-19.08,31.33-38.28,47-57.44C121.81,34.19,122.38,33.6,123,32.86Z"/><path fill="#4f6ef7" d="M68.69,143.87A48.13,48.13,0,0,1,48.44,133a4.4,4.4,0,0,1-1.24-3.09C48,114.58,48.9,99.27,49.75,84c.62-11.14,1.14-22.29,1.84-33.42a6.33,6.33,0,0,1,1.63-3.81A66.71,66.71,0,0,1,73,33.35c.4-.17.83-.27,1.7-.55C72.66,69.94,70.68,106.76,68.69,143.87Z"/></svg>
+        <span class="icon-size-label">40px</span>
+      </div>
+      <div class="icon-size-item">
+        <svg viewBox="0 0 190.7 189.78" style="width:28px;height:28px;" xmlns="http://www.w3.org/2000/svg"><path fill="#4f6ef7" d="M115.62,176.71A95.2,95.2,0,0,1,82,183.19c-24,.06-44.5-7.87-60-26.62C9.63,141.63,4.83,124.09,5.62,104.89,7.43,60.33,42.79,18.8,88,8c22.84-5.44,45-3.53,65.09,9.61s30.45,32.15,32.19,55.85c1.94,26.29-7.06,49.07-23.15,69.41-.51.64-1.11,1.2-1.89,2q-9.5-9.9-18.64-19.47c3-4.93,6.23-9.6,8.9-14.56A72.24,72.24,0,0,0,159.26,75c-.46-30.21-23.58-53.7-53.71-55.13C65.6,18,28.2,48.37,21.53,88.36c-4.28,25.69,7.19,50.21,29.14,61.41C65.5,157.33,81.13,158,97,153.9c2.37-.61,3.46-.1,4.69,1.81C106.2,162.66,110.83,169.5,115.62,176.71Z"/><path fill="#4f6ef7" d="M123,32.86a48.09,48.09,0,0,1,17.55,14.31C126.42,63,112.32,78.81,98.07,94.77L182.78,183c-1.59.09-2.48.19-3.36.19-14.41,0-28.83,0-43.24.05a4.61,4.61,0,0,1-4.33-2.26Q103.07,139.2,74.14,97.49c-1.39-2-1.46-3.23.18-5.22,15.74-19.08,31.33-38.28,47-57.44C121.81,34.19,122.38,33.6,123,32.86Z"/><path fill="#4f6ef7" d="M68.69,143.87A48.13,48.13,0,0,1,48.44,133a4.4,4.4,0,0,1-1.24-3.09C48,114.58,48.9,99.27,49.75,84c.62-11.14,1.14-22.29,1.84-33.42a6.33,6.33,0,0,1,1.63-3.81A66.71,66.71,0,0,1,73,33.35c.4-.17.83-.27,1.7-.55C72.66,69.94,70.68,106.76,68.69,143.87Z"/></svg>
+        <span class="icon-size-label">28px</span>
+      </div>
+      <div class="icon-size-item">
+        <svg viewBox="0 0 64 64" style="width:20px;height:20px;" xmlns="http://www.w3.org/2000/svg"><path fill="#4f6ef7" d="M35.87,48.35A20.13,20.13,0,0,1,29,49.62c-4.86,0-9-1.54-12.19-5.22a14.07,14.07,0,0,1-3.32-10.13c.37-8.74,7.55-16.88,16.74-19a16.85,16.85,0,0,1,13.23,1.88,13.59,13.59,0,0,1,6.54,11c.39,5.16-1.44,9.62-4.71,13.61a4.41,4.41,0,0,1-.38.4L41.15,38.3c.62-1,1.27-1.88,1.81-2.85a13.81,13.81,0,0,0,1.77-7A11.08,11.08,0,0,0,33.82,17.6C25.7,17.23,18.11,23.19,16.75,31a11.07,11.07,0,0,0,5.92,12,13.38,13.38,0,0,0,9.42.81.73.73,0,0,1,.95.35C34,45.6,34.89,46.94,35.87,48.35Z"/><path fill="#4f6ef7" d="M37.37,20.15A9.85,9.85,0,0,1,40.94,23L32.3,32.29l17.21,17.3c-.32,0-.5,0-.68,0-2.93,0-5.86,0-8.79,0a1,1,0,0,1-.88-.45Q33.31,41,27.44,32.82a.68.68,0,0,1,0-1c3.2-3.75,6.37-7.51,9.55-11.27C37.12,20.41,37.24,20.29,37.37,20.15Z"/><path fill="#4f6ef7" d="M26.33,41.91a9.85,9.85,0,0,1-4.11-2.13.79.79,0,0,1-.25-.61c.15-3,.34-6,.51-9,.13-2.19.23-4.37.38-6.56a1.17,1.17,0,0,1,.33-.74,13.66,13.66,0,0,1,4-2.63l.34-.1C27.14,27.42,26.74,34.64,26.33,41.91Z"/></svg>
+        <span class="icon-size-label">20px (favicon)</span>
+      </div>
+    </div>
+
+    <p class="divlabel">Logo Combinations — Dark Background</p>
+    <div class="grid2" style="margin-bottom:12px;">
+      <!-- Primary horizontal dark -->
+      <div class="card-dark" style="flex-direction:column;gap:12px;min-height:140px;">
+        <svg viewBox="0 0 666.08 187.04" style="width:240px;height:auto;" xmlns="http://www.w3.org/2000/svg">
+          <path fill="#4f6ef7" d="M113.49,176.22a95.12,95.12,0,0,1-33.62,6.48c-24,.06-44.49-7.87-60-26.62C7.5,141.14,2.71,123.6,3.49,104.4,5.31,59.83,40.67,18.31,85.91,7.53c22.85-5.44,45-3.53,65.1,9.61S181.45,49.29,183.2,73c1.94,26.29-7.07,49.07-23.16,69.41-.51.64-1.11,1.2-1.89,2L139.51,125c3-4.93,6.24-9.6,8.91-14.56a72.25,72.25,0,0,0,8.71-35.9c-.46-30.21-23.58-53.69-53.71-55.12-39.94-1.9-77.34,28.5-84,68.48-4.29,25.7,7.18,50.22,29.13,61.42,14.84,7.56,30.47,8.25,46.38,4.13,2.37-.61,3.45-.1,4.68,1.81C104.08,162.17,108.7,169,113.49,176.22Z"/>
+          <path fill="#4f6ef7" d="M120.9,32.37a48.17,48.17,0,0,1,17.55,14.31L95.94,94.28l84.72,88.26c-1.6.09-2.48.19-3.37.19-14.41,0-28.82,0-43.23.05a4.64,4.64,0,0,1-4.34-2.26Q101,138.72,72,97c-1.38-2-1.46-3.23.18-5.22,15.74-19.09,31.34-38.28,47-57.44C119.69,33.7,120.25,33.1,120.9,32.37Z"/>
+          <path fill="#4f6ef7" d="M66.57,143.38A48.22,48.22,0,0,1,46.31,132.5a4.36,4.36,0,0,1-1.23-3.09c.78-15.32,1.7-30.63,2.54-45.95.62-11.13,1.14-22.28,1.84-33.41a6.31,6.31,0,0,1,1.63-3.81A66.71,66.71,0,0,1,70.82,32.86c.4-.17.83-.27,1.7-.55C70.53,69.45,68.56,106.26,66.57,143.38Z"/>
+          <path fill="#f8f8ff" d="M217.25,140.38V47.57h20.41V84.43h2.78l35.11-36.86h26.13L256.52,93.31l46.71,47.07H276.32l-35.88-37.65h-2.78v37.65Z"/>
+          <path fill="#f8f8ff" d="M314.67,140.38V74.62h19.17V82h2.79a11,11,0,0,1,5.64-5.83,21.37,21.37,0,0,1,9.2-1.86h9.28V89.2h-9.59q-7.43,0-12.21,3.38T334.15,103v37.39Z"/>
+          <path fill="#f8f8ff" d="M397.86,142.24a41.48,41.48,0,0,1-14.69-2.45,23.49,23.49,0,0,1-10.28-7.16,17.69,17.69,0,0,1-3.79-11.47,17.16,17.16,0,0,1,3.79-11.34,22.91,22.91,0,0,1,10.51-6.89,47,47,0,0,1,15.39-2.33h21V96.89a9.68,9.68,0,0,0-3.4-7.62q-3.41-3-10.82-3t-10.83,2.85a13.08,13.08,0,0,0-4.64,7.35l-17.94-5.17a25.85,25.85,0,0,1,6-9.21,29.63,29.63,0,0,1,11-6.76,47.7,47.7,0,0,1,16.77-2.59q15.17,0,24,6.5t8.82,18.83v24.53q0,4,4.33,4h6.18v13.79h-13a17.14,17.14,0,0,1-9.43-2.38,7.28,7.28,0,0,1-3.71-6.37v-.13h-2.94a16.87,16.87,0,0,1-2.78,4.18,18.07,18.07,0,0,1-6.81,4.57Q405.91,142.25,397.86,142.24Zm3.4-13.52q8.21,0,13.38-3.92a12.39,12.39,0,0,0,5.18-10.41v-1.32H400.18q-5.42,0-8.5,2a6.25,6.25,0,0,0-3.1,5.57,6.84,6.84,0,0,0,3.25,5.83Q395.09,128.73,401.26,128.72Z"/>
+          <path fill="#f8f8ff" d="M475.18,140.38,450.75,74.62h20.72l17.78,53.56H492l17.78-53.56h20.72l-24.43,65.76Z"/>
+          <path fill="#f8f8ff" d="M553.58,66.93A13.76,13.76,0,0,1,544.69,64a10,10,0,0,1,0-15.38,15.11,15.11,0,0,1,17.86,0,9.46,9.46,0,0,1,3.56,7.69A9.46,9.46,0,0,1,562.55,64,13.7,13.7,0,0,1,553.58,66.93Zm-9.74,73.45V74.62h19.48v65.76Z"/>
+          <path fill="#4f6ef7" d="M642.5,166.9V132.83h-2.79a19.64,19.64,0,0,1-4.48,4.44,24.27,24.27,0,0,1-7.66,3.58,41.71,41.71,0,0,1-11.67,1.39,38.21,38.21,0,0,1-17.17-3.91,31.26,31.26,0,0,1-12.68-11.47q-4.78-7.56-4.79-18.3v-2.12q0-10.74,4.79-18.3a31.1,31.1,0,0,1,12.76-11.47,38.33,38.33,0,0,1,17.09-3.91q10.51,0,16,3A22.71,22.71,0,0,1,640,82.57h2.79V74.62H662V166.9Zm-20.73-39.25q9.13,0,15.08-5t6-14.52v-1.32q0-9.56-6-14.52t-15-5q-9,0-15,5t-6,14.52v1.32q0,9.56,6,14.52T621.77,127.65Z"/>
+        </svg>
+        <p class="label">Primary horizontal — dark background</p>
+      </div>
+      <!-- Stacked dark -->
+      <div class="card-dark" style="flex-direction:column;gap:12px;min-height:140px;">
+        <svg viewBox="0 0 500 500" style="width:120px;height:120px;" xmlns="http://www.w3.org/2000/svg">
+          <path fill="#4f6ef7" d="M270.06,249.33a95.2,95.2,0,0,1-33.62,6.48c-24,.06-44.5-7.87-60-26.62-12.35-14.94-17.15-32.48-16.36-51.68,1.81-44.57,37.17-86.09,82.42-96.87,22.84-5.45,45-3.53,65.09,9.61S338,122.4,339.76,146.1c1.94,26.29-7.06,49.07-23.15,69.41-.51.64-1.11,1.2-1.89,2l-18.64-19.47c3-4.93,6.23-9.6,8.9-14.56a72.26,72.26,0,0,0,8.72-35.9c-.46-30.21-23.58-53.69-53.71-55.12-40-1.9-77.35,28.5-84,68.48-4.28,25.7,7.19,50.22,29.14,61.42,14.83,7.56,30.46,8.25,46.37,4.13,2.37-.61,3.46-.1,4.69,1.81C260.64,235.28,265.27,242.12,270.06,249.33Z"/>
+          <path fill="#4f6ef7" d="M277.46,105.48A48.09,48.09,0,0,1,295,119.79l-42.5,47.6,84.71,88.26c-1.59.09-2.48.19-3.36.19-14.41,0-28.83,0-43.24,0a4.61,4.61,0,0,1-4.33-2.26q-28.79-41.81-57.71-83.52c-1.39-2-1.46-3.23.18-5.22,15.74-19.09,31.33-38.28,47-57.44C276.25,106.81,276.82,106.21,277.46,105.48Z"/>
+          <path fill="#4f6ef7" d="M223.13,216.49a48.24,48.24,0,0,1-20.25-10.88,4.41,4.41,0,0,1-1.24-3.09c.79-15.32,1.7-30.63,2.55-46,.62-11.13,1.14-22.28,1.84-33.41a6.31,6.31,0,0,1,1.63-3.81A66.71,66.71,0,0,1,227.39,106c.4-.17.83-.27,1.7-.55C227.1,142.56,225.12,179.37,223.13,216.49Z"/>
+          <path fill="#f8f8ff" d="M27.63,360.6V267.79H48v36.86h2.79l35.1-36.86h26.14L66.91,313.53l46.7,47.07H86.71L50.83,323H48V360.6Z"/>
+          <path fill="#f8f8ff" d="M125.05,360.6V294.84h19.18v7.42H147a11.1,11.1,0,0,1,5.65-5.83,21.34,21.34,0,0,1,9.2-1.86h9.28v14.85h-9.59q-7.43,0-12.22,3.39t-4.79,10.4V360.6Z"/>
+          <path fill="#f8f8ff" d="M208.25,362.46A41.44,41.44,0,0,1,193.56,360a23.49,23.49,0,0,1-10.28-7.16,17.69,17.69,0,0,1-3.79-11.47A17.16,17.16,0,0,1,183.28,330a22.91,22.91,0,0,1,10.51-6.89,47,47,0,0,1,15.39-2.32h21v-3.72a9.71,9.71,0,0,0-3.4-7.62q-3.41-3-10.83-3t-10.82,2.85a13,13,0,0,0-4.64,7.36l-17.94-5.17a25.9,25.9,0,0,1,5.95-9.22,29.76,29.76,0,0,1,11-6.76A47.76,47.76,0,0,1,216.29,293q15.15,0,24,6.5t8.81,18.83v24.53c0,2.65,1.45,4,4.33,4h6.19V360.6h-13a17.11,17.11,0,0,1-9.43-2.38,7.26,7.26,0,0,1-3.71-6.37v-.13h-2.94a17,17,0,0,1-2.79,4.18,17.91,17.91,0,0,1-6.8,4.57Q216.3,362.47,208.25,362.46Zm3.4-13.52q8.19,0,13.38-3.92a12.38,12.38,0,0,0,5.18-10.4v-1.33H210.57q-5.41,0-8.51,2a6.27,6.27,0,0,0-3.09,5.57,6.82,6.82,0,0,0,3.25,5.83C204.38,348.19,207.53,348.94,211.65,348.94Z"/>
+          <path fill="#f8f8ff" d="M285.57,360.6l-24.44-65.76h20.73l17.78,53.57h2.78l17.79-53.57h20.72L316.5,360.6Z"/>
+          <path fill="#f8f8ff" d="M364,287.15a13.71,13.71,0,0,1-8.89-2.92,9.94,9.94,0,0,1,0-15.38,15.11,15.11,0,0,1,17.86,0,10.1,10.1,0,0,1,0,15.38A13.67,13.67,0,0,1,364,287.15Zm-9.75,73.45V294.84h19.49V360.6Z"/>
+          <path fill="#4f6ef7" d="M452.88,387.12V353.05H450.1a19.5,19.5,0,0,1-4.49,4.44,24.2,24.2,0,0,1-7.65,3.58,41.83,41.83,0,0,1-11.68,1.39,38.07,38.07,0,0,1-17.16-3.91,31.14,31.14,0,0,1-12.68-11.47q-4.8-7.56-4.79-18.3v-2.12q0-10.74,4.79-18.3a31,31,0,0,1,12.76-11.47A38.32,38.32,0,0,1,426.28,293q10.52,0,16,3a22.68,22.68,0,0,1,8.12,6.82h2.78v-8h19.18v92.28Zm-20.72-39.24q9.12,0,15.08-5t5.95-14.52v-1.32q0-9.56-6-14.52t-15-5q-9,0-15,5t-6,14.52v1.32q0,9.56,6,14.52T432.16,347.88Z"/>
+        </svg>
+        <p class="label">Stacked — icon above wordmark</p>
+      </div>
+    </div>
+
+    <p class="divlabel">Logo Combinations — Light Background</p>
+    <div class="grid2" style="margin-bottom:12px;">
+      <div class="card-light" style="flex-direction:column;gap:12px;min-height:140px;">
+        <svg viewBox="0 0 669.32 184.62" style="width:240px;height:auto;" xmlns="http://www.w3.org/2000/svg">
+          <path fill="#4f6ef7" d="M115.65,175.14A95.12,95.12,0,0,1,82,181.62c-24,.06-44.49-7.87-60-26.62C9.66,140.06,4.87,122.52,5.65,103.32,7.47,58.75,42.83,17.23,88.07,6.45c22.85-5.44,45-3.53,65.1,9.61s30.44,32.15,32.19,55.85c1.94,26.29-7.07,49.07-23.16,69.41-.5.64-1.11,1.2-1.89,2l-18.64-19.47c3-4.93,6.24-9.6,8.91-14.56a72.25,72.25,0,0,0,8.71-35.9c-.46-30.21-23.58-53.69-53.71-55.12-39.94-1.9-77.34,28.5-84,68.48-4.29,25.7,7.18,50.22,29.14,61.42,14.83,7.56,30.46,8.25,46.37,4.13,2.37-.61,3.45-.1,4.68,1.81C106.24,161.09,110.87,167.93,115.65,175.14Z"/>
+          <path fill="#4f6ef7" d="M123.06,31.29A48.17,48.17,0,0,1,140.61,45.6L98.1,93.2l84.72,88.26c-1.6.09-2.48.19-3.37.19-14.41,0-28.82,0-43.23,0a4.61,4.61,0,0,1-4.33-2.26q-28.78-41.81-57.72-83.52c-1.38-2-1.46-3.23.18-5.22,15.74-19.09,31.34-38.28,47-57.44C121.85,32.62,122.41,32,123.06,31.29Z"/>
+          <path fill="#4f6ef7" d="M68.73,142.3a48.22,48.22,0,0,1-20.26-10.88,4.41,4.41,0,0,1-1.23-3.09c.78-15.32,1.7-30.63,2.55-46C50.4,71.25,50.92,60.1,51.62,49a6.31,6.31,0,0,1,1.63-3.81A66.71,66.71,0,0,1,73,31.78c.4-.17.83-.27,1.7-.55C72.69,68.37,70.72,105.18,68.73,142.3Z"/>
+          <path fill="#0a0a0f" d="M219.41,139.3V46.49h20.41V83.35h2.78l35.11-36.86h26.13L258.69,92.23l46.7,47.07H278.48L242.6,101.65h-2.78V139.3Z"/>
+          <path fill="#0a0a0f" d="M316.83,139.3V73.54H336V81h2.79a11,11,0,0,1,5.64-5.83,21.37,21.37,0,0,1,9.2-1.86h9.28V88.12h-9.59c-4.94,0-9,1.13-12.21,3.38s-4.8,5.73-4.8,10.41V139.3Z"/>
+          <path fill="#0a0a0f" d="M400,141.16a41.48,41.48,0,0,1-14.69-2.45,23.49,23.49,0,0,1-10.28-7.16,17.69,17.69,0,0,1-3.79-11.47,17.16,17.16,0,0,1,3.79-11.34,22.89,22.89,0,0,1,10.52-6.89A47,47,0,0,1,401,99.52h21V95.81a9.68,9.68,0,0,0-3.4-7.62q-3.4-3-10.82-3t-10.83,2.85a13.08,13.08,0,0,0-4.64,7.35l-17.94-5.17a25.85,25.85,0,0,1,6-9.21,29.63,29.63,0,0,1,11-6.76,47.72,47.72,0,0,1,16.78-2.59q15.15,0,24,6.5T440.85,97v24.53q0,4,4.33,4h6.18V139.3h-13a17.16,17.16,0,0,1-9.43-2.38,7.28,7.28,0,0,1-3.71-6.37v-.13h-2.94a16.87,16.87,0,0,1-2.78,4.18,18.07,18.07,0,0,1-6.81,4.57Q408.07,141.17,400,141.16Zm3.41-13.52q8.19,0,13.37-3.92A12.36,12.36,0,0,0,422,113.31V112H402.34q-5.41,0-8.5,2a6.24,6.24,0,0,0-3.09,5.57,6.83,6.83,0,0,0,3.24,5.83C396.16,126.89,399.3,127.64,403.43,127.64Z"/>
+          <path fill="#0a0a0f" d="M477.34,139.3,452.91,73.54h20.72l17.78,53.56h2.79L512,73.54H532.7L508.27,139.3Z"/>
+          <path fill="#0a0a0f" d="M555.74,65.85a13.78,13.78,0,0,1-8.89-2.92,9.38,9.38,0,0,1-3.63-7.69,9.38,9.38,0,0,1,3.63-7.69,15.11,15.11,0,0,1,17.86,0,9.46,9.46,0,0,1,3.56,7.69,9.46,9.46,0,0,1-3.56,7.69A13.7,13.7,0,0,1,555.74,65.85ZM546,139.3V73.54h19.48V139.3Z"/>
+          <path fill="#4f6ef7" d="M644.66,165.82V131.75h-2.79a19.43,19.43,0,0,1-4.48,4.44,24.27,24.27,0,0,1-7.66,3.58,41.71,41.71,0,0,1-11.67,1.39,38.21,38.21,0,0,1-17.17-3.91,31.26,31.26,0,0,1-12.68-11.47q-4.79-7.56-4.79-18.3v-2.12q0-10.74,4.79-18.3A31.1,31.1,0,0,1,601,75.59a38.36,38.36,0,0,1,17.09-3.91q10.52,0,16,3a22.71,22.71,0,0,1,8.12,6.83H645V73.54h19.17v92.28Zm-20.72-39.25q9.12,0,15.07-5t6-14.52v-1.32q0-9.56-6-14.52t-15-5q-9,0-15,5t-6,14.52v1.32q0,9.56,6,14.52T623.94,126.57Z"/>
+        </svg>
+        <p class="label" style="color:#5a5a6a;">Primary horizontal — light background</p>
+      </div>
+      <div class="card-light" style="flex-direction:column;gap:12px;min-height:140px;">
+        <svg viewBox="0 0 500 500" style="width:120px;height:120px;" xmlns="http://www.w3.org/2000/svg">
+          <path fill="#4f6ef7" d="M270.06,249.33a95.2,95.2,0,0,1-33.62,6.48c-24,.06-44.5-7.87-60-26.62-12.35-14.94-17.15-32.48-16.36-51.68,1.81-44.57,37.17-86.09,82.42-96.87,22.84-5.45,45-3.53,65.09,9.61S338,122.4,339.76,146.1c1.94,26.29-7.06,49.07-23.15,69.41-.51.64-1.11,1.2-1.89,2l-18.64-19.47c3-4.93,6.23-9.6,8.9-14.56a72.26,72.26,0,0,0,8.72-35.9c-.46-30.21-23.58-53.69-53.71-55.12-40-1.9-77.35,28.5-84,68.48-4.28,25.7,7.19,50.22,29.14,61.42,14.83,7.56,30.46,8.25,46.37,4.13,2.37-.61,3.46-.1,4.69,1.81C260.64,235.28,265.27,242.12,270.06,249.33Z"/>
+          <path fill="#4f6ef7" d="M277.46,105.48A48.09,48.09,0,0,1,295,119.79l-42.5,47.6,84.71,88.26c-1.59.09-2.48.19-3.36.19-14.41,0-28.83,0-43.24,0a4.61,4.61,0,0,1-4.33-2.26q-28.79-41.81-57.71-83.52c-1.39-2-1.46-3.23.18-5.22,15.74-19.09,31.33-38.28,47-57.44C276.25,106.81,276.82,106.21,277.46,105.48Z"/>
+          <path fill="#4f6ef7" d="M223.13,216.49a48.24,48.24,0,0,1-20.25-10.88,4.41,4.41,0,0,1-1.24-3.09c.79-15.32,1.7-30.63,2.55-46,.62-11.13,1.14-22.28,1.84-33.41a6.31,6.31,0,0,1,1.63-3.81A66.71,66.71,0,0,1,227.39,106c.4-.17.83-.27,1.7-.55C227.1,142.56,225.12,179.37,223.13,216.49Z"/>
+          <path fill="#0a0a0f" d="M27.63,360.6V267.79H48v36.86h2.79l35.1-36.86h26.14L66.91,313.53l46.7,47.07H86.71L50.83,323H48V360.6Z"/>
+          <path fill="#0a0a0f" d="M125.05,360.6V294.84h19.18v7.42H147a11.1,11.1,0,0,1,5.65-5.83,21.34,21.34,0,0,1,9.2-1.86h9.28v14.85h-9.59q-7.43,0-12.22,3.39t-4.79,10.4V360.6Z"/>
+          <path fill="#0a0a0f" d="M208.25,362.46A41.44,41.44,0,0,1,193.56,360a23.49,23.49,0,0,1-10.28-7.16,17.69,17.69,0,0,1-3.79-11.47A17.16,17.16,0,0,1,183.28,330a22.91,22.91,0,0,1,10.51-6.89,47,47,0,0,1,15.39-2.32h21v-3.72a9.71,9.71,0,0,0-3.4-7.62q-3.41-3-10.83-3t-10.82,2.85a13,13,0,0,0-4.64,7.36l-17.94-5.17a25.9,25.9,0,0,1,5.95-9.22,29.76,29.76,0,0,1,11-6.76A47.76,47.76,0,0,1,216.29,293q15.15,0,24,6.5t8.81,18.83v24.53c0,2.65,1.45,4,4.33,4h6.19V360.6h-13a17.11,17.11,0,0,1-9.43-2.38,7.26,7.26,0,0,1-3.71-6.37v-.13h-2.94a17,17,0,0,1-2.79,4.18,17.91,17.91,0,0,1-6.8,4.57Q216.3,362.47,208.25,362.46Zm3.4-13.52q8.19,0,13.38-3.92a12.38,12.38,0,0,0,5.18-10.4v-1.33H210.57q-5.41,0-8.51,2a6.27,6.27,0,0,0-3.09,5.57,6.82,6.82,0,0,0,3.25,5.83C204.38,348.19,207.53,348.94,211.65,348.94Z"/>
+          <path fill="#0a0a0f" d="M285.57,360.6l-24.44-65.76h20.73l17.78,53.57h2.78l17.79-53.57h20.72L316.5,360.6Z"/>
+          <path fill="#0a0a0f" d="M364,287.15a13.71,13.71,0,0,1-8.89-2.92,9.94,9.94,0,0,1,0-15.38,15.11,15.11,0,0,1,17.86,0,10.1,10.1,0,0,1,0,15.38A13.67,13.67,0,0,1,364,287.15Zm-9.75,73.45V294.84h19.49V360.6Z"/>
+          <path fill="#4f6ef7" d="M452.88,387.12V353.05H450.1a19.5,19.5,0,0,1-4.49,4.44,24.2,24.2,0,0,1-7.65,3.58,41.83,41.83,0,0,1-11.68,1.39,38.07,38.07,0,0,1-17.16-3.91,31.14,31.14,0,0,1-12.68-11.47q-4.8-7.56-4.79-18.3v-2.12q0-10.74,4.79-18.3a31,31,0,0,1,12.76-11.47A38.32,38.32,0,0,1,426.28,293q10.52,0,16,3a22.68,22.68,0,0,1,8.12,6.82h2.78v-8h19.18v92.28Zm-20.72-39.24q9.12,0,15.08-5t5.95-14.52v-1.32q0-9.56-6-14.52t-15-5q-9,0-15,5t-6,14.52v1.32q0,9.56,6,14.52T432.16,347.88Z"/>
+        </svg>
+        <p class="label" style="color:#5a5a6a;">Stacked — light background</p>
+      </div>
+    </div>
+
+    <p class="divlabel">Clear Space & Minimum Sizes</p>
+    <div class="grid2">
+      <div>
+        <div class="clearspace-wrap">
+          <div class="clearspace-inner" style="position:relative;">
+            <span class="cs-label cs-top">1× mark height</span>
+            <span class="cs-label cs-bottom">1× mark height</span>
+            <span class="cs-label cs-left">1× mark</span>
+            <span class="cs-label cs-right">1× mark</span>
+            <svg viewBox="0 0 190.7 189.78" style="width:56px;height:56px;" xmlns="http://www.w3.org/2000/svg"><path fill="#4f6ef7" d="M115.62,176.71A95.2,95.2,0,0,1,82,183.19c-24,.06-44.5-7.87-60-26.62C9.63,141.63,4.83,124.09,5.62,104.89,7.43,60.33,42.79,18.8,88,8c22.84-5.44,45-3.53,65.09,9.61s30.45,32.15,32.19,55.85c1.94,26.29-7.06,49.07-23.15,69.41-.51.64-1.11,1.2-1.89,2q-9.5-9.9-18.64-19.47c3-4.93,6.23-9.6,8.9-14.56A72.24,72.24,0,0,0,159.26,75c-.46-30.21-23.58-53.7-53.71-55.13C65.6,18,28.2,48.37,21.53,88.36c-4.28,25.69,7.19,50.21,29.14,61.41C65.5,157.33,81.13,158,97,153.9c2.37-.61,3.46-.1,4.69,1.81C106.2,162.66,110.83,169.5,115.62,176.71Z"/><path fill="#4f6ef7" d="M123,32.86a48.09,48.09,0,0,1,17.55,14.31C126.42,63,112.32,78.81,98.07,94.77L182.78,183c-1.59.09-2.48.19-3.36.19-14.41,0-28.83,0-43.24.05a4.61,4.61,0,0,1-4.33-2.26Q103.07,139.2,74.14,97.49c-1.39-2-1.46-3.23.18-5.22,15.74-19.08,31.33-38.28,47-57.44C121.81,34.19,122.38,33.6,123,32.86Z"/><path fill="#4f6ef7" d="M68.69,143.87A48.13,48.13,0,0,1,48.44,133a4.4,4.4,0,0,1-1.24-3.09C48,114.58,48.9,99.27,49.75,84c.62-11.14,1.14-22.29,1.84-33.42a6.33,6.33,0,0,1,1.63-3.81A66.71,66.71,0,0,1,73,33.35c.4-.17.83-.27,1.7-.55C72.66,69.94,70.68,106.76,68.69,143.87Z"/></svg>
+          </div>
+        </div>
+        <p class="label" style="margin-top:12px;">Minimum clear space — all sides</p>
+      </div>
+      <div class="card" style="display:flex;flex-direction:column;gap:12px;">
+        <p style="font-size:12px;color:var(--muted-fg);font-family:var(--font-mono);margin-bottom:4px;">MINIMUM SIZES</p>
+        <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--muted);">
+          <svg viewBox="0 0 190.7 189.78" style="width:24px;height:24px;flex-shrink:0;" xmlns="http://www.w3.org/2000/svg"><path fill="#4f6ef7" d="M115.62,176.71A95.2,95.2,0,0,1,82,183.19c-24,.06-44.5-7.87-60-26.62C9.63,141.63,4.83,124.09,5.62,104.89,7.43,60.33,42.79,18.8,88,8c22.84-5.44,45-3.53,65.09,9.61s30.45,32.15,32.19,55.85c1.94,26.29-7.06,49.07-23.15,69.41-.51.64-1.11,1.2-1.89,2q-9.5-9.9-18.64-19.47c3-4.93,6.23-9.6,8.9-14.56A72.24,72.24,0,0,0,159.26,75c-.46-30.21-23.58-53.7-53.71-55.13C65.6,18,28.2,48.37,21.53,88.36c-4.28,25.69,7.19,50.21,29.14,61.41C65.5,157.33,81.13,158,97,153.9c2.37-.61,3.46-.1,4.69,1.81C106.2,162.66,110.83,169.5,115.62,176.71Z"/><path fill="#4f6ef7" d="M123,32.86a48.09,48.09,0,0,1,17.55,14.31C126.42,63,112.32,78.81,98.07,94.77L182.78,183c-1.59.09-2.48.19-3.36.19-14.41,0-28.83,0-43.24.05a4.61,4.61,0,0,1-4.33-2.26Q103.07,139.2,74.14,97.49c-1.39-2-1.46-3.23.18-5.22,15.74-19.08,31.33-38.28,47-57.44C121.81,34.19,122.38,33.6,123,32.86Z"/><path fill="#4f6ef7" d="M68.69,143.87A48.13,48.13,0,0,1,48.44,133a4.4,4.4,0,0,1-1.24-3.09C48,114.58,48.9,99.27,49.75,84c.62-11.14,1.14-22.29,1.84-33.42a6.33,6.33,0,0,1,1.63-3.81A66.71,66.71,0,0,1,73,33.35c.4-.17.83-.27,1.7-.55C72.66,69.94,70.68,106.76,68.69,143.87Z"/></svg>
+          <div><p style="font-size:13px;color:var(--foreground);">24px minimum — icon mark</p><p style="font-size:11px;color:var(--subtle);font-family:var(--font-mono);">Below this: use favicon version</p></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;padding:10px 0;">
+          <svg viewBox="0 0 666.08 187.04" style="width:120px;height:auto;flex-shrink:0;" xmlns="http://www.w3.org/2000/svg"><path fill="#4f6ef7" d="M113.49,176.22a95.12,95.12,0,0,1-33.62,6.48c-24,.06-44.49-7.87-60-26.62C7.5,141.14,2.71,123.6,3.49,104.4,5.31,59.83,40.67,18.31,85.91,7.53c22.85-5.44,45-3.53,65.1,9.61S181.45,49.29,183.2,73c1.94,26.29-7.07,49.07-23.16,69.41-.51.64-1.11,1.2-1.89,2L139.51,125c3-4.93,6.24-9.6,8.91-14.56a72.25,72.25,0,0,0,8.71-35.9c-.46-30.21-23.58-53.69-53.71-55.12-39.94-1.9-77.34,28.5-84,68.48-4.29,25.7,7.18,50.22,29.13,61.42,14.84,7.56,30.47,8.25,46.38,4.13,2.37-.61,3.45-.1,4.68,1.81C104.08,162.17,108.7,169,113.49,176.22Z"/><path fill="#4f6ef7" d="M120.9,32.37a48.17,48.17,0,0,1,17.55,14.31L95.94,94.28l84.72,88.26c-1.6.09-2.48.19-3.37.19-14.41,0-28.82,0-43.23.05a4.64,4.64,0,0,1-4.34-2.26Q101,138.72,72,97c-1.38-2-1.46-3.23.18-5.22,15.74-19.09,31.34-38.28,47-57.44C119.69,33.7,120.25,33.1,120.9,32.37Z"/><path fill="#4f6ef7" d="M66.57,143.38A48.22,48.22,0,0,1,46.31,132.5a4.36,4.36,0,0,1-1.23-3.09c.78-15.32,1.7-30.63,2.54-45.95.62-11.13,1.14-22.28,1.84-33.41a6.31,6.31,0,0,1,1.63-3.81A66.71,66.71,0,0,1,70.82,32.86c.4-.17.83-.27,1.7-.55C70.53,69.45,68.56,106.26,66.57,143.38Z"/><path fill="#f8f8ff" d="M217.25,140.38V47.57h20.41V84.43h2.78l35.11-36.86h26.13L256.52,93.31l46.71,47.07H276.32l-35.88-37.65h-2.78v37.65Z"/><path fill="#f8f8ff" d="M553.58,66.93A13.76,13.76,0,0,1,544.69,64a10,10,0,0,1,0-15.38,15.11,15.11,0,0,1,17.86,0,9.46,9.46,0,0,1,3.56,7.69A9.46,9.46,0,0,1,562.55,64,13.7,13.7,0,0,1,553.58,66.93Zm-9.74,73.45V74.62h19.48v65.76Z"/><path fill="#4f6ef7" d="M642.5,166.9V132.83h-2.79a19.64,19.64,0,0,1-4.48,4.44,24.27,24.27,0,0,1-7.66,3.58,41.71,41.71,0,0,1-11.67,1.39,38.21,38.21,0,0,1-17.17-3.91,31.26,31.26,0,0,1-12.68-11.47q-4.78-7.56-4.79-18.3v-2.12q0-10.74,4.79-18.3a31.1,31.1,0,0,1,12.76-11.47,38.33,38.33,0,0,1,17.09-3.91q10.51,0,16,3A22.71,22.71,0,0,1,640,82.57h2.79V74.62H662V166.9Zm-20.73-39.25q9.13,0,15.08-5t6-14.52v-1.32q0-9.56-6-14.52t-15-5q-9,0-15,5t-6,14.52v1.32q0,9.56,6,14.52T621.77,127.65Z"/></svg>
+          <div style="margin-left:8px;"><p style="font-size:13px;color:var(--foreground);">120px minimum — full logo</p><p style="font-size:11px;color:var(--subtle);font-family:var(--font-mono);">Below this: use mark only</p></div>
+        </div>
+      </div>
+    </div>
+
+    <p class="divlabel">Logo Don'ts</p>
+    <div class="grid3">
+      <div class="dont-item"><div class="dont-icon">✗</div><div class="dont-text">Never stretch or distort the logo proportions</div></div>
+      <div class="dont-item"><div class="dont-icon">✗</div><div class="dont-text">Never rotate the mark at any angle</div></div>
+      <div class="dont-item"><div class="dont-icon">✗</div><div class="dont-text">Never change the q accent to any other color</div></div>
+      <div class="dont-item"><div class="dont-icon">✗</div><div class="dont-text">Never use on busy or photographic backgrounds without overlay</div></div>
+      <div class="dont-item"><div class="dont-icon">✗</div><div class="dont-text">Never add drop shadows, glows, or raster effects</div></div>
+      <div class="dont-item"><div class="dont-icon">✗</div><div class="dont-text">Never use low-contrast color combinations</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- 03 COLOR PALETTE -->
+<section id="color">
+  <div class="wrap">
+    <p class="sec-num">Section 03</p>
+    <h2 class="sec-title">Color Palette</h2>
+    <p class="sec-sub">The complete Kraviq color system. Every color has a purpose. Never use colors outside this system.</p>
+
+    <p class="divlabel">Primary Brand Color</p>
+    <div style="display:grid;grid-template-columns:2fr 1fr 1fr;gap:12px;margin-bottom:32px;">
+      <div class="swatch">
+        <div class="swatch-color" style="background:#4f6ef7;height:100px;"></div>
+        <div class="swatch-info">
+          <p class="swatch-name">Kraviq Blue — Primary</p>
+          <p class="swatch-hex">#4F6EF7</p>
+          <p class="swatch-vals">RGB: 79, 110, 247<br>HSL: 228°, 90%, 64%<br>CMYK: 68, 55, 0, 3</p>
+          <p style="font-size:11px;color:var(--muted-fg);margin-top:8px;line-height:1.6;">CTAs, links, active states, the q in wordmark, mark background, primary accent throughout UI</p>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:4px;">
+        <div class="swatch" style="flex:1;"><div class="swatch-color" style="background:#3654d4;height:48px;"></div><div class="swatch-info"><p class="swatch-name" style="font-size:11px;">Hover / 600</p><p class="swatch-hex">#3654D4</p></div></div>
+        <div class="swatch" style="flex:1;"><div class="swatch-color" style="background:#1e3bad;height:48px;"></div><div class="swatch-info"><p class="swatch-name" style="font-size:11px;">Dark / 800</p><p class="swatch-hex">#1E3BAD</p></div></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:4px;">
+        <div class="swatch" style="flex:1;"><div class="swatch-color" style="background:#c5ceff;height:48px;"></div><div class="swatch-info"><p class="swatch-name" style="font-size:11px;">Tint / 100</p><p class="swatch-hex">#C5CEFF</p></div></div>
+        <div class="swatch" style="flex:1;"><div class="swatch-color" style="background:rgba(79,110,247,0.1);height:48px;border:1px solid var(--muted);"></div><div class="swatch-info"><p class="swatch-name" style="font-size:11px;">Subtle bg</p><p class="swatch-hex">#4F6EF7/10</p></div></div>
+      </div>
+    </div>
+
+    <p class="divlabel">Primary Color Scale</p>
+    <div class="grid7" style="margin-bottom:32px;">
+      <div><div style="height:40px;border-radius:6px;background:#eef1fe;"></div><p style="font-size:10px;color:var(--subtle);text-align:center;margin-top:6px;font-family:var(--font-mono);">50<br>#EEF1FE</p></div>
+      <div><div style="height:40px;border-radius:6px;background:#c5ceff;"></div><p style="font-size:10px;color:var(--subtle);text-align:center;margin-top:6px;font-family:var(--font-mono);">100<br>#C5CEFF</p></div>
+      <div><div style="height:40px;border-radius:6px;background:#99aaff;"></div><p style="font-size:10px;color:var(--subtle);text-align:center;margin-top:6px;font-family:var(--font-mono);">200<br>#99AAFF</p></div>
+      <div><div style="height:40px;border-radius:6px;background:#6b86ff;"></div><p style="font-size:10px;color:var(--subtle);text-align:center;margin-top:6px;font-family:var(--font-mono);">300<br>#6B86FF</p></div>
+      <div><div style="height:40px;border-radius:6px;background:#4f6ef7;border:2px solid #4f6ef7;"></div><p style="font-size:10px;color:var(--foreground);text-align:center;margin-top:6px;font-family:var(--font-mono);font-weight:600;">400 ★<br>#4F6EF7</p></div>
+      <div><div style="height:40px;border-radius:6px;background:#3654d4;"></div><p style="font-size:10px;color:var(--subtle);text-align:center;margin-top:6px;font-family:var(--font-mono);">600<br>#3654D4</p></div>
+      <div><div style="height:40px;border-radius:6px;background:#1e3bad;"></div><p style="font-size:10px;color:var(--subtle);text-align:center;margin-top:6px;font-family:var(--font-mono);">800<br>#1E3BAD</p></div>
+    </div>
+
+    <p class="divlabel">Background System</p>
+    <div class="grid4" style="margin-bottom:32px;">
+      <div class="swatch"><div class="swatch-color" style="background:#0a0a0f;border:1px solid #1e1e2e;"></div><div class="swatch-info"><p class="swatch-name">Background</p><p class="swatch-hex">#0A0A0F</p><p class="swatch-vals">RGB: 10, 10, 15<br>HSL: 240°, 20%, 5%<br>Page background</p></div></div>
+      <div class="swatch"><div class="swatch-color" style="background:#111118;"></div><div class="swatch-info"><p class="swatch-name">Surface / Card</p><p class="swatch-hex">#111118</p><p class="swatch-vals">RGB: 17, 17, 24<br>HSL: 240°, 17%, 8%<br>Card backgrounds</p></div></div>
+      <div class="swatch"><div class="swatch-color" style="background:#1e1e2e;"></div><div class="swatch-info"><p class="swatch-name">Muted</p><p class="swatch-hex">#1E1E2E</p><p class="swatch-vals">RGB: 30, 30, 46<br>HSL: 240°, 21%, 15%<br>Hover states</p></div></div>
+      <div class="swatch"><div class="swatch-color" style="background:#2a2a3e;"></div><div class="swatch-info"><p class="swatch-name">Border</p><p class="swatch-hex">#2A2A3E</p><p class="swatch-vals">RGB: 42, 42, 62<br>HSL: 240°, 19%, 20%<br>Component borders</p></div></div>
+    </div>
+
+    <p class="divlabel">Text Colors</p>
+    <div class="grid4" style="margin-bottom:32px;">
+      <div class="swatch"><div class="swatch-color" style="background:#f8f8ff;"></div><div class="swatch-info"><p class="swatch-name">Ghost White</p><p class="swatch-hex">#F8F8FF</p><p class="swatch-vals">RGB: 248, 248, 255<br>HSL: 240°, 100%, 99%<br>Primary text — NEVER use #FFFFFF</p></div></div>
+      <div class="swatch"><div class="swatch-color" style="background:#9898a8;"></div><div class="swatch-info"><p class="swatch-name">Muted</p><p class="swatch-hex">#9898A8</p><p class="swatch-vals">RGB: 152, 152, 168<br>HSL: 240°, 7%, 63%<br>Secondary text, tagline</p></div></div>
+      <div class="swatch"><div class="swatch-color" style="background:#5a5a6a;"></div><div class="swatch-info"><p class="swatch-name">Subtle</p><p class="swatch-hex">#5A5A6A</p><p class="swatch-vals">RGB: 90, 90, 106<br>HSL: 240°, 8%, 38%<br>Placeholders, hints</p></div></div>
+      <div class="swatch"><div class="swatch-color" style="background:#0a0a0f;border:1px solid #2a2a3e;"></div><div class="swatch-info"><p class="swatch-name">Inverse</p><p class="swatch-hex">#0A0A0F</p><p class="swatch-vals">RGB: 10, 10, 15<br>HSL: 240°, 20%, 5%<br>Text on light bg</p></div></div>
+    </div>
+
+    <div style="background:rgba(79,110,247,0.08);border:1px solid rgba(79,110,247,0.2);border-radius:var(--r-md);padding:16px;margin-bottom:32px;display:flex;gap:12px;align-items:flex-start;">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#4f6ef7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:2px;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      <p style="font-size:13px;color:var(--muted-fg);line-height:1.6;"><strong style="color:var(--foreground);">Ghost White #F8F8FF vs Pure White #FFFFFF:</strong> Pure white on dark backgrounds creates harsh contrast. Ghost White has a subtle blue undertone (255 in blue channel) that harmonizes with the primary blue and reduces eye strain. This is the same technique used by Linear, Vercel, and Notion. Never substitute #FFFFFF.</p>
+    </div>
+
+    <p class="divlabel">Trading Status Colors — Fixed, Never Change</p>
+    <div class="grid4" style="margin-bottom:16px;">
+      <div class="swatch"><div class="swatch-color" style="background:#22c55e;"></div><div class="swatch-info"><p class="swatch-name">Profit</p><p class="swatch-hex">#22C55E</p><p class="swatch-vals">RGB: 34, 197, 94<br>HSL: 142°, 71%, 45%<br>CMYK: 83, 0, 52, 23<br><br>Positive P&L, wins, online status, success states</p></div></div>
+      <div class="swatch"><div class="swatch-color" style="background:#ef4444;"></div><div class="swatch-info"><p class="swatch-name">Loss</p><p class="swatch-hex">#EF4444</p><p class="swatch-vals">RGB: 239, 68, 68<br>HSL: 0°, 83%, 60%<br>CMYK: 0, 72, 72, 6<br><br>Negative P&L, losses, errors, danger states</p></div></div>
+      <div class="swatch"><div class="swatch-color" style="background:#f59e0b;"></div><div class="swatch-info"><p class="swatch-name">Warning</p><p class="swatch-hex">#F59E0B</p><p class="swatch-vals">RGB: 245, 158, 11<br>HSL: 38°, 92%, 50%<br>CMYK: 0, 36, 96, 4<br><br>Approaching limits, caution, drawdown warnings</p></div></div>
+      <div class="swatch"><div class="swatch-color" style="background:#6b7280;"></div><div class="swatch-info"><p class="swatch-name">Breakeven</p><p class="swatch-hex">#6B7280</p><p class="swatch-vals">RGB: 107, 114, 128<br>HSL: 220°, 9%, 46%<br>CMYK: 16, 11, 0, 50<br><br>Zero P&L, neutral states, breakeven indicators</p></div></div>
+    </div>
+
+    <div style="background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.15);border-radius:var(--r-md);padding:16px;display:flex;gap:12px;align-items:flex-start;">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:2px;"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      <p style="font-size:13px;color:var(--muted-fg);line-height:1.6;">Trading status colors are internationally recognised. <strong style="color:#22c55e;">Green = profit</strong>. <strong style="color:#ef4444;">Red = loss</strong>. These must never be repurposed for decorative use or any meaning outside their defined purpose. Doing so would confuse traders and undermine trust in the data.</p>
+    </div>
+
+    <p class="divlabel">Color Usage Reference</p>
+    <table style="margin-top:8px;">
+      <thead><tr><th>Context</th><th>Color</th><th>Value</th></tr></thead>
+      <tbody>
+        <tr><td>Primary CTA button</td><td><span style="color:var(--primary);">Primary Blue</span></td><td style="font-family:var(--font-mono);font-size:12px;">#4F6EF7</td></tr>
+        <tr><td>CTA hover state</td><td><span style="color:#3654d4;">Primary / 600</span></td><td style="font-family:var(--font-mono);font-size:12px;">#3654D4</td></tr>
+        <tr><td>Focus ring</td><td><span style="color:var(--primary);">Primary at 40% opacity</span></td><td style="font-family:var(--font-mono);font-size:12px;">#4F6EF7/40</td></tr>
+        <tr><td>Positive P&L / wins</td><td><span style="color:#22c55e;">Profit Green</span></td><td style="font-family:var(--font-mono);font-size:12px;">#22C55E</td></tr>
+        <tr><td>Negative P&L / losses</td><td><span style="color:#ef4444;">Loss Red</span></td><td style="font-family:var(--font-mono);font-size:12px;">#EF4444</td></tr>
+        <tr><td>Page background</td><td>Background</td><td style="font-family:var(--font-mono);font-size:12px;">#0A0A0F</td></tr>
+        <tr><td>Card background</td><td>Surface</td><td style="font-family:var(--font-mono);font-size:12px;">#111118</td></tr>
+        <tr><td>Component borders</td><td>Border</td><td style="font-family:var(--font-mono);font-size:12px;">#2A2A3E</td></tr>
+        <tr><td>Primary text</td><td><span style="color:#f8f8ff;">Ghost White</span></td><td style="font-family:var(--font-mono);font-size:12px;">#F8F8FF</td></tr>
+        <tr><td>Secondary text</td><td><span style="color:#9898a8;">Muted</span></td><td style="font-family:var(--font-mono);font-size:12px;">#9898A8</td></tr>
+        <tr><td>The q in wordmark</td><td><span style="color:var(--primary);">Primary Blue</span></td><td style="font-family:var(--font-mono);font-size:12px;">#4F6EF7</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- 04 TYPOGRAPHY -->
+<section id="type">
+  <div class="wrap">
+    <p class="sec-num">Section 04</p>
+    <h2 class="sec-title">Typography</h2>
+    <p class="sec-sub">Three fonts. Three roles. No exceptions.</p>
+
+    <div class="grid3" style="margin-bottom:40px;">
+      <div class="card"><p style="font-family:'Space Grotesk',sans-serif;font-size:28px;font-weight:700;letter-spacing:-0.03em;margin-bottom:8px;">Aa</p><p style="font-size:13px;font-weight:600;margin-bottom:4px;">Space Grotesk</p><p style="font-size:12px;color:var(--muted-fg);">Weights: 300–700<br>Role: Logo, headings, brand displays<br>Source: Google Fonts</p></div>
+      <div class="card"><p style="font-family:'Inter',sans-serif;font-size:28px;font-weight:400;margin-bottom:8px;">Aa</p><p style="font-size:13px;font-weight:600;margin-bottom:4px;">Inter</p><p style="font-size:12px;color:var(--muted-fg);">Weights: 300–700<br>Role: Body text, tagline, UI labels<br>Source: Google Fonts</p></div>
+      <div class="card"><p style="font-family:'JetBrains Mono',monospace;font-size:28px;font-weight:700;margin-bottom:8px;">01</p><p style="font-size:13px;font-weight:600;margin-bottom:4px;">JetBrains Mono</p><p style="font-size:12px;color:var(--muted-fg);">Weights: 400–700<br>Role: ALL financial numbers, data<br>Source: Google Fonts</p></div>
+    </div>
+
+    <p class="divlabel">Type Scale</p>
+    <div class="card" style="padding:32px;">
+      <div class="type-row"><div style="font-family:'Space Grotesk',sans-serif;font-size:56px;font-weight:700;letter-spacing:-0.03em;line-height:1;">You Trade Well.</div><p class="type-meta">Display · Space Grotesk 700 · 56px / 3.5rem · tracking -0.03em · hero headlines only</p></div>
+      <div class="type-row"><div style="font-family:'Space Grotesk',sans-serif;font-size:40px;font-weight:700;letter-spacing:-0.02em;line-height:1.2;">The Trading OS for Retail Forex</div><p class="type-meta">H1 · Space Grotesk 700 · 40px / 2.5rem · tracking -0.02em</p></div>
+      <div class="type-row"><div style="font-family:'Space Grotesk',sans-serif;font-size:28px;font-weight:600;letter-spacing:-0.01em;line-height:1.3;">Track. Score. Scale.</div><p class="type-meta">H2 · Space Grotesk 600 · 28px / 1.75rem · tracking -0.01em</p></div>
+      <div class="type-row"><div style="font-family:'Space Grotesk',sans-serif;font-size:20px;font-weight:600;line-height:1.3;">Trading Business Score</div><p class="type-meta">H3 · Space Grotesk 600 · 20px / 1.25rem · tracking 0</p></div>
+      <div class="type-row"><div style="font-family:'Space Grotesk',sans-serif;font-size:16px;font-weight:500;line-height:1.4;">Account Management</div><p class="type-meta">H4 · Space Grotesk 500 · 16px / 1rem · tracking 0</p></div>
+      <div class="type-row"><div style="font-family:'Inter',sans-serif;font-size:18px;font-weight:400;line-height:1.7;color:var(--muted-fg);">Track every trade, score your business, and grow with data — not guesswork.</div><p class="type-meta">Body Large · Inter 400 · 18px / 1.125rem · line-height 1.7</p></div>
+      <div class="type-row"><div style="font-family:'Inter',sans-serif;font-size:16px;font-weight:400;line-height:1.6;color:var(--muted-fg);">Your trading account syncs automatically the moment each trade closes.</div><p class="type-meta">Body · Inter 400 · 16px / 1rem · line-height 1.6</p></div>
+      <div class="type-row"><div style="font-family:'Inter',sans-serif;font-size:14px;font-weight:400;line-height:1.5;color:var(--muted-fg);">Last synced 2 minutes ago</div><p class="type-meta">Body Small · Inter 400 · 14px / 0.875rem · line-height 1.5</p></div>
+      <div class="type-row"><div style="font-family:'Inter',sans-serif;font-size:13px;font-weight:500;line-height:1.4;letter-spacing:0.01em;">Win Rate</div><p class="type-meta">Label · Inter 500 · 13px / 0.8125rem · tracking +0.01em</p></div>
+      <div class="type-row"><div style="font-family:'Inter',sans-serif;font-size:11px;font-weight:500;line-height:1.4;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted-fg);">Account Management</div><p class="type-meta">Overline · Inter 500 · 11px · tracking +0.12em · UPPERCASE</p></div>
+      <div class="type-row"><div style="font-family:'Inter',sans-serif;font-size:14px;font-weight:300;line-height:1.6;color:var(--muted-fg);letter-spacing:0.01em;">You Trade Well. Run It Like a Business.</div><p class="type-meta">Tagline · Inter Light 300 · 14px · tracking +0.01em · color: #9898A8 — contrasts wordmark weight</p></div>
+      <div class="type-row"><div style="font-family:'JetBrains Mono',monospace;font-size:32px;font-weight:700;letter-spacing:-0.02em;color:#22c55e;">+$4,284.50</div><p class="type-meta">Data Display · JetBrains Mono 700 · 32px · tracking -0.02em · color varies by profit/loss</p></div>
+      <div class="type-row"><div style="font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:500;color:var(--muted-fg);">Win rate: 67.3% · Trades: 142 · Score: 74</div><p class="type-meta">Data Inline · JetBrains Mono 500 · 14px · all financial data inline</p></div>
+    </div>
+
+    <p class="divlabel">Typography Rules</p>
+    <div class="grid2" style="margin-top:8px;">
+      <div class="card" style="gap:10px;display:flex;flex-direction:column;">
+        <p style="font-size:13px;font-weight:600;color:var(--foreground);margin-bottom:4px;">Core Rules</p>
+        <p style="font-size:13px;color:var(--muted-fg);line-height:1.6;">Headlines use <strong style="color:var(--foreground);">Space Grotesk</strong>. Body text uses <strong style="color:var(--foreground);">Inter</strong>. Numbers always use <strong style="color:var(--foreground);">JetBrains Mono</strong>. These rules have no exceptions.</p>
+        <p style="font-size:13px;color:var(--muted-fg);line-height:1.6;">Tight tracking on display text (−0.02 to −0.03em) makes headlines read as one confident unit.</p>
+        <p style="font-size:13px;color:var(--muted-fg);line-height:1.6;">Never use font weights below 300 at sizes below 14px — unreadable on dark backgrounds.</p>
+      </div>
+      <div class="card" style="gap:10px;display:flex;flex-direction:column;">
+        <p style="font-size:13px;font-weight:600;color:var(--foreground);margin-bottom:4px;">Data Rules</p>
+        <p style="font-size:13px;color:var(--muted-fg);line-height:1.6;">Line length: 60–75 characters maximum for body text blocks.</p>
+        <p style="font-size:13px;color:var(--muted-fg);line-height:1.6;">Financial numbers: always monospace, always right-aligned in tables, always show + or − sign explicitly.</p>
+        <p style="font-size:13px;color:var(--muted-fg);line-height:1.6;">The tagline uses Inter Light 300 to contrast with the Space Grotesk Bold wordmark. Weight difference creates visual hierarchy.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 05 ICONOGRAPHY -->
+<section id="icons">
+  <div class="wrap">
+    <p class="sec-num">Section 05</p>
+    <h2 class="sec-title">Iconography</h2>
+    <p class="sec-sub">Kraviq uses Lucide Icons — a clean, consistent outline icon set with 2px stroke weight and round line caps.</p>
+
+    <div class="grid2" style="margin-bottom:32px;">
+      <div class="card"><p style="font-size:13px;color:var(--muted-fg);line-height:1.8;"><strong style="color:var(--foreground);">Style:</strong> Outline icons, 2px stroke, round caps and corners<br><strong style="color:var(--foreground);">Grid:</strong> 24×24px base with 2px padding<br><strong style="color:var(--foreground);">Library:</strong> Lucide Icons (lucide.dev)<br><strong style="color:var(--foreground);">Default color:</strong> Inherits text color of context<br><strong style="color:var(--foreground);">Never:</strong> Use random colors outside the system</p></div>
+      <div class="card"><p style="font-size:12px;color:var(--muted-fg);font-family:var(--font-mono);margin-bottom:12px;">COLOR RULES</p>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <div style="display:flex;justify-content:space-between;font-size:13px;"><span style="color:var(--muted-fg);">Default / text context</span><span style="color:var(--foreground);font-family:var(--font-mono);font-size:12px;">#F8F8FF</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:13px;"><span style="color:var(--muted-fg);">Muted context</span><span style="color:#9898a8;font-family:var(--font-mono);font-size:12px;">#9898A8</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:13px;"><span style="color:var(--muted-fg);">Active / accent</span><span style="color:#4f6ef7;font-family:var(--font-mono);font-size:12px;">#4F6EF7</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:13px;"><span style="color:var(--muted-fg);">Profit context</span><span style="color:#22c55e;font-family:var(--font-mono);font-size:12px;">#22C55E</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:13px;"><span style="color:var(--muted-fg);">Loss context</span><span style="color:#ef4444;font-family:var(--font-mono);font-size:12px;">#EF4444</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:13px;"><span style="color:var(--muted-fg);">Warning context</span><span style="color:#f59e0b;font-family:var(--font-mono);font-size:12px;">#F59E0B</span></div>
+        </div>
+      </div>
+    </div>
+
+    <p class="divlabel">Size Scale</p>
+    <div class="icon-sizes" style="margin-bottom:32px;">
+      <div class="icon-size-item"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg><span class="icon-size-label">12px<br>inline text</span></div>
+      <div class="icon-size-item"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg><span class="icon-size-label">16px<br>buttons, nav</span></div>
+      <div class="icon-size-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg><span class="icon-size-label">20px<br>components</span></div>
+      <div class="icon-size-item"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg><span class="icon-size-label">24px<br>section headers</span></div>
+      <div class="icon-size-item"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg><span class="icon-size-label">32px<br>callouts</span></div>
+      <div class="icon-size-item"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#4f6ef7" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg><span class="icon-size-label">48px<br>display / hero</span></div>
+    </div>
+
+    <p class="divlabel">Key Icons</p>
+    <div class="grid4">
+      <div class="card" style="align-items:center;gap:10px;text-align:center;padding:20px 12px;"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#4f6ef7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg><p style="font-size:12px;color:var(--muted-fg);">TrendingUp<br>trading, growth</p></div>
+      <div class="card" style="align-items:center;gap:10px;text-align:center;padding:20px 12px;"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#4f6ef7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg><p style="font-size:12px;color:var(--muted-fg);">Shield<br>prop firm, compliance</p></div>
+      <div class="card" style="align-items:center;gap:10px;text-align:center;padding:20px 12px;"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#4f6ef7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg><p style="font-size:12px;color:var(--muted-fg);">Zap<br>EA sync, automation</p></div>
+      <div class="card" style="align-items:center;gap:10px;text-align:center;padding:20px 12px;"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#4f6ef7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg><p style="font-size:12px;color:var(--muted-fg);">BarChart2<br>analytics, score</p></div>
+      <div class="card" style="align-items:center;gap:10px;text-align:center;padding:20px 12px;"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><p style="font-size:12px;color:var(--muted-fg);">Star / War Account<br>experimental sandbox</p></div>
+      <div class="card" style="align-items:center;gap:10px;text-align:center;padding:20px 12px;"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg><p style="font-size:12px;color:var(--muted-fg);">TrendingUp (profit)<br>positive states</p></div>
+      <div class="card" style="align-items:center;gap:10px;text-align:center;padding:20px 12px;"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#4f6ef7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg><p style="font-size:12px;color:var(--muted-fg);">Activity<br>live data, heartbeat</p></div>
+      <div class="card" style="align-items:center;gap:10px;text-align:center;padding:20px 12px;"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#4f6ef7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg><p style="font-size:12px;color:var(--muted-fg);">Layers / Grid<br>accounts, stacking</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- 06 UI COMPONENTS -->
+<section id="components">
+  <div class="wrap">
+    <p class="sec-num">Section 06</p>
+    <h2 class="sec-title">UI Components</h2>
+    <p class="sec-sub">Live component examples showing the Kraviq design language in context.</p>
+
+    <p class="divlabel">Buttons</p>
+    <div class="card" style="display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-bottom:24px;">
+      <button class="btn btn-primary">Get Started</button>
+      <button class="btn btn-outline">View Details</button>
+      <button class="btn btn-ghost">Learn more</button>
+      <button class="btn btn-destructive">Delete Account</button>
+      <button class="btn btn-primary" style="opacity:0.4;cursor:not-allowed;" disabled>Disabled</button>
+      <button class="btn btn-primary" style="display:inline-flex;align-items:center;gap:8px;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Add Trade
+      </button>
+    </div>
+
+    <p class="divlabel">Status Badges</p>
+    <div class="card" style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:24px;">
+      <span class="badge badge-profit">+2.4%</span>
+      <span class="badge badge-profit">Win</span>
+      <span class="badge badge-loss">-1.2%</span>
+      <span class="badge badge-loss">Loss</span>
+      <span class="badge badge-warning">Caution</span>
+      <span class="badge badge-warning">Drawdown Alert</span>
+      <span class="badge badge-primary">Pro</span>
+      <span class="badge badge-primary">EA Sync</span>
+      <span class="badge badge-neutral">Manual</span>
+      <span class="badge badge-neutral">Breakeven</span>
+    </div>
+
+    <p class="divlabel">Cards</p>
+    <div class="grid3" style="margin-bottom:24px;">
+      <div class="card">
+        <p style="font-size:11px;color:var(--muted-fg);text-transform:uppercase;letter-spacing:0.06em;font-weight:500;margin-bottom:6px;">Total P&L</p>
+        <p style="font-family:'JetBrains Mono',monospace;font-size:28px;font-weight:700;color:#22c55e;line-height:1.2;">+$4,284.50</p>
+        <p style="font-size:12px;color:var(--subtle);font-family:'JetBrains Mono',monospace;margin-top:4px;">From 142 trades</p>
+      </div>
+      <div class="card" style="border-color:rgba(79,110,247,0.2);background:rgba(79,110,247,0.04);">
+        <p style="font-size:11px;color:var(--muted-fg);text-transform:uppercase;letter-spacing:0.06em;font-weight:500;margin-bottom:6px;">Business Score</p>
+        <p style="font-family:'JetBrains Mono',monospace;font-size:28px;font-weight:700;color:#4f6ef7;line-height:1.2;">74</p>
+        <p style="font-size:12px;color:var(--muted-fg);font-family:'JetBrains Mono',monospace;margin-top:4px;">Solid · +6 this week</p>
+      </div>
+      <div class="card" style="border-color:rgba(239,68,68,0.2);background:rgba(239,68,68,0.04);">
+        <p style="font-size:11px;color:var(--muted-fg);text-transform:uppercase;letter-spacing:0.06em;font-weight:500;margin-bottom:6px;">Drawdown</p>
+        <p style="font-family:'JetBrains Mono',monospace;font-size:28px;font-weight:700;color:#f59e0b;line-height:1.2;">3.2%</p>
+        <p style="font-size:12px;color:var(--subtle);font-family:'JetBrains Mono',monospace;margin-top:4px;">Limit: 5.0%</p>
+      </div>
+    </div>
+
+    <p class="divlabel">Form Inputs</p>
+    <div class="grid2" style="margin-bottom:24px;">
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <label style="font-size:13px;font-weight:500;color:var(--muted-fg);">Account Name <span style="color:#ef4444;">*</span></label>
+        <input class="input" placeholder="e.g. FTMO Challenge #2"/>
+        <p style="font-size:12px;color:var(--subtle);">Give this account a recognisable name</p>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <label style="font-size:13px;font-weight:500;color:var(--muted-fg);">Starting Balance <span style="color:#ef4444;">*</span></label>
+        <div style="position:relative;">
+          <span style="position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--subtle);font-size:14px;">$</span>
+          <input class="input" style="padding-left:28px;font-family:'JetBrains Mono',monospace;" placeholder="10,000.00"/>
+        </div>
+        <p style="font-size:12px;color:var(--subtle);">Enter the account starting balance</p>
+      </div>
+    </div>
+
+    <p class="divlabel">Border Radius Tokens</p>
+    <div class="grid4" style="margin-bottom:24px;">
+      <div class="card" style="align-items:center;gap:8px;text-align:center;"><div style="width:40px;height:40px;background:#4f6ef7;border-radius:4px;"></div><p style="font-size:12px;color:var(--muted-fg);">sm · 4px<br>badges, tight</p></div>
+      <div class="card" style="align-items:center;gap:8px;text-align:center;"><div style="width:40px;height:40px;background:#4f6ef7;border-radius:8px;"></div><p style="font-size:12px;color:var(--muted-fg);">md · 8px<br>buttons, inputs</p></div>
+      <div class="card" style="align-items:center;gap:8px;text-align:center;"><div style="width:40px;height:40px;background:#4f6ef7;border-radius:12px;"></div><p style="font-size:12px;color:var(--muted-fg);">lg · 12px<br>cards, panels</p></div>
+      <div class="card" style="align-items:center;gap:8px;text-align:center;"><div style="width:40px;height:20px;background:#4f6ef7;border-radius:999px;"></div><p style="font-size:12px;color:var(--muted-fg);">full · 999px<br>pills, avatars</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- 07 BRAND VOICE -->
+<section id="voice">
+  <div class="wrap">
+    <p class="sec-num">Section 07</p>
+    <h2 class="sec-title">Brand Voice</h2>
+    <p class="sec-sub">How Kraviq communicates. Direct, precise, empowering, professional, honest.</p>
+
+    <div class="grid3" style="margin-bottom:32px;">
+      <div class="card" style="text-align:center;padding:28px 16px;"><p style="font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700;color:var(--primary);margin-bottom:8px;">DIRECT</p><p style="font-size:13px;color:var(--muted-fg);">No filler words. No hedging. Say what is true.</p></div>
+      <div class="card" style="text-align:center;padding:28px 16px;"><p style="font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700;color:var(--primary);margin-bottom:8px;">PRECISE</p><p style="font-size:13px;color:var(--muted-fg);">Numbers and specifics over vague language.</p></div>
+      <div class="card" style="text-align:center;padding:28px 16px;"><p style="font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700;color:var(--primary);margin-bottom:8px;">EMPOWERING</p><p style="font-size:13px;color:var(--muted-fg);">We give traders the tools professionals use.</p></div>
+      <div class="card" style="text-align:center;padding:28px 16px;"><p style="font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700;color:var(--primary);margin-bottom:8px;">PROFESSIONAL</p><p style="font-size:13px;color:var(--muted-fg);">Serious product for serious traders.</p></div>
+      <div class="card" style="text-align:center;padding:28px 16px;"><p style="font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700;color:var(--primary);margin-bottom:8px;">HONEST</p><p style="font-size:13px;color:var(--muted-fg);">We show traders what is real, not what they want to hear.</p></div>
+    </div>
+
+    <p class="divlabel">Kraviq Sounds Like</p>
+    <div style="margin-bottom:12px;">
+      <div class="voice-yes"><p class="voice-text">"Your Business Score dropped 8 points this week. Discipline declined. Here's why."</p></div>
+      <div class="voice-yes"><p class="voice-text">"3 of your last 5 losses were revenge trades after a drawdown. That's a pattern."</p></div>
+      <div class="voice-yes"><p class="voice-text">"Your FTMO challenge expires in 6 days. Current drawdown: 3.2%. Limit: 5%. You're fine."</p></div>
+      <div class="voice-yes"><p class="voice-text">"You Trade Well. Run It Like a Business."</p></div>
+    </div>
+
+    <p class="divlabel">Kraviq Does NOT Sound Like</p>
+    <div style="margin-bottom:32px;">
+      <div class="voice-no"><p class="voice-text">"Wow, great job on those trades! 🚀 You're crushing it!"</p></div>
+      <div class="voice-no"><p class="voice-text">"Our cutting-edge AI-powered solution leverages advanced machine learning algorithms..."</p></div>
+      <div class="voice-no"><p class="voice-text">"Unlock your full trading potential! Sign up today and start your journey!"</p></div>
+    </div>
+
+    <p class="divlabel">Writing Principles</p>
+    <div class="card">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div style="padding:12px;border-left:2px solid var(--primary);">
+          <p style="font-size:13px;font-weight:600;color:var(--foreground);margin-bottom:4px;">"Lead with data, follow with insight."</p>
+          <p style="font-size:12px;color:var(--muted-fg);">Numbers first. Interpretation second.</p>
+        </div>
+        <div style="padding:12px;border-left:2px solid var(--primary);">
+          <p style="font-size:13px;font-weight:600;color:var(--foreground);margin-bottom:4px;">"Say what is true, not what feels good."</p>
+          <p style="font-size:12px;color:var(--muted-fg);">Honest data is more valuable than comfortable data.</p>
+        </div>
+        <div style="padding:12px;border-left:2px solid var(--primary);">
+          <p style="font-size:13px;font-weight:600;color:var(--foreground);margin-bottom:4px;">"One sentence is better than three."</p>
+          <p style="font-size:12px;color:var(--muted-fg);">Brevity is professionalism.</p>
+        </div>
+        <div style="padding:12px;border-left:2px solid var(--primary);">
+          <p style="font-size:13px;font-weight:600;color:var(--foreground);margin-bottom:4px;">"The user is the expert. We are the tool."</p>
+          <p style="font-size:12px;color:var(--muted-fg);">Never talk down to traders. Surface the data and trust them.</p>
+        </div>
+      </div>
+    </div>
+
+    <p class="divlabel">Tagline Usage</p>
+    <div class="grid2">
+      <div class="card"><p style="font-size:12px;color:var(--muted-fg);font-family:var(--font-mono);margin-bottom:12px;">PRIMARY TAGLINE</p><p style="font-family:'Inter',sans-serif;font-size:18px;font-weight:300;color:var(--muted-fg);">You Trade Well. Run It Like a Business.</p><p style="font-size:12px;color:var(--subtle);margin-top:12px;">Use: hero sections, OG images, brand presentations, email signatures</p></div>
+      <div class="card"><p style="font-size:12px;color:var(--muted-fg);font-family:var(--font-mono);margin-bottom:12px;">SHORT FORM</p><p style="font-family:'Inter',sans-serif;font-size:18px;font-weight:300;color:var(--muted-fg);">The Trading OS</p><p style="font-size:12px;color:var(--subtle);margin-top:12px;">Use: favicon alt text, app descriptions, tight spaces, app store listing</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- 08 USAGE RULES -->
+<section id="rules">
+  <div class="wrap">
+    <p class="sec-num">Section 08</p>
+    <h2 class="sec-title">Usage Rules</h2>
+    <p class="sec-sub">What to do. What never to do. The rules that protect the brand.</p>
+
+    <div class="grid2" style="margin-bottom:32px;">
+      <div class="rule-card rule-do">
+        <p class="rule-title do">✓ Do</p>
+        <div class="rule-item"><span style="color:#22c55e;">✓</span>Use the mark on dark backgrounds (#0A0A0F, #111118) as primary usage</div>
+        <div class="rule-item"><span style="color:#22c55e;">✓</span>Keep minimum clear space of 1× mark height on all sides</div>
+        <div class="rule-item"><span style="color:#22c55e;">✓</span>Use Ghost White (#F8F8FF) — never pure #FFFFFF</div>
+        <div class="rule-item"><span style="color:#22c55e;">✓</span>Keep the q accent always #4F6EF7</div>
+        <div class="rule-item"><span style="color:#22c55e;">✓</span>Use monospace font for all financial numbers</div>
+        <div class="rule-item"><span style="color:#22c55e;">✓</span>Maintain profit/loss color meanings always</div>
+        <div class="rule-item"><span style="color:#22c55e;">✓</span>Use the full logo (mark + wordmark) as the primary identifier</div>
+        <div class="rule-item"><span style="color:#22c55e;">✓</span>Scale mark proportionally — always maintain aspect ratio</div>
+      </div>
+      <div class="rule-card rule-dont">
+        <p class="rule-title dont">✗ Never Do</p>
+        <div class="rule-item"><span style="color:#ef4444;">✗</span>Change the q accent to any other color</div>
+        <div class="rule-item"><span style="color:#ef4444;">✗</span>Stretch, rotate, or distort the mark in any way</div>
+        <div class="rule-item"><span style="color:#ef4444;">✗</span>Use pure white (#FFFFFF) instead of Ghost White (#F8F8FF)</div>
+        <div class="rule-item"><span style="color:#ef4444;">✗</span>Place the logo on busy or photographic backgrounds</div>
+        <div class="rule-item"><span style="color:#ef4444;">✗</span>Add drop shadows, glows, or raster effects to the logo</div>
+        <div class="rule-item"><span style="color:#ef4444;">✗</span>Use profit green (#22C55E) for anything except profit/success</div>
+        <div class="rule-item"><span style="color:#ef4444;">✗</span>Use loss red (#EF4444) for anything except loss/danger/error</div>
+        <div class="rule-item"><span style="color:#ef4444;">✗</span>Use the logo below minimum sizes (24px mark, 120px full)</div>
+      </div>
+    </div>
+
+    <p class="divlabel">Background Usage</p>
+    <div class="grid3">
+      <div class="card-dark" style="flex-direction:column;gap:10px;padding:20px;">
+        <svg viewBox="0 0 190.7 189.78" style="width:36px;height:36px;" xmlns="http://www.w3.org/2000/svg"><path fill="#4f6ef7" d="M115.62,176.71A95.2,95.2,0,0,1,82,183.19c-24,.06-44.5-7.87-60-26.62C9.63,141.63,4.83,124.09,5.62,104.89,7.43,60.33,42.79,18.8,88,8c22.84-5.44,45-3.53,65.09,9.61s30.45,32.15,32.19,55.85c1.94,26.29-7.06,49.07-23.15,69.41-.51.64-1.11,1.2-1.89,2q-9.5-9.9-18.64-19.47c3-4.93,6.23-9.6,8.9-14.56A72.24,72.24,0,0,0,159.26,75c-.46-30.21-23.58-53.7-53.71-55.13C65.6,18,28.2,48.37,21.53,88.36c-4.28,25.69,7.19,50.21,29.14,61.41C65.5,157.33,81.13,158,97,153.9c2.37-.61,3.46-.1,4.69,1.81C106.2,162.66,110.83,169.5,115.62,176.71Z"/><path fill="#4f6ef7" d="M123,32.86a48.09,48.09,0,0,1,17.55,14.31C126.42,63,112.32,78.81,98.07,94.77L182.78,183c-1.59.09-2.48.19-3.36.19-14.41,0-28.83,0-43.24.05a4.61,4.61,0,0,1-4.33-2.26Q103.07,139.2,74.14,97.49c-1.39-2-1.46-3.23.18-5.22,15.74-19.08,31.33-38.28,47-57.44C121.81,34.19,122.38,33.6,123,32.86Z"/><path fill="#4f6ef7" d="M68.69,143.87A48.13,48.13,0,0,1,48.44,133a4.4,4.4,0,0,1-1.24-3.09C48,114.58,48.9,99.27,49.75,84c.62-11.14,1.14-22.29,1.84-33.42a6.33,6.33,0,0,1,1.63-3.81A66.71,66.71,0,0,1,73,33.35c.4-.17.83-.27,1.7-.55C72.66,69.94,70.68,106.76,68.69,143.87Z"/></svg>
+        <span class="badge badge-profit" style="font-size:10px;">✓ Primary</span>
+        <p class="label" style="color:#5a5a6a;">#0A0A0F</p>
+      </div>
+      <div class="card-dark" style="flex-direction:column;gap:10px;padding:20px;background:#111118;">
+        <svg viewBox="0 0 190.7 189.78" style="width:36px;height:36px;" xmlns="http://www.w3.org/2000/svg"><path fill="#4f6ef7" d="M115.62,176.71A95.2,95.2,0,0,1,82,183.19c-24,.06-44.5-7.87-60-26.62C9.63,141.63,4.83,124.09,5.62,104.89,7.43,60.33,42.79,18.8,88,8c22.84-5.44,45-3.53,65.09,9.61s30.45,32.15,32.19,55.85c1.94,26.29-7.06,49.07-23.15,69.41-.51.64-1.11,1.2-1.89,2q-9.5-9.9-18.64-19.47c3-4.93,6.23-9.6,8.9-14.56A72.24,72.24,0,0,0,159.26,75c-.46-30.21-23.58-53.7-53.71-55.13C65.6,18,28.2,48.37,21.53,88.36c-4.28,25.69,7.19,50.21,29.14,61.41C65.5,157.33,81.13,158,97,153.9c2.37-.61,3.46-.1,4.69,1.81C106.2,162.66,110.83,169.5,115.62,176.71Z"/><path fill="#4f6ef7" d="M123,32.86a48.09,48.09,0,0,1,17.55,14.31C126.42,63,112.32,78.81,98.07,94.77L182.78,183c-1.59.09-2.48.19-3.36.19-14.41,0-28.83,0-43.24.05a4.61,4.61,0,0,1-4.33-2.26Q103.07,139.2,74.14,97.49c-1.39-2-1.46-3.23.18-5.22,15.74-19.08,31.33-38.28,47-57.44C121.81,34.19,122.38,33.6,123,32.86Z"/><path fill="#4f6ef7" d="M68.69,143.87A48.13,48.13,0,0,1,48.44,133a4.4,4.4,0,0,1-1.24-3.09C48,114.58,48.9,99.27,49.75,84c.62-11.14,1.14-22.29,1.84-33.42a6.33,6.33,0,0,1,1.63-3.81A66.71,66.71,0,0,1,73,33.35c.4-.17.83-.27,1.7-.55C72.66,69.94,70.68,106.76,68.69,143.87Z"/></svg>
+        <span class="badge badge-profit" style="font-size:10px;">✓ Acceptable</span>
+        <p class="label" style="color:#5a5a6a;">#111118</p>
+      </div>
+      <div class="card-light" style="flex-direction:column;gap:10px;padding:20px;">
+        <svg viewBox="0 0 190.7 189.78" style="width:36px;height:36px;" xmlns="http://www.w3.org/2000/svg"><path fill="#4f6ef7" d="M115.62,176.71A95.2,95.2,0,0,1,82,183.19c-24,.06-44.5-7.87-60-26.62C9.63,141.63,4.83,124.09,5.62,104.89,7.43,60.33,42.79,18.8,88,8c22.84-5.44,45-3.53,65.09,9.61s30.45,32.15,32.19,55.85c1.94,26.29-7.06,49.07-23.15,69.41-.51.64-1.11,1.2-1.89,2q-9.5-9.9-18.64-19.47c3-4.93,6.23-9.6,8.9-14.56A72.24,72.24,0,0,0,159.26,75c-.46-30.21-23.58-53.7-53.71-55.13C65.6,18,28.2,48.37,21.53,88.36c-4.28,25.69,7.19,50.21,29.14,61.41C65.5,157.33,81.13,158,97,153.9c2.37-.61,3.46-.1,4.69,1.81C106.2,162.66,110.83,169.5,115.62,176.71Z"/><path fill="#4f6ef7" d="M123,32.86a48.09,48.09,0,0,1,17.55,14.31C126.42,63,112.32,78.81,98.07,94.77L182.78,183c-1.59.09-2.48.19-3.36.19-14.41,0-28.83,0-43.24.05a4.61,4.61,0,0,1-4.33-2.26Q103.07,139.2,74.14,97.49c-1.39-2-1.46-3.23.18-5.22,15.74-19.08,31.33-38.28,47-57.44C121.81,34.19,122.38,33.6,123,32.86Z"/><path fill="#4f6ef7" d="M68.69,143.87A48.13,48.13,0,0,1,48.44,133a4.4,4.4,0,0,1-1.24-3.09C48,114.58,48.9,99.27,49.75,84c.62-11.14,1.14-22.29,1.84-33.42a6.33,6.33,0,0,1,1.63-3.81A66.71,66.71,0,0,1,73,33.35c.4-.17.83-.27,1.7-.55C72.66,69.94,70.68,106.76,68.69,143.87Z"/></svg>
+        <span class="badge badge-profit" style="font-size:10px;">✓ Reversed</span>
+        <p class="label" style="color:#5a5a6a;">Light bg</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 09 FILE FORMATS -->
+<section id="formats">
+  <div class="wrap">
+    <p class="sec-num">Section 09</p>
+    <h2 class="sec-title">File Formats</h2>
+    <p class="sec-sub">When to use each format and how to export correctly from Illustrator.</p>
+
+    <table style="margin-bottom:32px;">
+      <thead><tr><th>Format</th><th>Use Case</th><th>When to Use</th></tr></thead>
+      <tbody>
+        <tr><td>SVG</td><td style="color:var(--foreground);">Primary digital format</td><td style="color:var(--muted-fg);">Web, app, email, Figma. Use everywhere possible. Scales infinitely.</td></tr>
+        <tr><td>PNG @1x</td><td style="color:var(--foreground);">General digital use</td><td style="color:var(--muted-fg);">Documents, presentations, Slack, when SVG not supported</td></tr>
+        <tr><td>PNG @2x</td><td style="color:var(--foreground);">Retina displays</td><td style="color:var(--muted-fg);">App icons, high-DPI screens. Always provide alongside @1x</td></tr>
+        <tr><td>PNG @3x</td><td style="color:var(--foreground);">High resolution</td><td style="color:var(--muted-fg);">App Store assets, very large display, marketing materials</td></tr>
+        <tr><td>WebP</td><td style="color:var(--foreground);">Website performance</td><td style="color:var(--muted-fg);">Replace PNG on web. 25-35% smaller. Generate via squoosh.app</td></tr>
+        <tr><td>PDF</td><td style="color:var(--foreground);">Print + sharing</td><td style="color:var(--muted-fg);">Print materials, sharing with printers, editable format</td></tr>
+        <tr><td>AI</td><td style="color:var(--foreground);">Master source</td><td style="color:var(--muted-fg);">Never delete. Never share publicly. Illustrator edits only.</td></tr>
+        <tr><td>ICO</td><td style="color:var(--foreground);">Browser favicon only</td><td style="color:var(--muted-fg);">Must include 16, 32, 48px. Generate at realfavicongenerator.net</td></tr>
+      </tbody>
+    </table>
+
+    <p class="divlabel">Export Checklist</p>
+    <div class="card">
+      <p style="font-size:12px;color:var(--muted-fg);font-family:var(--font-mono);margin-bottom:16px;">BEFORE EXPORTING ANY LOGO FILE</p>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+        <div style="display:flex;gap:8px;font-size:13px;color:var(--muted-fg);align-items:flex-start;"><span style="color:#22c55e;flex-shrink:0;">□</span>All text converted to outlines</div>
+        <div style="display:flex;gap:8px;font-size:13px;color:var(--muted-fg);align-items:flex-start;"><span style="color:#22c55e;flex-shrink:0;">□</span>All strokes expanded</div>
+        <div style="display:flex;gap:8px;font-size:13px;color:var(--muted-fg);align-items:flex-start;"><span style="color:#22c55e;flex-shrink:0;">□</span>No raster effects applied</div>
+        <div style="display:flex;gap:8px;font-size:13px;color:var(--muted-fg);align-items:flex-start;"><span style="color:#22c55e;flex-shrink:0;">□</span>No linked images (all embedded)</div>
+        <div style="display:flex;gap:8px;font-size:13px;color:var(--muted-fg);align-items:flex-start;"><span style="color:#22c55e;flex-shrink:0;">□</span>Correct artboard size</div>
+        <div style="display:flex;gap:8px;font-size:13px;color:var(--muted-fg);align-items:flex-start;"><span style="color:#22c55e;flex-shrink:0;">□</span>Tested at minimum sizes (16px)</div>
+        <div style="display:flex;gap:8px;font-size:13px;color:var(--muted-fg);align-items:flex-start;"><span style="color:#22c55e;flex-shrink:0;">□</span>Tested in monochrome — still reads</div>
+        <div style="display:flex;gap:8px;font-size:13px;color:var(--muted-fg);align-items:flex-start;"><span style="color:#22c55e;flex-shrink:0;">□</span>.ai master saved before export</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 10 DEVELOPER TOKENS -->
+<section id="tokens">
+  <div class="wrap">
+    <p class="sec-num">Section 10</p>
+    <h2 class="sec-title">Developer Tokens</h2>
+    <p class="sec-sub">CSS custom properties and Tailwind config — copy directly into your project.</p>
+
+    <p class="divlabel">CSS Custom Properties</p>
+    <pre class="code"><span class="cmt">/* ── index.css — Kraviq Design Tokens ───────────── */</span>
+<span class="val">:root {</span>
+  <span class="cmt">/* ── Brand ──────────────────────────────────────── */</span>
+  <span class="prop">--primary</span>:          <span class="str">79 110 247</span>;    <span class="cmt">/* #4F6EF7 */</span>
+  <span class="prop">--primary-50</span>:       <span class="str">238 241 254</span>;   <span class="cmt">/* #EEF1FE */</span>
+  <span class="prop">--primary-100</span>:      <span class="str">197 206 255</span>;   <span class="cmt">/* #C5CEFF */</span>
+  <span class="prop">--primary-200</span>:      <span class="str">153 170 255</span>;   <span class="cmt">/* #99AAFF */</span>
+  <span class="prop">--primary-300</span>:      <span class="str">107 134 255</span>;   <span class="cmt">/* #6B86FF */</span>
+  <span class="prop">--primary-400</span>:      <span class="str">79 110 247</span>;    <span class="cmt">/* #4F6EF7 ★ BASE */</span>
+  <span class="prop">--primary-600</span>:      <span class="str">54 84 212</span>;     <span class="cmt">/* #3654D4 */</span>
+  <span class="prop">--primary-800</span>:      <span class="str">30 59 173</span>;     <span class="cmt">/* #1E3BAD */</span>
+
+  <span class="cmt">/* ── Backgrounds ─────────────────────────────────── */</span>
+  <span class="prop">--background</span>:       <span class="str">10 10 15</span>;      <span class="cmt">/* #0A0A0F */</span>
+  <span class="prop">--card</span>:             <span class="str">17 17 24</span>;      <span class="cmt">/* #111118 */</span>
+  <span class="prop">--muted</span>:            <span class="str">30 30 46</span>;      <span class="cmt">/* #1E1E2E */</span>
+  <span class="prop">--border</span>:           <span class="str">42 42 62</span>;      <span class="cmt">/* #2A2A3E */</span>
+
+  <span class="cmt">/* ── Text ────────────────────────────────────────── */</span>
+  <span class="prop">--foreground</span>:       <span class="str">248 248 255</span>;   <span class="cmt">/* #F8F8FF — Ghost White */</span>
+  <span class="prop">--muted-foreground</span>: <span class="str">152 152 168</span>;   <span class="cmt">/* #9898A8 */</span>
+  <span class="prop">--subtle</span>:           <span class="str">90 90 106</span>;     <span class="cmt">/* #5A5A6A */</span>
+
+  <span class="cmt">/* ── Trading Status ─── NEVER CHANGE THESE ──────── */</span>
+  <span class="prop">--profit</span>:           <span class="str">34 197 94</span>;     <span class="cmt">/* #22C55E */</span>
+  <span class="prop">--loss</span>:             <span class="str">239 68 68</span>;     <span class="cmt">/* #EF4444 */</span>
+  <span class="prop">--warning</span>:          <span class="str">245 158 11</span>;    <span class="cmt">/* #F59E0B */</span>
+  <span class="prop">--breakeven</span>:        <span class="str">107 114 128</span>;   <span class="cmt">/* #6B7280 */</span>
+
+  <span class="cmt">/* ── Typography ──────────────────────────────────── */</span>
+  <span class="prop">--font-display</span>:     <span class="str">'Space Grotesk', sans-serif</span>;
+  <span class="prop">--font-body</span>:        <span class="str">'Inter', sans-serif</span>;
+  <span class="prop">--font-mono</span>:        <span class="str">'JetBrains Mono', monospace</span>;
+
+  <span class="cmt">/* ── Border Radius ───────────────────────────────── */</span>
+  <span class="prop">--radius-sm</span>:        <span class="str">4px</span>;
+  <span class="prop">--radius-md</span>:        <span class="str">8px</span>;
+  <span class="prop">--radius-lg</span>:        <span class="str">12px</span>;
+  <span class="prop">--radius-xl</span>:        <span class="str">16px</span>;
+  <span class="prop">--radius-2xl</span>:       <span class="str">24px</span>;
+  <span class="prop">--radius-full</span>:      <span class="str">999px</span>;
+
+  <span class="cmt">/* ── Spacing (8pt grid) ──────────────────────────── */</span>
+  <span class="prop">--space-1</span>:  <span class="str">4px</span>;   <span class="prop">--space-2</span>:  <span class="str">8px</span>;
+  <span class="prop">--space-3</span>:  <span class="str">12px</span>;  <span class="prop">--space-4</span>:  <span class="str">16px</span>;
+  <span class="prop">--space-5</span>:  <span class="str">20px</span>;  <span class="prop">--space-6</span>:  <span class="str">24px</span>;
+  <span class="prop">--space-8</span>:  <span class="str">32px</span>;  <span class="prop">--space-10</span>: <span class="str">40px</span>;
+  <span class="prop">--space-12</span>: <span class="str">48px</span>;  <span class="prop">--space-16</span>: <span class="str">64px</span>;
+  <span class="prop">--space-20</span>: <span class="str">80px</span>;  <span class="prop">--space-24</span>: <span class="str">96px</span>;
+<span class="val">}</span></pre>
+
+    <p class="divlabel">Tailwind Config</p>
+    <pre class="code"><span class="cmt">// tailwind.config.js</span>
+<span class="val">module.exports</span> = {
+  theme: {
+    extend: {
+      colors: {
+        <span class="prop">primary</span>:    <span class="str">'hsl(var(--primary) / &lt;alpha-value&gt;)'</span>,
+        <span class="prop">background</span>: <span class="str">'hsl(var(--background) / &lt;alpha-value&gt;)'</span>,
+        <span class="prop">card</span>:       <span class="str">'hsl(var(--card) / &lt;alpha-value&gt;)'</span>,
+        <span class="prop">border</span>:     <span class="str">'hsl(var(--border) / &lt;alpha-value&gt;)'</span>,
+        <span class="prop">foreground</span>: <span class="str">'hsl(var(--foreground) / &lt;alpha-value&gt;)'</span>,
+        <span class="prop">muted</span>:      <span class="str">'hsl(var(--muted) / &lt;alpha-value&gt;)'</span>,
+        <span class="prop">profit</span>:     <span class="str">'hsl(var(--profit) / &lt;alpha-value&gt;)'</span>,
+        <span class="prop">loss</span>:       <span class="str">'hsl(var(--loss) / &lt;alpha-value&gt;)'</span>,
+        <span class="prop">warning</span>:    <span class="str">'hsl(var(--warning) / &lt;alpha-value&gt;)'</span>,
+        <span class="prop">breakeven</span>:  <span class="str">'hsl(var(--breakeven) / &lt;alpha-value&gt;)'</span>,
+      },
+      fontFamily: {
+        <span class="prop">heading</span>: <span class="str">'var(--font-display)'</span>,
+        <span class="prop">sans</span>:    <span class="str">'var(--font-body)'</span>,
+        <span class="prop">mono</span>:    <span class="str">'var(--font-mono)'</span>,
+      },
+      borderRadius: {
+        <span class="prop">sm</span>:    <span class="str">'var(--radius-sm)'</span>,
+        <span class="prop">md</span>:    <span class="str">'var(--radius-md)'</span>,
+        <span class="prop">lg</span>:    <span class="str">'var(--radius-lg)'</span>,
+        <span class="prop">xl</span>:    <span class="str">'var(--radius-xl)'</span>,
+        <span class="prop">'2xl'</span>: <span class="str">'var(--radius-2xl)'</span>,
+      },
+    },
+  },
+}</pre>
+
+    <p class="divlabel">Usage Examples</p>
+    <pre class="code"><span class="cmt">// ✓ Correct — always use CSS variables</span>
+&lt;p <span class="prop">className</span>=<span class="str">"text-[hsl(var(--foreground))]"</span>&gt;Primary text&lt;/p&gt;
+&lt;p <span class="prop">className</span>=<span class="str">"text-[hsl(var(--muted-foreground))]"</span>&gt;Secondary text&lt;/p&gt;
+&lt;span <span class="prop">className</span>=<span class="str">"text-[hsl(var(--profit))]"</span>&gt;+$4,284&lt;/span&gt;
+&lt;span <span class="prop">className</span>=<span class="str">"text-[hsl(var(--loss))]"</span>&gt;-$142&lt;/span&gt;
+
+<span class="cmt">// ✓ Financial numbers — always monospace</span>
+&lt;span <span class="prop">className</span>=<span class="str">"font-mono"</span>&gt;+$4,284.50&lt;/span&gt;
+&lt;span <span class="prop">className</span>=<span class="str">"font-mono"</span>&gt;Win rate: 67.3%&lt;/span&gt;
+
+<span class="cmt">// ✗ Never hardcode colors</span>
+&lt;span <span class="prop">style</span>=<span class="str">{{ color: '#22C55E' }}</span>&gt; <span class="cmt">← wrong</span>
+&lt;p <span class="prop">className</span>=<span class="str">"text-green-500"</span>&gt; <span class="cmt">← wrong</span>
+&lt;p <span class="prop">style</span>=<span class="str">{{ color: '#FFFFFF' }}</span>&gt; <span class="cmt">← wrong, use #F8F8FF</span></pre>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<div class="doc-footer">
+  <svg viewBox="0 0 190.7 189.78" style="width:40px;height:40px;opacity:0.5;" xmlns="http://www.w3.org/2000/svg"><path fill="#4f6ef7" d="M115.62,176.71A95.2,95.2,0,0,1,82,183.19c-24,.06-44.5-7.87-60-26.62C9.63,141.63,4.83,124.09,5.62,104.89,7.43,60.33,42.79,18.8,88,8c22.84-5.44,45-3.53,65.09,9.61s30.45,32.15,32.19,55.85c1.94,26.29-7.06,49.07-23.15,69.41-.51.64-1.11,1.2-1.89,2q-9.5-9.9-18.64-19.47c3-4.93,6.23-9.6,8.9-14.56A72.24,72.24,0,0,0,159.26,75c-.46-30.21-23.58-53.7-53.71-55.13C65.6,18,28.2,48.37,21.53,88.36c-4.28,25.69,7.19,50.21,29.14,61.41C65.5,157.33,81.13,158,97,153.9c2.37-.61,3.46-.1,4.69,1.81C106.2,162.66,110.83,169.5,115.62,176.71Z"/><path fill="#4f6ef7" d="M123,32.86a48.09,48.09,0,0,1,17.55,14.31C126.42,63,112.32,78.81,98.07,94.77L182.78,183c-1.59.09-2.48.19-3.36.19-14.41,0-28.83,0-43.24.05a4.61,4.61,0,0,1-4.33-2.26Q103.07,139.2,74.14,97.49c-1.39-2-1.46-3.23.18-5.22,15.74-19.08,31.33-38.28,47-57.44C121.81,34.19,122.38,33.6,123,32.86Z"/><path fill="#4f6ef7" d="M68.69,143.87A48.13,48.13,0,0,1,48.44,133a4.4,4.4,0,0,1-1.24-3.09C48,114.58,48.9,99.27,49.75,84c.62-11.14,1.14-22.29,1.84-33.42a6.33,6.33,0,0,1,1.63-3.81A66.71,66.71,0,0,1,73,33.35c.4-.17.83-.27,1.7-.55C72.66,69.94,70.68,106.76,68.69,143.87Z"/></svg>
+  <p class="doc-footer-meta">Kraviq Brand Guidelines v1.0 · June 2026</p>
+  <p class="doc-footer-meta">kraviq.app · Confidential — Internal Use</p>
+</div>
+
+</div>
+
+<script>
+// Active nav highlighting
+const sections = document.querySelectorAll('section[id], div[id="cover"]');
+const navItems = document.querySelectorAll('.nav-item');
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      navItems.forEach(item => item.classList.remove('active'));
+      const active = document.querySelector(`.nav-item[href="#${entry.target.id}"]`);
+      if (active) active.classList.add('active');
+    }
+  });
+}, { threshold: 0.3 });
+sections.forEach(s => observer.observe(s));
+</script>
+</body>
+</html>

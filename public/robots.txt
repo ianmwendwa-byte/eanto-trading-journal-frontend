@@ -11,5 +11,11 @@ Disallow: /settings
 Disallow: /ea
 Disallow: /notifications
 Disallow: /onboarding
+Disallow: /analytics
+Disallow: /strategies
+Disallow: /insights
+Disallow: /score
+Disallow: /import
+Disallow: /ai
 
 Sitemap: https://kraviq.app/sitemap.xml

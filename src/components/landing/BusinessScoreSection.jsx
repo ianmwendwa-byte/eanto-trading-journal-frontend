@@ -1,5 +1,6 @@
 import { motion, useInView } from "framer-motion";
 import { useRef, useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 
 // ── Animated SVG score dial ───────────────────────────────────────────────────
 
@@ -164,7 +165,11 @@ export const BusinessScoreSection = () => {
             </h2>
 
             <p className="text-muted-foreground leading-relaxed mb-8 max-w-md">
-              The Trading Business Score is a 0–100 composite metric that
+              The{" "}
+              <Link to="/business-score" className="text-primary hover:underline">
+                Trading Business Score
+              </Link>{" "}
+              is a 0–100 composite metric that
               measures five pillars of your trading health. Updated weekly, it
               tells you not just if you're profitable — but if you're running a
               sustainable trading business.

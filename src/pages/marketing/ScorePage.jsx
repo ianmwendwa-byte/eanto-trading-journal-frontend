@@ -1,16 +1,72 @@
 import { useRef, useEffect, useState } from "react";
 import { motion, useInView } from "framer-motion";
 import { Link } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
 import { Star, TrendingUp, Shield, BarChart3, Target, Repeat, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PageLayout } from "@/components/landing/PageLayout";
+import { reveal } from "@/lib/animations";
+import {
+  buildFaqSchema,
+  buildBreadcrumbSchema,
+  buildWebPageSchema,
+} from "@/lib/featurePageSchemas";
+import {
+  FeatureBreadcrumb,
+  FeatureFAQ,
+  RelatedFeatures,
+} from "@/components/landing/FeaturePageShared";
 
-const reveal = (delay = 0) => ({
-  initial: { opacity: 0, y: 24 },
-  whileInView: { opacity: 1, y: 0 },
-  viewport: { once: true },
-  transition: { duration: 0.5, ease: "easeOut", delay },
-});
+const PAGE_TITLE = "Trading Business Score: 5-Pillar Performance Scoring | Kraviq";
+const PAGE_DESCRIPTION =
+  "The Trading Business Score rates your consistency, risk management, profitability, discipline, and growth on a 0-100 scale, recalculated weekly from your actual trade history.";
+const PAGE_URL = "https://kraviq.app/business-score";
+
+const FAQS = [
+  {
+    question: "How many trades do I need before I get a score?",
+    answer:
+      "At least 10 closed trades. Below that, Kraviq shows a clear not-enough-data state rather than a misleading score built on too little history.",
+  },
+  {
+    question: "Are War Account trades included in my score?",
+    answer:
+      "No. War Account trades are excluded from your Business Score and from every aggregate metric, since they're meant for testing strategies, not for measuring your real performance.",
+  },
+  {
+    question: "How often does the score update?",
+    answer:
+      "It recalculates daily, with a weekly snapshot saved every Friday. That snapshot is what you see reflected in your score history and week-over-week trend.",
+  },
+  {
+    question: "Can a profitable month still produce a low score?",
+    answer:
+      "Yes. Profitability is one of five pillars, alongside consistency, risk management, discipline, and growth. A profitable stretch built on oversized positions or erratic session attendance scores lower than the P&L alone would suggest, because the other four pillars are dragging it down.",
+  },
+];
+
+const RELATED_FEATURES = [
+  {
+    title: "Strategy & Playbook",
+    description: "Rule adherence from your linked strategies feeds the discipline pillar.",
+    href: "/features/strategy",
+  },
+  {
+    title: "Trade Tracking",
+    description: "Every closed trade is the raw data the five pillars are calculated from.",
+    href: "/features/trade-tracking",
+  },
+  {
+    title: "Prop Firm Compliance",
+    description: "See how drawdown discipline on a challenge account ties into risk management.",
+    href: "/features/prop-firm-compliance",
+  },
+];
+
+const breadcrumbItems = [
+  { label: "Home", href: "/" },
+  { label: "Business Score" },
+];
 
 // ── Animated score dial ───────────────────────────────────────────────────────
 
@@ -110,7 +166,7 @@ const PILLARS = [
   {
     icon: Target,
     title: "Discipline",
-    description: "Are you following your rules? Discipline detects revenge trading, over-trading after losses, and session violations — the behavioural leaks that erode accounts.",
+    description: "Are you following your rules? Discipline detects revenge trading, over-trading after losses, and session violations: the behavioural leaks that erode accounts.",
     score: 68,
     color: "bg-warning",
     example: "A cluster of trades within 10 minutes of a loss event is flagged as potential revenge trading.",
@@ -133,8 +189,29 @@ const BANDS = [
   { range: "81–100", label: "Elite",        cls: "text-warning", bg: "bg-warning/10 border-warning/20" },
 ];
 
-export const ScorePage = () => (
+export const ScorePage = () => {
+  const faqSchema = buildFaqSchema(FAQS);
+  const breadcrumbSchema = buildBreadcrumbSchema(breadcrumbItems);
+  const webPageSchema = buildWebPageSchema({
+    name: PAGE_TITLE,
+    description: PAGE_DESCRIPTION,
+    url: PAGE_URL,
+  });
+
+  return (
   <PageLayout title="Business Score">
+    <Helmet>
+      <title>{PAGE_TITLE}</title>
+      <meta name="description" content={PAGE_DESCRIPTION} />
+      <link rel="canonical" href={PAGE_URL} />
+      <meta property="og:title" content={PAGE_TITLE} />
+      <meta property="og:description" content={PAGE_DESCRIPTION} />
+      <meta property="og:url" content={PAGE_URL} />
+      <meta name="robots" content="index, follow" />
+      <script type="application/ld+json">{webPageSchema}</script>
+      <script type="application/ld+json">{breadcrumbSchema}</script>
+      <script type="application/ld+json">{faqSchema}</script>
+    </Helmet>
 
     {/* ── Hero ──────────────────────────────────────────────────────────── */}
     <section className="relative pt-32 pb-20 overflow-hidden">
@@ -147,6 +224,7 @@ export const ScorePage = () => (
         aria-hidden="true"
       />
       <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <FeatureBreadcrumb items={breadcrumbItems} />
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
@@ -175,7 +253,7 @@ export const ScorePage = () => (
           className="text-lg text-muted-foreground max-w-2xl mx-auto mb-10 leading-relaxed"
         >
           The Trading Business Score is a 0–100 composite metric unique to
-          Kraviq. It tells you not just if you're profitable — but whether
+          Kraviq. It tells you not just if you're profitable, but whether
           you're running a sustainable trading business.
         </motion.p>
         <motion.div
@@ -379,6 +457,9 @@ export const ScorePage = () => (
       </div>
     </section>
 
+    <FeatureFAQ faqs={FAQS} />
+    <RelatedFeatures items={RELATED_FEATURES} />
+
     {/* ── CTA ───────────────────────────────────────────────────────────── */}
     <section className="py-20 border-t border-border">
       <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
@@ -402,4 +483,5 @@ export const ScorePage = () => (
     </section>
 
   </PageLayout>
-);
+  );
+};

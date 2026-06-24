@@ -214,7 +214,7 @@ export const BlogPostPage = () => {
   return (
     <PageLayout title={frontmatter.title}>
       <Helmet>
-        <title>{frontmatter.title} — Kraviq Blog</title>
+        <title>{`${frontmatter.title} — Kraviq Blog`}</title>
         <meta
           name="description"
           content={

@@ -62,7 +62,12 @@ export const ProblemStrip = () => {
           Sound familiar?
         </motion.p>
 
-        {/* Pain point display */}
+        {/* Pain point display — AnimatePresence mode="wait" only keeps the
+            active item mounted, so the other 4 problem statements never
+            reach the static/prerendered HTML. The sr-only list below holds
+            the complete, real content for crawlers and screen readers; the
+            animated rotation is purely a decorative presentation layer for
+            sighted users on top of it. */}
         <div className="relative min-h-[120px] flex items-center justify-center mb-10">
           {/* Decorative quote mark */}
           <span
@@ -72,9 +77,16 @@ export const ProblemStrip = () => {
             "
           </span>
 
+          <ul className="sr-only">
+            {PROBLEMS.map((problem) => (
+              <li key={problem}>{problem}</li>
+            ))}
+          </ul>
+
           <AnimatePresence mode="wait">
             <motion.blockquote
               key={active}
+              aria-hidden="true"
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -16 }}

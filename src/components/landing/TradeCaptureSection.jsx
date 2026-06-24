@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
 import { PenLine, FileUp, Wifi } from "lucide-react";
 
 // ── Step mockups ──────────────────────────────────────────────────────────────
@@ -170,7 +171,11 @@ export const TradeCaptureSection = () => {
             className="text-muted-foreground text-lg max-w-lg mx-auto"
           >
             Three ways to get your trades into Kraviq — choose one or use
-            all three.
+            all three. See the full breakdown on the{" "}
+            <Link to="/features/trade-tracking" className="text-primary hover:underline">
+              trade tracking page
+            </Link>
+            .
           </motion.p>
         </div>
 

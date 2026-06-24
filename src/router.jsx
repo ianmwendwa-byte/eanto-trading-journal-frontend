@@ -28,6 +28,14 @@ import { WarPage }      from "@/pages/marketing/WarPage";
 import { EASyncPage }   from "@/pages/marketing/EASyncPage";
 import { ScorePage }    from "@/pages/marketing/ScorePage";
 
+// New deep feature pages
+import { TradeTrackingPage }       from "@/pages/features/TradeTrackingPage";
+import { FinancialLedgerPage }     from "@/pages/features/FinancialLedgerPage";
+import { PropFirmCompliancePage }  from "@/pages/features/PropFirmCompliancePage";
+import { RiskCalculatorsPage }     from "@/pages/features/RiskCalculatorsPage";
+import { BacktestingPage }         from "@/pages/features/BacktestingPage";
+import { StrategyPage }            from "@/pages/features/StrategyPage";
+
 
 // Auth pages
 import { Login }            from "@/pages/auth/Login";
@@ -142,6 +150,14 @@ export const router = createBrowserRouter([
       { path: "/war-account",    element: <WarPage /> },
       { path: "/ea-sync",        element: <EASyncPage /> },
       { path: "/business-score", element: <ScorePage /> },
+
+      // New deep feature pages
+      { path: "/features/trade-tracking",       element: <TradeTrackingPage /> },
+      { path: "/features/financial-ledger",     element: <FinancialLedgerPage /> },
+      { path: "/features/prop-firm-compliance", element: <PropFirmCompliancePage /> },
+      { path: "/features/risk-calculators",     element: <RiskCalculatorsPage /> },
+      { path: "/features/backtesting",          element: <BacktestingPage /> },
+      { path: "/features/strategy",             element: <StrategyPage /> },
 
       // Legal
       { path: "/privacy", element: <PrivacyPolicy /> },
