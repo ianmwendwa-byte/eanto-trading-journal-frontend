@@ -89,7 +89,7 @@ export const ProblemStrip = () => {
             <motion.blockquote
               key={active}
               aria-hidden="true"
-              initial={{ opacity: 0, y: 16 }}
+              initial={isMounted ? { opacity: 0, y: 16 } : false}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -16 }}
               transition={{ duration: 0.4, ease: "easeOut" }}

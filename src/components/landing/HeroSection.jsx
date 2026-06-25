@@ -13,10 +13,10 @@ import { useIsMounted } from "@/hooks/useIsMounted";
 
 // ── Mini screen mockups ───────────────────────────────────────────────────────
 
-const DashboardScreen = () => (
+const DashboardScreen = ({ isMounted }) => (
   <motion.div
     key="dashboard"
-    initial={{ opacity: 0 }}
+    initial={isMounted ? { opacity: 0 } : false}
     animate={{ opacity: 1 }}
     exit={{ opacity: 0 }}
     transition={{ duration: 0.35 }}
@@ -107,10 +107,10 @@ const DashboardScreen = () => (
   </motion.div>
 );
 
-const AccountsScreen = () => (
+const AccountsScreen = ({ isMounted }) => (
   <motion.div
     key="accounts"
-    initial={{ opacity: 0 }}
+    initial={isMounted ? { opacity: 0 } : false}
     animate={{ opacity: 1 }}
     exit={{ opacity: 0 }}
     transition={{ duration: 0.35 }}
@@ -193,10 +193,10 @@ const AccountsScreen = () => (
   </motion.div>
 );
 
-const TradesScreen = () => (
+const TradesScreen = ({ isMounted }) => (
   <motion.div
     key="trades"
-    initial={{ opacity: 0 }}
+    initial={isMounted ? { opacity: 0 } : false}
     animate={{ opacity: 1 }}
     exit={{ opacity: 0 }}
     transition={{ duration: 0.35 }}
@@ -468,7 +468,7 @@ export const HeroSection = () => {
                   style={{ aspectRatio: "16/10" }}
                 >
                   <AnimatePresence mode="wait">
-                    <CurrentScreen key={currentScreen} />
+                    <CurrentScreen key={currentScreen} isMounted={isMounted} />
                   </AnimatePresence>
                 </div>
               </div>
