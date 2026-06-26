@@ -9,6 +9,8 @@ import { useIsMobile } from "@/hooks/use-mobile";
 
 const SIDEBAR_EXPANDED  = 240;
 const SIDEBAR_COLLAPSED = 64;
+// Mobile drawer: clamp to 85% of viewport, max 300px
+const MOBILE_DRAWER_WIDTH = "min(85vw, 300px)";
 
 export const DashboardLayout = () => {
   const { sidebarCollapsed, setSidebarCollapsed } = useAppStore();
@@ -43,16 +45,16 @@ export const DashboardLayout = () => {
               exit={{ opacity: 0 }}
               transition={{ duration: 0.2 }}
               onClick={() => setMobileOpen(false)}
-              className="fixed inset-0 bg-black/60 z-40"
+              className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40"
             />
             <motion.div
               key="drawer"
-              initial={{ x: -SIDEBAR_EXPANDED }}
+              initial={{ x: "-100%" }}
               animate={{ x: 0 }}
-              exit={{ x: -SIDEBAR_EXPANDED }}
+              exit={{ x: "-100%" }}
               transition={{ duration: 0.25, ease: "easeInOut" }}
-              className="fixed left-0 top-0 bottom-0 z-50"
-              style={{ width: SIDEBAR_EXPANDED }}
+              className="fixed left-0 top-0 bottom-0 z-50 shadow-2xl"
+              style={{ width: MOBILE_DRAWER_WIDTH }}
             >
               <DashboardSidebar
                 collapsed={false}
