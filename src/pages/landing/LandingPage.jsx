@@ -77,9 +77,13 @@ export const LandingPage = () => {
             content="Kraviq is a trading business operating system for retail traders. Run your ledger, backtest strategies, calculate risk, sync your MT4/MT5 EA, and score your trading performance — in one platform."
           />
           <meta name="robots" content="index, follow" />
-          <script type="application/ld+json">{faqSchema}</script>
         </Helmet>
       )}
+      {/* FAQPage schema rendered outside the mount guard so it is present in
+          the SSG HTML. <script> tags are not React-hoisted to <head> — they
+          stay inline in the body, which is fine: crawlers parse JSON-LD
+          anywhere in the document. dangerouslySetInnerHTML prevents escaping. */}
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: faqSchema }} />
 
       <div className="min-h-screen bg-background text-foreground antialiased overflow-x-hidden">
         {/* Skip to main content (accessibility) */}

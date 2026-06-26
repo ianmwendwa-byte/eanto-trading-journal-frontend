@@ -128,11 +128,10 @@
     </script>
 
     <!--
-      FAQPage schema intentionally lives in LandingPage.jsx (via Helmet), not
-      here. Google's structured data guidelines require FAQ markup to match
-      Q&A content actually visible on that exact page — putting it in this
-      shared template would duplicate it onto every page (blog posts, /about,
-      /features/*) regardless of whether that page has an FAQ section at all.
+      FAQPage schema lives in LandingPage.jsx, rendered via dangerouslySetInnerHTML
+      outside the mounted guard so it is present in the SSG HTML. It must not
+      live here because this template is shared across all 46 pages — putting
+      the homepage FAQ schema here would duplicate it onto every page.
     -->
 
   </head>

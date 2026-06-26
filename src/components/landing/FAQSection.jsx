@@ -58,7 +58,7 @@ export const FAQSection = () => {
     >
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="text-center mb-14">
+        <div key={isMounted ? "m" : "s"} className="text-center mb-14">
           <motion.p
             initial={isMounted ? { opacity: 0, y: 12 } : false}
             whileInView={{ opacity: 1, y: 0 }}
@@ -82,6 +82,7 @@ export const FAQSection = () => {
 
         {/* FAQ list */}
         <motion.div
+          key={isMounted ? "list-m" : "list-s"}
           initial={isMounted ? { opacity: 0, y: 16 } : false}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}

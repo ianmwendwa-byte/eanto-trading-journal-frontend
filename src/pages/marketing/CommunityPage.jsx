@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
 import {
   Users, MessageCircle, TrendingUp, Zap,
   BookOpen, Shield, ArrowRight,
@@ -67,6 +68,16 @@ export const CommunityPage = () => {
   const isMounted = useIsMounted();
   return (
   <PageLayout title="Community">
+    <Helmet>
+      <title>Kraviq Community — Trade Alongside 1,000+ Serious Traders</title>
+      <meta name="description" content="Join the Kraviq Discord community. Live trade reviews, prop firm knowledge base, accountability groups, and early feature access. Free to join." />
+      <link rel="canonical" href="https://kraviq.app/community" />
+      <meta property="og:title" content="Kraviq Community — Trade Alongside 1,000+ Serious Traders" />
+      <meta property="og:description" content="Join the Kraviq Discord community. Live trade reviews, prop firm knowledge base, accountability groups, and early feature access. Free to join." />
+      <meta property="og:url" content="https://kraviq.app/community" />
+      <meta name="twitter:title" content="Kraviq Community — Trade Alongside 1,000+ Serious Traders" />
+      <meta name="twitter:description" content="Join the Kraviq Discord community. Live trade reviews, prop firm knowledge base, accountability groups, and early feature access. Free to join." />
+    </Helmet>
 
     {/* ── Hero ──────────────────────────────────────────────────────────── */}
     <section className="relative pt-32 pb-20 overflow-hidden">

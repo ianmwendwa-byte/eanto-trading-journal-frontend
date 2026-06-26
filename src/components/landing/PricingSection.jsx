@@ -103,7 +103,7 @@ export const PricingSection = () => {
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="text-center mb-12">
+        <div key={isMounted ? "m" : "s"} className="text-center mb-12">
           <motion.p
             initial={isMounted ? { opacity: 0, y: 12 } : false}
             whileInView={{ opacity: 1, y: 0 }}
@@ -173,6 +173,7 @@ export const PricingSection = () => {
 
         {/* Pricing cards */}
         <motion.div
+          key={isMounted ? "cards-m" : "cards-s"}
           variants={container}
           initial="initial"
           whileInView="whileInView"
@@ -266,6 +267,7 @@ export const PricingSection = () => {
 
         {/* Footnote */}
         <motion.p
+          key={isMounted ? "foot-m" : "foot-s"}
           initial={isMounted ? { opacity: 0 } : false}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}

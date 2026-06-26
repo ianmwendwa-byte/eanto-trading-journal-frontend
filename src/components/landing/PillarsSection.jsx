@@ -81,7 +81,7 @@ export const PillarsSection = () => {
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="text-center mb-16">
+        <div key={isMounted ? "m" : "s"} className="text-center mb-16">
           <motion.p
             initial={isMounted ? { opacity: 0, y: 12 } : false}
             whileInView={{ opacity: 1, y: 0 }}
@@ -115,6 +115,7 @@ export const PillarsSection = () => {
 
         {/* Pillar cards */}
         <motion.div
+          key={isMounted ? "cards-m" : "cards-s"}
           variants={container}
           initial="initial"
           whileInView="whileInView"

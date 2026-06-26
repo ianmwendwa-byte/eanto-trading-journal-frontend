@@ -21,7 +21,7 @@ export const FinalCTASection = () => {
         aria-hidden="true"
       />
 
-      <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <div key={isMounted ? "m" : "s"} className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         <motion.p
           initial={isMounted ? { opacity: 0, y: 12 } : false}
           whileInView={{ opacity: 1, y: 0 }}

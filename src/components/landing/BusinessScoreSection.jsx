@@ -121,6 +121,7 @@ export const BusinessScoreSection = () => {
 
           {/* Left — Score visual */}
           <motion.div
+            key={isMounted ? "left-m" : "left-s"}
             initial={isMounted ? { opacity: 0, x: -40 } : false}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
@@ -148,6 +149,7 @@ export const BusinessScoreSection = () => {
 
           {/* Right — Content */}
           <motion.div
+            key={isMounted ? "right-m" : "right-s"}
             initial={isMounted ? { opacity: 0, x: 40 } : false}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}

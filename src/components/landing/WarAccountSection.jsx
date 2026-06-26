@@ -89,6 +89,7 @@ export const WarAccountSection = () => {
         <div className="grid md:grid-cols-2 gap-16 items-center">
           {/* Content */}
           <motion.div
+            key={isMounted ? "content-m" : "content-s"}
             initial={isMounted ? { opacity: 0, x: -60 } : false}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
@@ -133,6 +134,7 @@ export const WarAccountSection = () => {
 
           {/* Mockup */}
           <motion.div
+            key={isMounted ? "mockup-m" : "mockup-s"}
             initial={isMounted ? { opacity: 0, x: 60 } : false}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}

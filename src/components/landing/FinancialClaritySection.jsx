@@ -6,10 +6,9 @@ import { useIsMounted } from "@/hooks/useIsMounted";
 // ── Node ─────────────────────────────────────────────────────────────────────
 // Uses border + bg to highlight — no scale() transforms that bleed outside layout box
 
-const FlowNode = ({ icon: Icon, label, value, highlight, delay }) => {
-  const isMounted = useIsMounted();
-  return (
+const FlowNode = ({ icon: Icon, label, value, highlight, delay, isMounted }) => (
   <motion.div
+    key={`fn-${delay}-${isMounted}`}
     initial={isMounted ? { opacity: 0, y: 20 } : false}
     whileInView={{ opacity: 1, y: 0 }}
     viewport={{ once: true }}
@@ -57,16 +56,14 @@ const FlowNode = ({ icon: Icon, label, value, highlight, delay }) => {
       </p>
     )}
   </motion.div>
-  );
-};
+);
 
 // ── Arrow connector ───────────────────────────────────────────────────────────
 // Sits in its own auto-width grid column — never overlaps nodes
 
-const FlowArrow = ({ label, costs, delay }) => {
-  const isMounted = useIsMounted();
-  return (
+const FlowArrow = ({ label, costs, delay, isMounted }) => (
   <motion.div
+    key={`fa-${delay}-${isMounted}`}
     initial={isMounted ? { opacity: 0 } : false}
     whileInView={{ opacity: 1 }}
     viewport={{ once: true }}
@@ -102,8 +99,7 @@ const FlowArrow = ({ label, costs, delay }) => {
       </svg>
     </div>
   </motion.div>
-  );
-};
+);
 
 // ── Mobile step card ──────────────────────────────────────────────────────────
 
@@ -193,7 +189,7 @@ export const FinancialClaritySection = () => {
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
 
         {/* Header */}
-        <div className="text-center mb-16">
+        <div key={isMounted ? "m" : "s"} className="text-center mb-16">
           <motion.p
             initial={isMounted ? { opacity: 0, y: 12 } : false}
             whileInView={{ opacity: 1, y: 0 }}
@@ -249,19 +245,22 @@ export const FinancialClaritySection = () => {
               value="$10,000"
               highlight={false}
               delay={0}
+              isMounted={isMounted}
             />
-            <FlowArrow label="trading" delay={0.1} />
+            <FlowArrow label="trading" delay={0.1} isMounted={isMounted} />
             <FlowNode
               icon={TrendingUp}
               label="Gross P&L"
               value="+$2,400"
               highlight={false}
               delay={0.2}
+              isMounted={isMounted}
             />
             <FlowArrow
               label="costs deducted"
               costs={["commission −$82", "swap −$12", "prop fee −$256"]}
               delay={0.3}
+              isMounted={isMounted}
             />
             <FlowNode
               icon={Calculator}
@@ -269,19 +268,22 @@ export const FinancialClaritySection = () => {
               value="+$2,050"
               highlight={false}
               delay={0.4}
+              isMounted={isMounted}
             />
-            <FlowArrow label="withdrawals" delay={0.5} />
+            <FlowArrow label="withdrawals" delay={0.5} isMounted={isMounted} />
             <FlowNode
               icon={Star}
               label="True Net P&L"
               value="+$1,800"
               highlight={true}
               delay={0.6}
+              isMounted={isMounted}
             />
           </div>
 
           {/* ── Mobile: vertical stack ── */}
           <motion.div
+            key={isMounted ? "mob-m" : "mob-s"}
             className="flex md:hidden flex-col items-center w-full gap-0"
             initial={isMounted ? { opacity: 0 } : false}
             whileInView={{ opacity: 1 }}
@@ -325,6 +327,7 @@ export const FinancialClaritySection = () => {
 
         {/* Caption */}
         <motion.p
+          key={isMounted ? "cap-m" : "cap-s"}
           initial={isMounted ? { opacity: 0, y: 12 } : false}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}

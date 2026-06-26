@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Helmet } from "react-helmet-async";
 import { Mail, MessageSquare, Clock, ArrowRight, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -170,6 +171,16 @@ export const ContactPage = () => {
   const isMounted = useIsMounted();
   return (
   <PageLayout title="Contact">
+    <Helmet>
+      <title>Contact Kraviq — Support, Billing &amp; Feedback</title>
+      <meta name="description" content="Get in touch with the Kraviq team. We reply within 24 hours on business days. Reach support, billing, or send feature ideas and feedback." />
+      <link rel="canonical" href="https://kraviq.app/contact" />
+      <meta property="og:title" content="Contact Kraviq — Support, Billing & Feedback" />
+      <meta property="og:description" content="Get in touch with the Kraviq team. We reply within 24 hours on business days. Reach support, billing, or send feature ideas and feedback." />
+      <meta property="og:url" content="https://kraviq.app/contact" />
+      <meta name="twitter:title" content="Contact Kraviq — Support, Billing & Feedback" />
+      <meta name="twitter:description" content="Get in touch with the Kraviq team. We reply within 24 hours on business days. Reach support, billing, or send feature ideas and feedback." />
+    </Helmet>
 
     {/* Header */}
     <section className="relative pt-32 pb-16 overflow-hidden">

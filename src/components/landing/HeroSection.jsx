@@ -325,6 +325,7 @@ export const HeroSection = () => {
 
           {/* ── Left content ─────────────────────────────────────────────── */}
           <motion.div
+            key={isMounted ? "lc-m" : "lc-s"}
             variants={stagger}
             initial="initial"
             animate="animate"
@@ -414,6 +415,7 @@ export const HeroSection = () => {
 
           {/* ── Right mockup ─────────────────────────────────────────────── */}
           <motion.div
+            key={isMounted ? "rm-m" : "rm-s"}
             initial={isMounted ? { opacity: 0, x: 40 } : false}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6, ease: "easeOut", delay: 0.3 }}

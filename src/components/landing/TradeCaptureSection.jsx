@@ -145,7 +145,7 @@ export const TradeCaptureSection = () => {
     >
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="text-center mb-20">
+        <div key={isMounted ? "m" : "s"} className="text-center mb-20">
           <motion.p
             initial={isMounted ? { opacity: 0, y: 12 } : false}
             whileInView={{ opacity: 1, y: 0 }}
@@ -198,7 +198,7 @@ export const TradeCaptureSection = () => {
               const Icon = step.icon;
               return (
                 <motion.div
-                  key={step.num}
+                  key={`${step.num}-${isMounted}`}
                   initial={isMounted ? { opacity: 0, x: -24 } : false}
                   whileInView={{ opacity: 1, x: 0 }}
                   viewport={{ once: true }}

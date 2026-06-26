@@ -195,7 +195,7 @@ export const AccountManagementSection = () => {
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="text-center mb-20">
+        <div key={isMounted ? "m" : "s"} className="text-center mb-20">
           <motion.p
             initial={isMounted ? { opacity: 0, y: 12 } : false}
             whileInView={{ opacity: 1, y: 0 }}
@@ -244,6 +244,7 @@ export const AccountManagementSection = () => {
               >
                 {/* Content */}
                 <motion.div
+                  key={isMounted ? "content-m" : "content-s"}
                   {...reveal(contentSide, isMounted)}
                   viewport={{ once: true }}
                 >
@@ -276,6 +277,7 @@ export const AccountManagementSection = () => {
 
                 {/* Mockup */}
                 <motion.div
+                  key={isMounted ? "mockup-m" : "mockup-s"}
                   {...reveal(mockupSide, isMounted)}
                   viewport={{ once: true }}
                   className="flex justify-center"

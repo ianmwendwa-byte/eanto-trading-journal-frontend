@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
 import { Swords, Shield, TrendingUp, Zap, ArrowRight, Check, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PageLayout } from "@/components/landing/PageLayout";
@@ -81,6 +82,16 @@ export const WarPage = () => {
   const isMounted = useIsMounted();
   return (
   <PageLayout title="War Account">
+    <Helmet>
+      <title>War Account — Strategy Testing Sandbox | Kraviq</title>
+      <meta name="description" content="Test aggressive forex strategies in isolation. Full margin, news trading, and scalping allowed. Your real performance metrics and Business Score stay untouched." />
+      <link rel="canonical" href="https://kraviq.app/war-account" />
+      <meta property="og:title" content="War Account — Strategy Testing Sandbox | Kraviq" />
+      <meta property="og:description" content="Test aggressive forex strategies in isolation. Full margin, news trading, and scalping allowed. Your real performance metrics and Business Score stay untouched." />
+      <meta property="og:url" content="https://kraviq.app/war-account" />
+      <meta name="twitter:title" content="War Account — Strategy Testing Sandbox | Kraviq" />
+      <meta name="twitter:description" content="Test aggressive forex strategies in isolation. Full margin, news trading, and scalping allowed. Your real performance metrics and Business Score stay untouched." />
+    </Helmet>
 
     {/* ── Hero ──────────────────────────────────────────────────────────── */}
     <section className="relative pt-32 pb-20 overflow-hidden">

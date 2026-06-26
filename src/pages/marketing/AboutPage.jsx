@@ -99,6 +99,21 @@ const FOUNDER_PARAGRAPHS = [
   "Kraviq exists so the next trader doesn't have to guess.",
 ];
 
+const PERSON_SCHEMA = JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "Person",
+  name: "Ian Mwendwa",
+  jobTitle: "Founder",
+  worksFor: {
+    "@type": "Organization",
+    name: "Kraviq",
+    url: "https://kraviq.app",
+  },
+  url: "https://kraviq.app/about",
+  description:
+    "Software engineer and retail forex trader. Founder of Kraviq, a trading business operating system for retail traders.",
+});
+
 export const AboutPage = () => {
   const isMounted = useIsMounted();
   return (
@@ -116,6 +131,7 @@ export const AboutPage = () => {
         content="Kraviq is a business operating system for retail traders, built by Ian Mwendwa. Journal your trades, track your ledger, backtest strategies, run risk calculators, and use the same institutional-grade tools prop desks already have."
       />
       <meta property="og:url" content="https://kraviq.app/about" />
+      <script type="application/ld+json">{PERSON_SCHEMA}</script>
     </Helmet>
 
     {/* ── Header ────────────────────────────────────────────────────────── */}
@@ -128,7 +144,7 @@ export const AboutPage = () => {
         }}
         aria-hidden="true"
       />
-      <div className="relative max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <div key={isMounted ? "hero-m" : "hero-s"} className="relative max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         <motion.h1
           {...reveal(0, isMounted)}
           className="font-heading font-bold text-5xl md:text-6xl text-foreground leading-tight mb-6"
@@ -147,7 +163,7 @@ export const AboutPage = () => {
     {/* ── Mission / Vision ─────────────────────────────────────────────── */}
     <section className="py-24 border-t border-border">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid md:grid-cols-2 gap-8">
+        <div key={isMounted ? "mv-m" : "mv-s"} className="grid md:grid-cols-2 gap-8">
           <motion.div {...reveal(0, isMounted)}>
             <p className="font-mono text-[11px] uppercase tracking-widest text-muted-foreground mb-3 pb-2 border-b border-border">
               Mission
@@ -174,7 +190,7 @@ export const AboutPage = () => {
 
     {/* ── What Kraviq does ─────────────────────────────────────────────── */}
     <section className="py-24 border-t border-border">
-      <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div key={isMounted ? "what-m" : "what-s"} className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.h2
           {...reveal(0, isMounted)}
           className="font-heading font-bold text-3xl md:text-4xl text-foreground mb-8"
@@ -210,7 +226,7 @@ export const AboutPage = () => {
     {/* ── Brand Pillars ────────────────────────────────────────────────── */}
     <section className="py-24 border-t border-border">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid sm:grid-cols-3 gap-3">
+        <div key={isMounted ? "pillars-m" : "pillars-s"} className="grid sm:grid-cols-3 gap-3">
           {PILLARS.map((pillar, i) => (
             <motion.div
               key={pillar.title}
@@ -238,7 +254,7 @@ export const AboutPage = () => {
 
     {/* ── Core Values ──────────────────────────────────────────────────── */}
     <section className="py-24 border-t border-border">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div key={isMounted ? "values-m" : "values-s"} className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.h2
           {...reveal(0, isMounted)}
           className="font-heading font-bold text-3xl md:text-4xl text-foreground mb-12 text-center"
@@ -268,7 +284,7 @@ export const AboutPage = () => {
 
     {/* ── Founder ───────────────────────────────────────────────────────── */}
     <section className="py-24 border-t border-border">
-      <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div key={isMounted ? "founder-m" : "founder-s"} className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.h2
           {...reveal(0, isMounted)}
           className="font-heading font-bold text-3xl md:text-4xl text-foreground mb-8"
@@ -287,7 +303,7 @@ export const AboutPage = () => {
 
     {/* ── Closing CTA ───────────────────────────────────────────────────── */}
     <section className="py-24 border-t border-border">
-      <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <div key={isMounted ? "cta-m" : "cta-s"} className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         <motion.div {...reveal(0, isMounted)}>
           <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="inline-block">
             <Button size="lg" asChild className="gap-2">
