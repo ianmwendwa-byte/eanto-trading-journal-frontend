@@ -44,6 +44,59 @@ export default defineConfig(({ mode }) => {
     },
     build: {
       outDir: "dist",
+      chunkSizeWarningLimit: 600,
+      rollupOptions: {
+        output: {
+          manualChunks: (id) => {
+            if (id.includes("node_modules/react/") ||
+                id.includes("node_modules/react-dom/") ||
+                id.includes("node_modules/react-router")) {
+              return "vendor-react";
+            }
+            if (id.includes("node_modules/framer-motion")) {
+              return "vendor-motion";
+            }
+            if (id.includes("node_modules/firebase") ||
+                id.includes("node_modules/@firebase")) {
+              return "vendor-firebase";
+            }
+            if (id.includes("node_modules/@tanstack")) {
+              return "vendor-query";
+            }
+            if (id.includes("node_modules/radix-ui") ||
+                id.includes("node_modules/@radix-ui")) {
+              return "vendor-radix";
+            }
+            if (id.includes("node_modules/recharts")) {
+              return "vendor-charts";
+            }
+            if (id.includes("node_modules/lightweight-charts")) {
+              return "vendor-tv-charts";
+            }
+            if (id.includes("node_modules/lucide-react")) {
+              return "vendor-icons";
+            }
+            if (id.includes("node_modules/zustand")) {
+              return "vendor-state";
+            }
+            if (id.includes("node_modules/axios")) {
+              return "vendor-http";
+            }
+            if (id.includes("node_modules/zod")) {
+              return "vendor-validation";
+            }
+            if (id.includes("node_modules/@dnd-kit")) {
+              return "vendor-dnd";
+            }
+            if (id.includes("node_modules/date-fns")) {
+              return "vendor-dates";
+            }
+            if (id.includes("node_modules")) {
+              return "vendor-misc";
+            }
+          },
+        },
+      },
     },
     test: {
       globals: true,

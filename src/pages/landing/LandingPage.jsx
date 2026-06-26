@@ -46,6 +46,14 @@ export const LandingPage = () => {
     setMounted(true);
   }, []);
 
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      import("@/pages/auth/Register");
+      import("@/pages/auth/Login");
+    }, 2000);
+    return () => clearTimeout(timer);
+  }, []);
+
   // SoftwareApplication + Organization schemas already live sitewide in
   // index.html (every page is part of the same app/brand, so that's valid
   // everywhere). FAQPage schema is NOT sitewide-valid — it must only appear

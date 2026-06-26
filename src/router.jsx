@@ -5,47 +5,39 @@ import { DashboardLayout } from "@/components/layouts/DashboardLayout";
 import { ScrollToTop } from "@/components/shared/ScrollToTop";
 import { useAuthStore } from "@/store/useAuthStore";
 
-// Landing page
-import { LandingPage }    from "@/pages/landing/LandingPage";
+// Public pages — lazy loaded so each route becomes its own chunk
+const LandingPage         = lazy(() => import("@/pages/landing/LandingPage").then(m => ({ default: m.LandingPage })));
 
-// Legal pages
-import { DataPolicy as PrivacyPolicy } from "@/pages/legal/DataPolicy";
-import { TermsOfService }              from "@/pages/legal/TermsOfService";
-import { TrackingPolicy }              from "@/pages/legal/TrackingPolicy";
+const PrivacyPolicy       = lazy(() => import("@/pages/legal/DataPolicy").then(m => ({ default: m.DataPolicy })));
+const TermsOfService      = lazy(() => import("@/pages/legal/TermsOfService").then(m => ({ default: m.TermsOfService })));
+const TrackingPolicy      = lazy(() => import("@/pages/legal/TrackingPolicy").then(m => ({ default: m.TrackingPolicy })));
 
-// Marketing pages
-import { AboutPage }     from "@/pages/marketing/AboutPage";
-import { ContactPage }   from "@/pages/marketing/ContactPage";
-import { CommunityPage } from "@/pages/marketing/CommunityPage";
+const AboutPage           = lazy(() => import("@/pages/marketing/AboutPage").then(m => ({ default: m.AboutPage })));
+const ContactPage         = lazy(() => import("@/pages/marketing/ContactPage").then(m => ({ default: m.ContactPage })));
+const CommunityPage       = lazy(() => import("@/pages/marketing/CommunityPage").then(m => ({ default: m.CommunityPage })));
 
-// Blog pages
-import { BlogIndexPage }    from "@/pages/blog/BlogIndexPage";
-import { BlogPostPage }     from "@/pages/blog/BlogPostPage";
-import { BlogCategoryPage } from "@/pages/blog/BlogCategoryPage";
+const BlogIndexPage       = lazy(() => import("@/pages/blog/BlogIndexPage").then(m => ({ default: m.BlogIndexPage })));
+const BlogPostPage        = lazy(() => import("@/pages/blog/BlogPostPage").then(m => ({ default: m.BlogPostPage })));
+const BlogCategoryPage    = lazy(() => import("@/pages/blog/BlogCategoryPage").then(m => ({ default: m.BlogCategoryPage })));
 
-// Feature pages
-import { WarPage }      from "@/pages/marketing/WarPage";
-import { EASyncPage }   from "@/pages/marketing/EASyncPage";
-import { ScorePage }    from "@/pages/marketing/ScorePage";
+const WarPage             = lazy(() => import("@/pages/marketing/WarPage").then(m => ({ default: m.WarPage })));
+const EASyncPage          = lazy(() => import("@/pages/marketing/EASyncPage").then(m => ({ default: m.EASyncPage })));
+const ScorePage           = lazy(() => import("@/pages/marketing/ScorePage").then(m => ({ default: m.ScorePage })));
 
-// New deep feature pages
-import { TradeTrackingPage }       from "@/pages/features/TradeTrackingPage";
-import { FinancialLedgerPage }     from "@/pages/features/FinancialLedgerPage";
-import { PropFirmCompliancePage }  from "@/pages/features/PropFirmCompliancePage";
-import { RiskCalculatorsPage }     from "@/pages/features/RiskCalculatorsPage";
-import { BacktestingPage }         from "@/pages/features/BacktestingPage";
-import { StrategyPage }            from "@/pages/features/StrategyPage";
+const TradeTrackingPage      = lazy(() => import("@/pages/features/TradeTrackingPage").then(m => ({ default: m.TradeTrackingPage })));
+const FinancialLedgerPage    = lazy(() => import("@/pages/features/FinancialLedgerPage").then(m => ({ default: m.FinancialLedgerPage })));
+const PropFirmCompliancePage = lazy(() => import("@/pages/features/PropFirmCompliancePage").then(m => ({ default: m.PropFirmCompliancePage })));
+const RiskCalculatorsPage    = lazy(() => import("@/pages/features/RiskCalculatorsPage").then(m => ({ default: m.RiskCalculatorsPage })));
+const BacktestingPage        = lazy(() => import("@/pages/features/BacktestingPage").then(m => ({ default: m.BacktestingPage })));
+const StrategyPage           = lazy(() => import("@/pages/features/StrategyPage").then(m => ({ default: m.StrategyPage })));
 
+const Login           = lazy(() => import("@/pages/auth/Login").then(m => ({ default: m.Login })));
+const Register        = lazy(() => import("@/pages/auth/Register").then(m => ({ default: m.Register })));
+const ForgotPassword  = lazy(() => import("@/pages/auth/ForgotPassword").then(m => ({ default: m.ForgotPassword })));
+const VerifyEmailPage = lazy(() => import("@/pages/auth/VerifyEmailPage").then(m => ({ default: m.VerifyEmailPage })));
+const AuthActionPage  = lazy(() => import("@/pages/auth/AuthActionPage").then(m => ({ default: m.AuthActionPage })));
 
-// Auth pages
-import { Login }            from "@/pages/auth/Login";
-import { Register }         from "@/pages/auth/Register";
-import { ForgotPassword }   from "@/pages/auth/ForgotPassword";
-import { VerifyEmailPage }  from "@/pages/auth/VerifyEmailPage";
-import { AuthActionPage }   from "@/pages/auth/AuthActionPage";
-
-// Onboarding
-import { Onboarding } from "@/pages/onboarding/Onboarding";
+const Onboarding = lazy(() => import("@/pages/onboarding/Onboarding").then(m => ({ default: m.Onboarding })));
 
 // App pages — lazy loaded to reduce initial bundle for public visitors
 const Dashboard      = lazy(() => import("@/pages/app/Dashboard").then(m => ({ default: m.Dashboard })));
@@ -102,11 +94,15 @@ const AppRoot = () => (
   </ProtectedRoute>
 );
 
-// Root layout — renders ScrollToTop on every route change then the matched page
+// Root layout — renders ScrollToTop on every route change then the matched page.
+// Suspense here catches lazy-loaded public/auth pages; the inner Suspense on
+// app routes overrides this for dashboard pages (shows AppPageFallback instead).
 const Root = () => (
   <>
     <ScrollToTop />
-    <Outlet />
+    <Suspense fallback={null}>
+      <Outlet />
+    </Suspense>
   </>
 );
 
